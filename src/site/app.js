@@ -202,9 +202,9 @@ const P = {};
 P.home = () => ({ title:"Nerdy Pixels Academy | Digital skills for Africa's emerging workforce", html:`
 <section class="hero"><div class="wrap hero-grid">
 <div class="stack" style="gap:22px"><span class="eyebrow">Nerdy Pixels Academy</span>
-<h1>Practical digital marketing training for Africa's emerging workforce.</h1>
+<h1>Practical digital marketing training <span class="accent">for Africa's emerging workforce.</span></h1>
 <p class="lead">Learn the skills companies are hiring for, from marketers who do the work every day. Earn recognised certifications, build a portfolio, and pay from anywhere in Africa.</p>
-<div class="row"><a class="btn" href="#/courses/digital-marketing">Explore the bootcamp</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div></div>
+<div class="row"><a class="btn green" href="#/courses/digital-marketing">Explore the bootcamp →</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div></div>
 ${priceCard()}
 </div></section>
 <section class="section"><div class="wrap stack" style="gap:28px">
@@ -212,7 +212,7 @@ ${priceCard()}
 <div class="grid g4">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div class="card"><div style="font-size:28px;font-weight:800;color:var(--ink)">${s[0]}</div><div class="muted">${s[1]}</div></div>`).join("")}</div>
 </div></section>
 <section class="section tint"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2>
-<div class="grid g4">${PERSONAS.map(p=>`<div class="card stack" style="gap:8px"><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div>
+<div class="grid g4">${PERSONAS.map((p,i)=>`<div class="card stack persona" style="gap:8px"><span class="nbadge">${i+1}</span><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div>
 <div><a class="btn" href="#/courses/digital-marketing">Find out if it's right for you</a></div></div></section>
 <section class="section"><div class="wrap stack" style="gap:28px"><div class="row" style="justify-content:space-between;align-items:flex-end"><h2>More programmes</h2><a href="#/courses" style="font-weight:600">All courses</a></div>
 <div class="grid g3">${COURSES.slice(0,3).map(c=>`<div class="card stack" style="gap:10px"><span class="pill">${c.weeks}</span><h3>${c.name}</h3><p class="muted">${c.text}</p><a href="#/waitlist/${c.slug}" style="font-weight:600;margin-top:auto">Join the waitlist</a></div>`).join("")}</div></div></section>
@@ -236,13 +236,13 @@ P.bootcamp = () => { const open = earlyOpen(); return { title:"Digital Marketing
 <nav class="subnav" aria-label="On this page"><div class="wrap"><b>Digital Marketing Bootcamp</b>${[["overview","Overview"],["curriculum","Curriculum"],["certifications","Certifications"],["pricing","Pricing"],["event","Free event"],["faq","FAQ"]].map(a=>`<a href="#/courses/digital-marketing?s=${a[0]}">${a[1]}</a>`).join("")}</div></nav>
 <section class="hero" id="overview"><div class="wrap hero-grid">
 <div class="stack" style="gap:22px"><span class="eyebrow">Professional Digital Marketing Bootcamp. The next cohort starts ${COHORT_START}</span>
-<h1>Become a job-ready digital marketer, with five certifications and a portfolio of real work.</h1>
+<h1>Become a job-ready digital marketer. <span class="accent">Certified, with a portfolio to prove it.</span></h1>
 <p class="lead">Eight practical modules taught live by working marketers. Every module ends with a portfolio piece, and you finish with a live project for a real brand.</p>
-<div class="row"><a class="btn" href="#/checkout${open?"?plan=early":""}">Enrol in the next cohort</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div>
+<div class="row"><a class="btn green" href="#/checkout${open?"?plan=early":""}">Enrol in the next cohort →</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div>
 <ul class="list row" style="flex-direction:row;gap:20px">${check("Live classes Thursday to Sunday")}${check("Pay from anywhere in Africa")}${check("Monthly plan available")}</ul></div>
 ${priceCard()}</div></section>
 <section class="stats wrap" aria-label="At a glance" style="padding:0">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div><b>${s[0]}</b><span class="muted small">${s[1]}</span></div>`).join("")}</section>
-<section class="section"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2><div class="grid g4">${PERSONAS.map(p=>`<div class="card stack" style="gap:8px"><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div></div></section>
+<section class="section"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2><div class="grid g4">${PERSONAS.map((p,i)=>`<div class="card stack persona" style="gap:8px"><span class="nbadge">${i+1}</span><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div></div></section>
 <section class="section tint" id="curriculum"><div class="wrap stack" style="gap:24px">
 <div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>What you'll learn, and what you'll build</h2><p class="lead">One module a week. Monday to Wednesday is self-paced certification work; Thursday to Sunday is live classes and practice.</p></div><a href="#/curriculum" style="font-weight:600">See the full weekly plan</a></div>
 <div class="stack" style="gap:14px">${modulesList()}</div></div></section>
