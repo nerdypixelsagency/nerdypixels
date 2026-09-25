@@ -46,3 +46,5 @@ h2{font-weight:800;letter-spacing:-.02em}
 details.faq{border-radius:18px;border-width:2px}
 .band{border-radius:28px;background:linear-gradient(135deg,var(--soft),#EFE3FF)}
 input,select,textarea{border-radius:12px}
+.hero .price-card .list li,.hero .price-card .check{color:var(--text)}
+.hero .price-card .btn.ghost{color:var(--ink);border-color:var(--line-2)}
