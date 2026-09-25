@@ -1,0 +1,50 @@
+/* Visual identity from the Nerdy Pixels landing design, applied across the full site */
+:root{ --lav:#C9A8FF; --radius:20px; --shadow:0 30px 60px -20px rgba(46,11,99,.35); }
+h1{font-weight:800;letter-spacing:-.035em;line-height:1.02}
+h2{font-weight:800;letter-spacing:-.02em}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.btn{border-radius:999px;font-weight:700}
+.btn.green{box-shadow:0 12px 30px -10px rgba(37,211,102,.6)}
+.btn.sm{border-radius:999px}
+.btn.ghost{border-width:1.5px}
+.card{border-radius:20px;border-width:2px}
+.bar{background:var(--deeper);font-weight:500}
+.bar a{color:var(--green);text-decoration:none;font-weight:700}
+.bar a::after{content:" →"}
+.menu a.on{border-color:var(--purple);color:var(--purple-ink)}
+
+/* dark purple hero with brand orbs */
+.hero{position:relative;overflow:hidden;color:var(--on-dark);
+  background:radial-gradient(circle at 92% 8%, #4A1A9E 0 22%, transparent 22.2%),
+             radial-gradient(circle at 2% 100%, #4A1A9E 0 12%, transparent 12.2%),
+             linear-gradient(180deg,var(--deep),var(--deeper));padding:72px 0 88px}
+.hero h1,.hero h2,.hero h3{color:#fff}
+.hero h1 .accent{color:var(--lav)}
+.hero .lead{color:var(--on-dark-2)}
+.hero .eyebrow{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:8px 16px;border-radius:999px;letter-spacing:.02em;text-transform:none;font-size:14px}
+.hero .eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green)}
+.hero .btn.ghost{color:#fff;border-color:rgba(255,255,255,.3)}
+.hero .muted{color:var(--on-dark-2)}
+.hero .list li,.hero .check{color:var(--on-dark)}
+.hero .price-card{position:relative;border:0;border-radius:28px;color:var(--text);box-shadow:var(--shadow)}
+.hero .price-card h1,.hero .price-card h2,.hero .price-card h3{color:var(--ink)}
+.hero .price-card .muted{color:var(--muted)}
+.hero .price-card .btn.deep{background:var(--purple);border-radius:999px}
+.hero .hero-grid > .price-card::after{content:"";position:absolute;top:-90px;right:-10px;width:170px;height:170px;background:var(--astro) no-repeat center/contain;filter:drop-shadow(0 16px 24px rgba(0,0,0,.3));pointer-events:none}
+@media (max-width:900px){.hero .hero-grid > .price-card{margin-top:70px}}
+
+/* stats strip like the landing */
+.stats{border:0;gap:14px;margin-top:-40px;position:relative;z-index:2}
+.stats div{background:var(--deep-2);border:0!important;border-radius:18px;color:var(--on-dark)}
+.stats b{color:#fff}
+.stats .muted{color:var(--on-dark-2)}
+
+/* numbered persona cards */
+.nbadge{width:44px;height:44px;border-radius:50%;background:var(--deep);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.module .num{border-radius:50%;background:var(--purple);color:#fff}
+.plan{border-radius:28px}
+details.faq{border-radius:18px;border-width:2px}
+.band{border-radius:28px;background:linear-gradient(135deg,var(--soft),#EFE3FF)}
+input,select,textarea{border-radius:12px}
+.hero .price-card .list li,.hero .price-card .check{color:var(--text)}
+.hero .price-card .btn.ghost{color:var(--ink);border-color:var(--line-2)}
