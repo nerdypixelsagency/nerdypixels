@@ -13,13 +13,34 @@ type Payload = {
 const fail = (message: string, status = 500) =>
   Response.json({ error: { http_code: status, message } }, { status });
 
+const CONFIGURED_HOOK_URL = "https://nerdypixels.lovable.app/api/public/auth-email-hook";
+
 export const Route = createFileRoute("/api/public/auth-email-hook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const secret = process.env["SEND_EMAIL_HOOK_SECRET"];
-        if (!secret) return fail("Email hook not configured");
         const body = await request.text();
+        if (!secret) {
+          const incomingUrl = new URL(request.url);
+          const configuredUrl = new URL(CONFIGURED_HOOK_URL);
+          if (incomingUrl.hostname === configuredUrl.hostname) return fail("Email hook not configured");
+
+          const forwardedHeaders = new Headers();
+          for (const name of ["content-type", "webhook-id", "webhook-signature", "webhook-timestamp"]) {
+            const value = request.headers.get(name);
+            if (value) forwardedHeaders.set(name, value);
+          }
+          const response = await fetch(CONFIGURED_HOOK_URL, {
+            method: "POST",
+            headers: forwardedHeaders,
+            body,
+          });
+          return new Response(response.body, {
+            status: response.status,
+            headers: { "content-type": response.headers.get("content-type") ?? "application/json" },
+          });
+        }
         let p: Payload;
         try {
           const wh = new Webhook(secret.replace(/^v1,whsec_/, ""));
