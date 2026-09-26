@@ -134,9 +134,9 @@ const MOD_CERT = '<span class="pill green" style="margin-top:6px">Certification 
 function header(path){
   const on = p => (p === "/" ? path === "/" : path.startsWith(p)) ? ' class="on" aria-current="page"' : "";
   const bar = earlyOpen()
-    ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October.<a href="/checkout?plan=early">Claim your seat</a></div>`
-    : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months.<a href="/checkout">Enrol now</a></div>`;
-  return `${bar}<header class="top"><div class="wrap nav">
+    ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October. <span class="cd" data-countdown="2026-10-10T23:59:59+01:00" data-label="left"></span><a href="/checkout?plan=early">Claim your seat</a></div>`
+    : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months. <span class="cd" data-countdown="2026-11-05T09:00:00+01:00" data-label="until classes start"></span><a href="/checkout">Enrol now</a></div>`;
+  return `<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
 <a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" style="height:50px;width:auto"></a>
 <nav class="menu" aria-label="Main"><a href="/"${on("/")}>Home</a><a href="/courses"${on("/courses")}>Courses</a><a href="/blog"${on("/blog")}>Blog</a><a href="/faq"${on("/faq")}>FAQ</a><a href="/contact"${on("/contact")}>Contact Us</a></nav>
 <div class="nav-cta"><a class="btn ghost sm" href="/events/first-marketing-strategy">Free event</a><a class="btn sm" href="/checkout">Enrol now</a></div>
@@ -197,6 +197,9 @@ function formError(form, msg){
   if (!box){ box = document.createElement("p"); box.className = "err"; box.setAttribute("role","alert"); const btn = form.querySelector("[type=submit]"); btn.parentNode.insertBefore(box, btn); }
   box.textContent = msg; box.scrollIntoView({block:"center",behavior:"smooth"});
 }
+const TOPICS = ["SEO","Social media marketing","Google Ads","Meta ads","Web analytics","Content strategy","Email marketing","AI marketing tools","Brand projects","Career launch"];
+function marquee(){ const t = TOPICS.map(x=>`<span>${x}</span>`).join(""); return `<section class="marquee" aria-label="What you'll learn"><div class="marquee-track" aria-hidden="false">${t}</div><div class="marquee-track" aria-hidden="true">${t}</div></section>`; }
+function stickyEnrol(){ return `<div class="sticky-enrol"><div><b>${naira(PRICE_EARLY)}</b><span class="small"> early bird or ${naira(PRICE_MONTH)}/month</span></div><a class="btn green sm" href="/checkout">Enrol now</a></div>`; }
 /* ============ Pages ============ */
 const P = {};
 
@@ -207,7 +210,7 @@ P.home = () => ({ title:"Nerdy Pixels Academy | Digital skills for Africa's emer
 <p class="lead">Learn the skills companies are hiring for, from marketers who do the work every day. Earn recognised certifications, build a portfolio, and pay from anywhere in Africa.</p>
 <div class="row"><a class="btn green" href="/courses/digital-marketing">Explore the bootcamp →</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
 ${priceCard()}
-</div></section>
+</div></section>${marquee()}
 <section class="section"><div class="wrap stack" style="gap:28px">
 <div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>Enrolling now: Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications and live classes. The next cohort starts ${COHORT_START}.</p></div><a href="/courses/digital-marketing" style="font-weight:600">View the bootcamp</a></div>
 <div class="grid g4">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div class="card"><div style="font-size:28px;font-weight:800;color:var(--ink)">${s[0]}</div><div class="muted">${s[1]}</div></div>`).join("")}</div>
@@ -504,6 +507,8 @@ function render(){
   document.title = page.title;
   document.getElementById("app").innerHTML = header(path) + `<main id="main" tabindex="-1">${page.html}</main>` + footer();
   if (page.mount) page.mount();
+  if (/^\/courses\/digital-marketing$/.test(path)) document.getElementById("main").insertAdjacentHTML("beforeend", stickyEnrol());
+  if (window.__npaTick) window.__npaTick();
   if (/^\/(checkout|pay-instalment)/.test(path)){ const f = document.querySelector(".wa-float"); if (f) f.remove(); }
   if (q.s) setTimeout(()=>scrollToId(q.s), 30); else window.scrollTo(0, 0);
   const h1 = document.querySelector("main h1"); if (h1 && !q.s) { document.getElementById("main").focus({preventScroll:true}); }
@@ -514,6 +519,8 @@ function scrollToId(id){ const el = document.getElementById(id); if (el) el.scro
 let booted = false;
 export function boot(){
 if (booted) return; booted = true;
+const tick = () => document.querySelectorAll("[data-countdown]").forEach(el => { const ms = new Date(el.dataset.countdown) - Date.now(); if (ms <= 0){ el.textContent = ""; return; } const d = Math.floor(ms/864e5), h = Math.floor(ms%864e5/36e5), m = Math.floor(ms%36e5/6e4); el.textContent = `${d}d ${h}h ${m}m ${el.dataset.label}`; });
+tick(); setInterval(tick, 30000); window.__npaTick = tick;
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-act]"); if (!a) return;
   const act = a.dataset.act, v = a.dataset.v;
