@@ -520,11 +520,12 @@ document.addEventListener("click", e => {
   if (act === "co-method"){ c.method = v; coSave(c); coRender(); }
   if (act === "co-pay"){
     const ct = country(c.country), plan = coPlan(c), m = ct.methods.find(x=>x[0]===c.method) || ct.methods[0], amount = plan==="early"?PRICE_EARLY:PRICE_MONTH;
-    startPayment({ label: plan==="early"?"Bootcamp, early bird":"Bootcamp, November instalment", amount, cur: ct.cur, curName: ct.curName, methodLabel: m[1], hint: m[2] + ".",
-      onSuccess: ref => {
-        const order = { ref, plan, amount, cur: ct.cur, country: ct.code, methodLabel: m[1], name: c.name, first: c.name.trim().split(" ")[0], email: c.email.trim(), phone: c.phone, persona: c.persona, source: c.source, referral: c.ref };
-        save("orders", order); sset("npa-last-order", order); sessionStorage.removeItem("npa-co"); go("#/checkout/success");
-      }});
+    const btn = a; btn.disabled = true; const old = btn.innerHTML; btn.innerHTML = "Opening secure payment…";
+    const order = { plan, amount, cur: ct.cur, country: ct.code, methodLabel: m[1], method: m[0], name: c.name, first: c.name.trim().split(" ")[0], email: c.email.trim(), phone: c.phone, persona: c.persona, source: c.source, referral: c.ref };
+    save("orders", order);
+    window.__npaPay({ kind:"enrolment", plan, name:c.name, email:c.email.trim(), phone:(ct.dial||"")+" "+(c.phone||""), country:ct.code, persona:c.persona, source:c.source, referral:c.ref, method:m[0] })
+      .then(r => { sset("npa-pending-order", order); location.href = r.link; })
+      .catch(err => { btn.disabled = false; btn.innerHTML = old; toast((err && err.message) || "We couldn't start the payment. Please try again."); });
   }
 });
 document.addEventListener("change", e => {
@@ -545,15 +546,17 @@ document.addEventListener("submit", e => {
     need((d.name||"").trim(), "Enter your full name.");
     need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com.");
     const first = d.name.trim().split(" ")[0];
-    if (kind === "event"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can send your joining link."); save("events", {...d, first}); go("#/events/first-marketing-strategy/registered"); }
+    if (kind === "event"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can send your joining link."); save("events", {...d, first}); if (window.__npaEvent) window.__npaEvent({...d}).catch(()=>{}); go("#/events/first-marketing-strategy/registered"); }
     if (kind === "co-details"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can add you to your cohort's group."); need(d.agree, "Tick the box to accept the terms and payment policy.");
       const c = coState(); Object.assign(c, d, {agree:true, step:3}); coSave(c); coRender(); window.scrollTo({top:0,behavior:"smooth"}); }
     if (kind === "contact"){ need((d.message||"").trim().length >= 5, "Write a short message so we know how to help."); save("messages", {...d, first}); go("#/contact/sent"); }
     if (kind === "waitlist"){ save("waitlist", {...d, first, course:f.dataset.course}); go("#/waitlist/" + f.dataset.course + "/joined"); }
     if (kind === "instalment"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can send your receipt.");
       const ct = country(d.country); formError(f, "");
-      startPayment({ label: d.month + " instalment", amount: PRICE_MONTH, cur: ct.cur, curName: ct.curName, methodLabel: ct.methods.map(m=>m[1]).join(", "), hint: "Choose " + ct.methods.map(m=>m[1]).join(", ") + " on the secure payment screen.",
-        onSuccess: ref => { const p = {...d, first, ref}; save("instalments", p); sset("npa-last-instalment", p); go("#/pay-instalment/success"); }});
+      const btn = f.querySelector('button[type="submit"]'); if (btn){ btn.disabled = true; btn.textContent = "Opening secure payment…"; }
+      window.__npaPay({ kind:"instalment", month:d.month, name:d.name, email:d.email, phone:ct.dial+" "+d.phone, country:ct.code, referral:d.ref||"" })
+        .then(r => { sset("npa-pending-instalment", {...d, first}); location.href = r.link; })
+        .catch(err => { if (btn){ btn.disabled = false; btn.textContent = "Continue to pay ₦40,000"; } formError(f, (err && err.message) || "We couldn't start the payment. Please try again."); });
     }
   }catch(err){ if (err !== 0) throw err; }
 });
