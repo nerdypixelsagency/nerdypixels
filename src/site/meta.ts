@@ -54,7 +54,7 @@ const M: Record<string, Meta> = {
 
 export function metaFor(path: string): Meta {
   const p = path.replace(/\/+$/, "") || "/";
-  return M[p] ?? { title: "Nerdy Pixels Academy", description: M["/"].description, noindex: true };
+  return M[p] ?? { title: "Nerdy Pixels Academy", description: M["/"]!.description, noindex: true };
 }
 
 const FAQ = [
@@ -83,7 +83,7 @@ export function jsonLdFor(path: string) {
       "@context": "https://schema.org",
       "@type": "Course",
       name: "Professional Digital Marketing Bootcamp",
-      description: M["/courses/digital-marketing"].description,
+      description: M["/courses/digital-marketing"]!.description,
       provider: { "@type": "Organization", name: "Nerdy Pixels Academy", sameAs: SITE_URL },
       offers: [
         { "@type": "Offer", price: 60000, priceCurrency: "NGN", category: "Early bird, pay once" },
