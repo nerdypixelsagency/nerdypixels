@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { requestPasswordReset, requestSignup } from "@/lib/auth-actions.functions";
 import logoDark from "@/assets/logo-dark.png.asset.json";
 import "@/components/admin/admin.css";
 
@@ -24,33 +26,53 @@ function AuthPage() {
   const [ok, setOk] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const signupFn = useServerFn(requestSignup);
+  const resetFn = useServerFn(requestPasswordReset);
+
+  function friendly(msg: string) {
+    if (/rate limit/i.test(msg)) return "Too many attempts. Please wait a few minutes and try again.";
+    if (/invalid login/i.test(msg)) return "Wrong email or password.";
+    if (/not confirmed/i.test(msg)) return "Please confirm your email first — check your inbox (or use Forgot password to get a fresh link).";
+    if (/fetch|network/i.test(msg)) return "Connection problem. Check your internet and try again.";
+    return msg || "Something went wrong.";
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setErr(""); setOk(""); setBusy(true);
     try {
       if (mode === "in") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        let { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error && /fetch|network/i.test(error.message)) ({ error } = await supabase.auth.signInWithPassword({ email, password }));
         if (error) throw error;
         navigate({ to: "/admin" });
       } else {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/admin` } });
-        if (error) throw error;
-        if (data.session) navigate({ to: "/admin" });
-        else setOk("Check your email to confirm your account, then sign in.");
+        const r = await signupFn({ data: { email, password } });
+        if (!r.ok) throw new Error(r.error);
+        setOk("Check your email (from info@npdacademy.com) to confirm your account, then sign in.");
+        setMode("in");
       }
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Something went wrong.");
+      setErr(friendly(e instanceof Error ? e.message : ""));
     } finally {
-      setBusy(false);
+      setTimeout(() => setBusy(false), 1500);
     }
   }
 
   async function forgot() {
     setErr(""); setOk("");
     if (!email) { setErr("Enter your email above first."); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
-    if (error) setErr(error.message);
-    else setOk("If that account exists, a reset link is on its way.");
+    setBusy(true);
+    try {
+      const r = await resetFn({ data: { email } });
+      if (!r.ok) setErr(r.error ?? "Couldn't send the email.");
+      else setOk("If that account exists, a reset link is on its way from info@npdacademy.com.");
+    } catch (e) {
+      setErr(friendly(e instanceof Error ? e.message : ""));
+    } finally {
+      setTimeout(() => setBusy(false), 1500);
+    }
   }
 
   return (
