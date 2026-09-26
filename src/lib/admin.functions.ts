@@ -19,13 +19,16 @@ export const getEnrolments = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const role = await roleOf(context);
     if (!role) throw new Error("Forbidden");
+    const { data: m } = await context.supabase.from("app_settings").select("value").eq("key", "payment_mode").maybeSingle();
+    const mode = m?.value === "test" ? "test" : "live";
     const { data, error } = await context.supabase
       .from("enrolments")
       .select("*")
+      .eq("mode", mode)
       .order("created_at", { ascending: false })
       .limit(5000);
     if (error) throw new Error(error.message);
-    return { role, rows: data ?? [] };
+    return { role, mode, rows: data ?? [] };
   });
 
 export const updateEnrolmentStatus = createServerFn({ method: "POST" })
@@ -80,3 +83,21 @@ export const removeAdmin = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+export const getPaymentModeFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await roleOf(context))) throw new Error("Forbidden");
+    const { data } = await context.supabase.from("app_settings").select("value").eq("key", "payment_mode").maybeSingle();
+    return { mode: data?.value === "test" ? "test" : "live" };
+  });
+
+export const setPaymentMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ mode: z.enum(["live", "test"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    if ((await roleOf(context)) !== "super_admin") throw new Error("Only the super admin can switch payment mode.");
+    const { error } = await context.supabase.from("app_settings").update({ value: data.mode }).eq("key", "payment_mode");
+    if (error) throw new Error(error.message);
+    return { mode: data.mode };
+  });

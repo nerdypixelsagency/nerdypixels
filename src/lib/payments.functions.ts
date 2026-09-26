@@ -26,11 +26,12 @@ function originOf() {
 export const startPayment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => startSchema.parse(d))
   .handler(async ({ data }) => {
-    const { PRICE_EARLY, PRICE_MONTH, EARLY_END, flwCreatePayment } = await import("./payments.server");
+    const { PRICE_EARLY, PRICE_MONTH, EARLY_END, flwCreatePayment, getPaymentMode } = await import("./payments.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const plan = data.kind === "enrolment" ? (data.plan === "early" && Date.now() <= EARLY_END.getTime() ? "early" : "monthly") : "monthly";
     const amount = data.kind === "enrolment" && plan === "early" ? PRICE_EARLY : PRICE_MONTH;
     const txRef = "NPA-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+    const mode = await getPaymentMode();
     const referral = data.referral ? data.referral.toUpperCase() : null;
 
     const { error } = await supabaseAdmin.from("enrolments").insert({
@@ -47,12 +48,14 @@ export const startPayment = createServerFn({ method: "POST" })
       amount,
       payment_method: data.method ?? null,
       tx_ref: txRef,
+      mode,
     });
     if (error) {
       console.error("Insert enrolment failed", error);
       throw new Error("We couldn't start the payment. Please try again.");
     }
     const link = await flwCreatePayment({
+      mode,
       txRef,
       amount,
       email: data.email,
