@@ -104,3 +104,28 @@ export const setPaymentMode = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { mode: data.mode };
   });
+
+export const sendInstalmentReminder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ email: z.string().trim().email(), month: z.enum(["December", "January"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    if (!(await roleOf(context))) throw new Error("Forbidden");
+    const { monthlyStudents, sendReminderEmail } = await import("./reminders.server");
+    const { getPaymentMode } = await import("./payments.server");
+    const mode = await getPaymentMode();
+    const s = (await monthlyStudents(mode)).find((x) => x.email === data.email.toLowerCase());
+    if (!s) throw new Error("Student not found on the monthly plan.");
+    if (!s.unpaid.includes(data.month)) throw new Error(`${data.month} is already paid.`);
+    await sendReminderEmail(s, data.month, "manual");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("instalment_reminders").insert({ email: s.email, month: data.month, stage: "manual", mode, sent_by: context.userId });
+    return { ok: true };
+  });
+
+export const listReminders = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await roleOf(context))) throw new Error("Forbidden");
+    const { data } = await context.supabase.from("instalment_reminders").select("email, month, stage, created_at").order("created_at", { ascending: false }).limit(2000);
+    return data ?? [];
+  });

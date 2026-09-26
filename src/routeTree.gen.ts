@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
 import { Route as ApiPublicAuthEmailHookRouteImport } from './routes/api/public/auth-email-hook'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
+import { Route as ApiPublicCronInstalmentRemindersRouteImport } from './routes/api/public/cron/instalment-reminders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -91,6 +92,12 @@ const ApiPublicFlutterwaveWebhookRoute =
     path: '/api/public/flutterwave-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronInstalmentRemindersRoute =
+  ApiPublicCronInstalmentRemindersRouteImport.update({
+    id: '/api/public/cron/instalment-reminders',
+    path: '/api/public/cron/instalment-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +143,7 @@ export interface FileRoutesById {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin/'
+    | '/api/public/cron/instalment-reminders'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin'
+    | '/api/public/cron/instalment-reminders'
   id:
     | '__root__'
     | '/'
@@ -178,6 +190,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/_authenticated/admin/'
+    | '/api/public/cron/instalment-reminders'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -188,6 +201,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
+  ApiPublicCronInstalmentRemindersRoute: typeof ApiPublicCronInstalmentRemindersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -283,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlutterwaveWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/instalment-reminders': {
+      id: '/api/public/cron/instalment-reminders'
+      path: '/api/public/cron/instalment-reminders'
+      fullPath: '/api/public/cron/instalment-reminders'
+      preLoaderRoute: typeof ApiPublicCronInstalmentRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -324,6 +345,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,
+  ApiPublicCronInstalmentRemindersRoute: ApiPublicCronInstalmentRemindersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
