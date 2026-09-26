@@ -13,12 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PaymentReturnRouteImport } from './routes/payment-return'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_authenticated/admin.enrolments'
 import { Route as AuthenticatedAdminInstalmentsRouteImport } from './routes/_authenticated/admin.instalments'
 import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin.referrals'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
+import { Route as ApiPublicAuthEmailHookRouteImport } from './routes/api/public/auth-email-hook'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -38,6 +40,11 @@ const AuthRoute = AuthRouteImport.update({
 const PaymentReturnRoute = PaymentReturnRouteImport.update({
   id: '/payment-return',
   path: '/payment-return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -73,6 +80,11 @@ const AuthenticatedAdminTeamRoute = AuthenticatedAdminTeamRouteImport.update({
   path: '/team',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicAuthEmailHookRoute = ApiPublicAuthEmailHookRouteImport.update({
+  id: '/api/public/auth-email-hook',
+  path: '/api/public/auth-email-hook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicFlutterwaveWebhookRoute =
   ApiPublicFlutterwaveWebhookRouteImport.update({
     id: '/api/public/flutterwave-webhook',
@@ -84,11 +96,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
+  '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -96,10 +110,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
+  '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -109,11 +125,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/_authenticated/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
   '/_authenticated/admin/team': typeof AuthenticatedAdminTeamRoute
+  '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -123,11 +141,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/payment-return'
+    | '/reset-password'
     | '/admin'
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/referrals'
     | '/admin/team'
+    | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -135,10 +155,12 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/payment-return'
+    | '/reset-password'
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/referrals'
     | '/admin/team'
+    | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin'
   id:
@@ -147,11 +169,13 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/payment-return'
+    | '/reset-password'
     | '/_authenticated/admin'
     | '/_authenticated/admin/enrolments'
     | '/_authenticated/admin/instalments'
     | '/_authenticated/admin/referrals'
     | '/_authenticated/admin/team'
+    | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -161,6 +185,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   PaymentReturnRoute: typeof PaymentReturnRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
 }
 
@@ -192,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/payment-return'
       fullPath: '/payment-return'
       preLoaderRoute: typeof PaymentReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -235,6 +268,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/team'
       preLoaderRoute: typeof AuthenticatedAdminTeamRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/auth-email-hook': {
+      id: '/api/public/auth-email-hook'
+      path: '/api/public/auth-email-hook'
+      fullPath: '/api/public/auth-email-hook'
+      preLoaderRoute: typeof ApiPublicAuthEmailHookRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/flutterwave-webhook': {
       id: '/api/public/flutterwave-webhook'
@@ -281,6 +321,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   PaymentReturnRoute: PaymentReturnRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,
 }
 export const routeTree = rootRouteImport
