@@ -110,6 +110,51 @@ export type Database = {
         }
         Relationships: []
       }
+      instalment_reminders: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          mode: string
+          month: string
+          sent_by: string | null
+          stage: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          mode?: string
+          month: string
+          sent_by?: string | null
+          stage: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          mode?: string
+          month?: string
+          sent_by?: string | null
+          stage?: string
+        }
+        Relationships: []
+      }
+      private_settings: {
+        Row: {
+          key: string
+          value: string
+        }
+        Insert: {
+          key: string
+          value: string
+        }
+        Update: {
+          key?: string
+          value?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
