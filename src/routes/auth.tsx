@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { requestPasswordReset, requestSignup } from "@/lib/auth-actions.functions";
-import logoDark from "@/assets/logo-dark.png.asset.json";
+const logoDark = { url: "/brand/logo-dark.png" };
 import "@/components/admin/admin.css";
 
 export const Route = createFileRoute("/auth")({

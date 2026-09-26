@@ -1,7 +1,7 @@
 import { EMAIL_FROM } from "./payments.server";
 
 const SITE = "https://bootcamp.npdacademy.com";
-const LOGO = `${SITE}/__l5e/assets-v1/4719f1e2-1155-4557-9341-b6338ab2ad19/logo-dark.png`;
+const LOGO = `${SITE}/brand/logo-dark.png`;
 
 type Copy = { subject: string; heading: string; body: string; cta: string };
 

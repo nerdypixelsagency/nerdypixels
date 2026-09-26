@@ -2,7 +2,7 @@ import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo } from "react";
 import { startPayment, registerEvent } from "@/lib/payments.functions";
-import astronaut from "@/assets/astronaut.png.asset.json";
+const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
 import { renderStatic, boot, renderNow } from "./app.js";
 import "./site.css";

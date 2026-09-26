@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn, setPaymentMode } from "@/lib/admin.functions";
-import logoDark from "@/assets/logo-dark.png.asset.json";
+const logoDark = { url: "/brand/logo-dark.png" };
 import "@/components/admin/admin.css";
 
 export const Route = createFileRoute("/_authenticated/admin")({

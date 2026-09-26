@@ -1,6 +1,6 @@
 
-import logoDarkA from "@/assets/logo-dark.png.asset.json";
-import logoLightA from "@/assets/logo-light.png.asset.json";
+const logoDarkA = { url: "/brand/logo-dark.png" };
+const logoLightA = { url: "/brand/logo-light.png" };
 
 /* ============ Config ============ */
 const SITE = { phone:"2349136713644", phoneLabel:"+234 913 671 3644", email:"info@npdacademy.com" };
