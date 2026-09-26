@@ -14,16 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      enrolments: {
+        Row: {
+          amount: number
+          country: string | null
+          created_at: string
+          currency: string
+          email: string
+          email_sent_at: string | null
+          flw_transaction_id: string | null
+          id: string
+          instalment_month: string | null
+          kind: string
+          name: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          persona: string | null
+          phone: string | null
+          plan: string | null
+          referral_code: string | null
+          source: string | null
+          status: string
+          tx_ref: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          country?: string | null
+          created_at?: string
+          currency?: string
+          email: string
+          email_sent_at?: string | null
+          flw_transaction_id?: string | null
+          id?: string
+          instalment_month?: string | null
+          kind?: string
+          name: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          persona?: string | null
+          phone?: string | null
+          plan?: string | null
+          referral_code?: string | null
+          source?: string | null
+          status?: string
+          tx_ref?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          country?: string | null
+          created_at?: string
+          currency?: string
+          email?: string
+          email_sent_at?: string | null
+          flw_transaction_id?: string | null
+          id?: string
+          instalment_month?: string | null
+          kind?: string
+          name?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          persona?: string | null
+          phone?: string | null
+          plan?: string | null
+          referral_code?: string | null
+          source?: string | null
+          status?: string
+          tx_ref?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_super_admin: { Args: never; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +256,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin"],
+    },
   },
 } as const
