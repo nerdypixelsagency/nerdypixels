@@ -25,8 +25,17 @@
 - "Pay an instalment" uses the same flow for later monthly payments.
 - Test with Flutterwave's test keys first, then switch to live keys.
 
-## 5. Check it works
-- Make a test payment, confirm the record shows "paid" in Supabase and the email arrives.
+## 5. Admin dashboard
+- New private admin area at /admin with an email + password sign-in page.
+- fegokendigital@gmail.com is the super admin (only after that email is verified). Super admin can add or remove other admins.
+- Layout like your reference: side menu, summary cards at the top (total enrolments, revenue, paid vs pending, early-bird sales), a revenue-over-time chart, a "top referral codes" table, and a pie chart of who is enrolling (career switcher, graduate, etc.).
+- Enrolments page: searchable, filterable list (by plan, status, referral code, date) with CSV export.
+- Referrals page: each code with sign-ups and money collected, for working out commissions.
+- Instalments page: who has paid which month and who is due.
+- Uses your brand purple, green and Poppins, light look.
+
+## 6. Check it works
+- Make a test payment, confirm the record shows "paid" in Supabase and in the admin dashboard, and the email arrives.
 
 ## Not included this round
 - Instalment reminder emails (needs a scheduled job; can follow).
@@ -39,4 +48,5 @@
 - `src/lib/enrolments.functions.ts`: public `createServerFn` validating input with zod, inserting the row, then sending via Resend REST API using `RESEND_API_KEY` read inside the handler; email failure does not block enrolment.
 - `src/routes/index.tsx` wires the bridge from the plain JS bundle to the server function.
 - Flutterwave: server fn creates a Standard checkout (`POST /v3/payments`) with `tx_ref` = enrolment id, amount set server-side from plan (never trusted from browser), meta includes referral code; redirect back to `#/checkout?tx_ref=...`. Server route `/api/public/flutterwave-webhook` verifies the `verif-hash` header against `FLW_SECRET_HASH`, re-verifies via `GET /v3/transactions/:id/verify` (amount + currency NGN), marks row paid, then sends the Resend email. Secrets: `FLW_SECRET_KEY`, `FLW_PUBLIC_KEY`, `FLW_SECRET_HASH`.
+- Admin: `app_role` enum (`super_admin`, `admin`), `user_roles` table + `has_role` security-definer fn; trigger on auth.users grants `super_admin` to fegokendigital@gmail.com only when `email_confirmed_at` is set (insert + confirm update). Enrolments get SELECT/UPDATE policies for admins via `has_role`. Admin routes under `src/routes/_authenticated/admin/*`, `/auth` sign-in page; data via `requireSupabaseAuth` server fns with role check; `attachSupabaseAuth` added to `src/start.ts` functionMiddleware. Charts with recharts. Email sign-in must be enabled in the Supabase dashboard (external project).
 - Needed from you: Resend key, sender address/domain, WhatsApp group link, Flutterwave keys (entered via secure form).
