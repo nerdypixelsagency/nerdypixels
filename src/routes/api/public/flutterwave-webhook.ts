@@ -11,9 +11,9 @@ export const Route = createFileRoute("/api/public/flutterwave-webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env["FLW_SECRET_HASH"];
+        const secrets = [process.env["FLW_SECRET_HASH"], process.env["FLW_TEST_SECRET_HASH"]].filter(Boolean) as string[];
         const sig = request.headers.get("verif-hash") ?? "";
-        if (!secret || !sig || !same(sig, secret)) return new Response("Invalid signature", { status: 401 });
+        if (!sig || !secrets.some((s) => same(sig, s))) return new Response("Invalid signature", { status: 401 });
         const body = (await request.json().catch(() => null)) as { data?: { id?: number | string; tx_ref?: string } } | null;
         const id = body?.data?.id;
         const txRef = body?.data?.tx_ref;

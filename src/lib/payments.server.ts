@@ -8,14 +8,27 @@ export const WHATSAPP_GROUP =
   "https://wa.me/2349136713644?text=" +
   encodeURIComponent("Hello, I've enrolled in the bootcamp. Please add me to my cohort's WhatsApp group.");
 // Change once your domain is verified in Resend.
-export const EMAIL_FROM = "Nerdy Pixels Academy <onboarding@resend.dev>";
+export const EMAIL_FROM = "Nerdy Pixels Academy <info@npdacademy.com>";
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin;
 }
 
+export type PayMode = "live" | "test";
+export async function getPaymentMode(): Promise<PayMode> {
+  const db = await admin();
+  const { data } = await db.from("app_settings").select("value").eq("key", "payment_mode").maybeSingle();
+  return data?.value === "test" ? "test" : "live";
+}
+export function flwKey(mode: PayMode) {
+  const key = process.env[mode === "test" ? "FLW_TEST_SECRET_KEY" : "FLW_SECRET_KEY"];
+  if (!key) throw new Error(mode === "test" ? "Test payments are not configured yet." : "Payments are not configured yet.");
+  return key;
+}
+
 export async function flwCreatePayment(p: {
+  mode: PayMode;
   txRef: string;
   amount: number;
   email: string;
@@ -25,8 +38,7 @@ export async function flwCreatePayment(p: {
   title: string;
   meta: Record<string, string>;
 }) {
-  const key = process.env["FLW_SECRET_KEY"];
-  if (!key) throw new Error("Payments are not configured yet.");
+  const key = flwKey(p.mode);
   const res = await fetch("https://api.flutterwave.com/v3/payments", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -50,12 +62,11 @@ export async function flwCreatePayment(p: {
 
 // Verifies with Flutterwave and marks the record paid. Idempotent.
 export async function confirmPayment(transactionId: string, txRef: string) {
-  const key = process.env["FLW_SECRET_KEY"];
-  if (!key) throw new Error("Payments are not configured yet.");
   const db = await admin();
   const { data: row } = await db.from("enrolments").select("*").eq("tx_ref", txRef).maybeSingle();
   if (!row) return { ok: false as const, reason: "not_found" };
   if (row.status === "paid") return { ok: true as const, row };
+  const key = flwKey((row as { mode?: string }).mode === "test" ? "test" : "live");
 
   const res = await fetch(`https://api.flutterwave.com/v3/transactions/${encodeURIComponent(transactionId)}/verify`, {
     headers: { Authorization: `Bearer ${key}` },
