@@ -25,7 +25,7 @@ function Dashboard() {
     }
     paid.forEach((r) => {
       const d = (r.paid_at ?? r.created_at).slice(0, 10);
-      if (days[d]) { days[d].revenue += r.amount; days[d].count += 1; }
+      const b = days[d]; if (b) { b.revenue += r.amount; b.count += 1; }
     });
     const persona: Record<string, number> = {};
     enrol.forEach((r) => { const k = PERSONAS[r.persona ?? ""] ?? "Not given"; persona[k] = (persona[k] ?? 0) + 1; });
@@ -44,7 +44,7 @@ function Dashboard() {
       revenue: paid.reduce((a, r) => a + r.amount, 0),
       students: enrol.filter((r) => r.status === "paid").length,
       pending: enrol.filter((r) => r.status === "pending").length,
-      early: plans[0].value,
+      early: plans[0]!.value,
       events: rows.filter((r) => r.kind === "event").length,
       series: Object.values(days),
       persona: Object.entries(persona).map(([name, value]) => ({ name, value })),

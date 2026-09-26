@@ -20,7 +20,7 @@ export async function flwCreatePayment(p: {
   amount: number;
   email: string;
   name: string;
-  phone?: string;
+  phone?: string | undefined;
   redirectUrl: string;
   title: string;
   meta: Record<string, string>;

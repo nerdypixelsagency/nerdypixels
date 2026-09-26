@@ -36,9 +36,9 @@ function Index() {
   const event = useServerFn(registerEvent);
   useEffect(() => {
     const w = window as unknown as Record<string, unknown>;
-    w.__resources = { logoDark: logoDark.url, logoLight: logoLight.url };
-    w.__npaPay = (d: unknown) => pay({ data: d as never });
-    w.__npaEvent = (d: { name: string; email: string; phone?: string }) =>
+    w["__resources"] = { logoDark: logoDark.url, logoLight: logoLight.url };
+    w["__npaPay"] = (d: unknown) => pay({ data: d as never });
+    w["__npaEvent"] = (d: { name: string; email: string; phone?: string }) =>
       event({ data: { name: d.name, email: d.email, phone: d.phone } });
     document.documentElement.style.setProperty("--astro", `url(${astronaut.url})`);
     if (!started) {

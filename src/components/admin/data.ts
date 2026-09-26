@@ -1,5 +1,4 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getEnrolments } from "@/lib/admin.functions";
 
 export type Enrolment = {
   id: string;
@@ -20,7 +19,7 @@ export type Enrolment = {
   created_at: string;
 };
 
-export const enrolmentsQuery = (fn: typeof getEnrolments) =>
+export const enrolmentsQuery = (fn: () => Promise<unknown>) =>
   queryOptions({ queryKey: ["admin-enrolments"], queryFn: () => fn() as Promise<{ role: string; rows: Enrolment[] }> });
 
 export const naira = (n: number) => "₦" + Math.round(n).toLocaleString("en-NG");
