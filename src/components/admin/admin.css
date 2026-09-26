@@ -1,4 +1,4 @@
-.adm {
+.adm, .adm-auth {
   --a-purple: #7d2ae8;
   --a-purple-ink: #6420c9;
   --a-deep: #2e0b63;
@@ -13,6 +13,8 @@
   --a-line: #ebe6f3;
   --a-bg: #f6f4fa;
   --a-card: #ffffff;
+}
+.adm {
   font-family: Poppins, system-ui, sans-serif;
   color: var(--a-ink);
   background: var(--a-bg);
