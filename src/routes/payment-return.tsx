@@ -42,12 +42,12 @@ function PaymentReturn() {
         if (r.kind === "instalment") {
           const pend = read("npa-pending-instalment") || {};
           sessionStorage.setItem("npa-last-instalment", JSON.stringify({ ...pend, month: r.month, ref: r.ref, first: pend.first || "" }));
-          window.location.replace("/#/pay-instalment/success");
+          window.location.replace("/pay-instalment/success");
         } else {
           const pend = read("npa-pending-order") || {};
           sessionStorage.setItem("npa-last-order", JSON.stringify({ ...pend, plan: r.plan, amount: r.amount, ref: r.ref, cur: "NGN" }));
           sessionStorage.removeItem("npa-co");
-          window.location.replace("/#/checkout/success");
+          window.location.replace("/checkout/success");
         }
       })
       .catch(() => {
@@ -63,7 +63,7 @@ function PaymentReturn() {
         <p>{msg}</p>
         {failed && (
           <p style={{ marginTop: 20 }}>
-            <a href="/#/checkout" style={{ fontWeight: 600 }}>Back to checkout</a>
+            <a href="/checkout" style={{ fontWeight: 600 }}>Back to checkout</a>
           </p>
         )}
       </div>
