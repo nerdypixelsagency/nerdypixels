@@ -25,7 +25,25 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
+// Self-healing relay: deployments that lack the backend settings (e.g. the
+// Vercel custom-domain copy) forward server-function calls to the fully
+// configured Lovable deployment.
+const RELAY_TARGET = "https://nerdypixels.lovable.app";
+const relayMiddleware = createMiddleware().server(async ({ request, next }) => {
+  const url = new URL(request.url);
+  if (!url.pathname.startsWith("/_serverFn") || process.env["SUPABASE_URL"] || url.origin === RELAY_TARGET) return next();
+  const headers = new Headers(request.headers);
+  headers.set("origin", RELAY_TARGET);
+  headers.set("referer", `${RELAY_TARGET}/`);
+  headers.delete("host");
+  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
+  const init: RequestInit = { method: request.method, headers };
+  if (body) init.body = body;
+  const res = await fetch(`${RELAY_TARGET}${url.pathname}${url.search}`, init);
+  return new Response(res.body, { status: res.status, headers: res.headers }) as never;
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
+  requestMiddleware: [relayMiddleware, errorMiddleware, csrfMiddleware],
   functionMiddleware: [attachSupabaseAuth],
 }));

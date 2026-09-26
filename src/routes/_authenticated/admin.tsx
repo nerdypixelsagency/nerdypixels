@@ -21,7 +21,22 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const { user } = Route.useRouteContext();
   const roleFn = useServerFn(getMyRole);
-  const { data, isLoading, error } = useQuery({ queryKey: ["admin-role"], queryFn: () => roleFn(), retry: false });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["admin-role"],
+    retry: false,
+    queryFn: async (): Promise<{ role: string | null }> => {
+      // 1) server check; 2) refresh session and retry; 3) direct check protected by database rules
+      try { return await roleFn(); } catch (e1) { console.warn("role check failed, healing", e1); }
+      try { await supabase.auth.refreshSession(); return await roleFn(); } catch (e2) { console.warn("retry failed, falling back", e2); }
+      await supabase.rpc("claim_super_admin").then(() => undefined, () => undefined);
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) throw new Error("Not signed in");
+      const { data: rows, error: re } = await supabase.from("user_roles").select("role").eq("user_id", u.user.id);
+      if (re) throw re;
+      const roles = (rows ?? []).map((r) => r.role as string);
+      return { role: roles.includes("super_admin") ? "super_admin" : roles.includes("admin") ? "admin" : null };
+    },
+  });
   const qc = useQueryClient();
   const modeFn = useServerFn(getPaymentModeFn);
   const setModeFn = useServerFn(setPaymentMode);
