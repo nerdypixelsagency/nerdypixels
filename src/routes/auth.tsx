@@ -45,6 +45,14 @@ function AuthPage() {
     }
   }
 
+  async function forgot() {
+    setErr(""); setOk("");
+    if (!email) { setErr("Enter your email above first."); return; }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+    if (error) setErr(error.message);
+    else setOk("If that account exists, a reset link is on its way.");
+  }
+
   return (
     <div className="adm-auth">
       <form onSubmit={submit}>
@@ -58,6 +66,11 @@ function AuthPage() {
         <button type="button" onClick={() => setMode(mode === "in" ? "up" : "in")} style={{ background: "none", border: 0, color: "#6420c9", fontWeight: 600, cursor: "pointer", font: "inherit", fontSize: 13 }}>
           {mode === "in" ? "First time? Create an account" : "Already have an account? Sign in"}
         </button>
+        {mode === "in" && (
+          <button type="button" onClick={forgot} style={{ background: "none", border: 0, color: "#6420c9", cursor: "pointer", font: "inherit", fontSize: 13 }}>
+            Forgot password?
+          </button>
+        )}
       </form>
     </div>
   );
