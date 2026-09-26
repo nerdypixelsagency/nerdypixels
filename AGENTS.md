@@ -16,3 +16,4 @@
 
 - Auth emails go through the Supabase Send Email hook at `/api/public/auth-email-hook`, sent via Resend (`src/lib/auth-emails.server.ts`). Why: external Supabase project; user chose Resend over Supabase default sender.
 - Deployments without backend env (Vercel custom domain) relay /_serverFn calls to nerdypixels.lovable.app via relayMiddleware in src/start.ts; auth sign-up/reset links are generated server-side (admin.generateLink) and sent by Resend. Why: Vercel lacks secrets; avoids Supabase email rate limits.
+- Instalment reminders run daily via pg_cron → `/api/public/cron/instalment-reminders` (token in `private_settings.cron_token`, service-role only); dedupe via `instalment_reminders` unique index. Why: stateless workers need durable once-only sends.
