@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { getEnrolments } from "@/lib/admin.functions";
 import { download, enrolmentsQuery, naira, toCsv } from "@/components/admin/data";
 
@@ -32,8 +32,8 @@ function Referrals() {
           <div className="adm-scroll"><table className="adm-table">
             <thead><tr><th>Code</th><th className="num">Checkouts</th><th className="num">Paid students</th><th className="num">Paid payments</th><th className="num">Revenue</th><th></th></tr></thead>
             <tbody>{groups.map((g) => (
-              <>
-                <tr key={g.code} style={{ cursor: "pointer" }} onClick={() => setOpen(open === g.code ? null : g.code)}>
+              <Fragment key={g.code}>
+                <tr style={{ cursor: "pointer" }} onClick={() => setOpen(open === g.code ? null : g.code)}>
                   <td><b>{g.code}</b></td><td className="num">{g.rows.length}</td><td className="num">{g.students.size}</td><td className="num">{g.paid}</td><td className="num money">{naira(g.revenue)}</td>
                   <td className="num"><button className="adm-btn ghost" onClick={(e) => { e.stopPropagation(); download(`referral-${g.code}.csv`, toCsv(g.rows)); }}>CSV</button></td>
                 </tr>
@@ -43,7 +43,7 @@ function Referrals() {
                     <td className="num">{r.kind === "instalment" ? r.instalment_month : r.plan}</td><td className="num money">{naira(r.amount)}</td><td><span className={`adm-pill ${r.status}`}>{r.status}</span></td>
                   </tr>
                 ))}
-              </>
+              </Fragment>
             ))}</tbody>
           </table></div>
         )}

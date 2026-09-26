@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-type Ctx = { supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>; userId: string };
 
 async function roleOf(ctx: { supabase: any; userId: string }) {
   await ctx.supabase.rpc("claim_super_admin");
@@ -81,4 +80,3 @@ export const removeAdmin = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export type { Ctx };

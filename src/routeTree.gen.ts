@@ -14,6 +14,11 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PaymentReturnRouteImport } from './routes/payment-return'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_authenticated/admin.enrolments'
+import { Route as AuthenticatedAdminInstalmentsRouteImport } from './routes/_authenticated/admin.instalments'
+import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin.referrals'
+import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -40,6 +45,34 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminEnrolmentsRoute =
+  AuthenticatedAdminEnrolmentsRouteImport.update({
+    id: '/enrolments',
+    path: '/enrolments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminInstalmentsRoute =
+  AuthenticatedAdminInstalmentsRouteImport.update({
+    id: '/instalments',
+    path: '/instalments',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminReferralsRoute =
+  AuthenticatedAdminReferralsRouteImport.update({
+    id: '/referrals',
+    path: '/referrals',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminTeamRoute = AuthenticatedAdminTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const ApiPublicFlutterwaveWebhookRoute =
   ApiPublicFlutterwaveWebhookRouteImport.update({
     id: '/api/public/flutterwave-webhook',
@@ -51,15 +84,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
+  '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
+  '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
+  '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
+  '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,8 +109,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
+  '/_authenticated/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
+  '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/_authenticated/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -77,14 +124,23 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/admin'
+    | '/admin/enrolments'
+    | '/admin/instalments'
+    | '/admin/referrals'
+    | '/admin/team'
     | '/api/public/flutterwave-webhook'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/payment-return'
-    | '/admin'
+    | '/admin/enrolments'
+    | '/admin/instalments'
+    | '/admin/referrals'
+    | '/admin/team'
     | '/api/public/flutterwave-webhook'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -92,7 +148,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/_authenticated/admin'
+    | '/_authenticated/admin/enrolments'
+    | '/_authenticated/admin/instalments'
+    | '/_authenticated/admin/referrals'
+    | '/_authenticated/admin/team'
     | '/api/public/flutterwave-webhook'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -140,6 +201,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/enrolments': {
+      id: '/_authenticated/admin/enrolments'
+      path: '/enrolments'
+      fullPath: '/admin/enrolments'
+      preLoaderRoute: typeof AuthenticatedAdminEnrolmentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/instalments': {
+      id: '/_authenticated/admin/instalments'
+      path: '/instalments'
+      fullPath: '/admin/instalments'
+      preLoaderRoute: typeof AuthenticatedAdminInstalmentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/referrals': {
+      id: '/_authenticated/admin/referrals'
+      path: '/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AuthenticatedAdminReferralsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/team': {
+      id: '/_authenticated/admin/team'
+      path: '/team'
+      fullPath: '/admin/team'
+      preLoaderRoute: typeof AuthenticatedAdminTeamRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/flutterwave-webhook': {
       id: '/api/public/flutterwave-webhook'
       path: '/api/public/flutterwave-webhook'
@@ -150,12 +246,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminEnrolmentsRoute: typeof AuthenticatedAdminEnrolmentsRoute
+  AuthenticatedAdminInstalmentsRoute: typeof AuthenticatedAdminInstalmentsRoute
+  AuthenticatedAdminReferralsRoute: typeof AuthenticatedAdminReferralsRoute
+  AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminEnrolmentsRoute: AuthenticatedAdminEnrolmentsRoute,
+  AuthenticatedAdminInstalmentsRoute: AuthenticatedAdminInstalmentsRoute,
+  AuthenticatedAdminReferralsRoute: AuthenticatedAdminReferralsRoute,
+  AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
