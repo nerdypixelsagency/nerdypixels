@@ -10,23 +10,34 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PaymentReturnRouteImport } from './routes/payment-return'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StudentRouteImport } from './routes/student'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAddStudentRouteImport } from './routes/_authenticated/admin.add-student'
+import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin.commissions'
 import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_authenticated/admin.enrolments'
 import { Route as AuthenticatedAdminInstalmentsRouteImport } from './routes/_authenticated/admin.instalments'
 import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin.referrals'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
 import { Route as ApiPublicAuthEmailHookRouteImport } from './routes/api/public/auth-email-hook'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
+import { Route as AuthenticatedAdminEnrolmentIdRouteImport } from './routes/_authenticated/admin.enrolment.$id'
+import { Route as ApiPublicCronDailySummaryRouteImport } from './routes/api/public/cron/daily-summary'
 import { Route as ApiPublicCronInstalmentRemindersRouteImport } from './routes/api/public/cron/instalment-reminders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -48,6 +59,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -58,6 +74,18 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminAddStudentRoute =
+  AuthenticatedAdminAddStudentRouteImport.update({
+    id: '/add-student',
+    path: '/add-student',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCommissionsRoute =
+  AuthenticatedAdminCommissionsRouteImport.update({
+    id: '/commissions',
+    path: '/commissions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminEnrolmentsRoute =
   AuthenticatedAdminEnrolmentsRouteImport.update({
     id: '/enrolments',
@@ -92,6 +120,18 @@ const ApiPublicFlutterwaveWebhookRoute =
     path: '/api/public/flutterwave-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminEnrolmentIdRoute =
+  AuthenticatedAdminEnrolmentIdRouteImport.update({
+    id: '/enrolment/$id',
+    path: '/enrolment/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const ApiPublicCronDailySummaryRoute =
+  ApiPublicCronDailySummaryRouteImport.update({
+    id: '/api/public/cron/daily-summary',
+    path: '/api/public/cron/daily-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCronInstalmentRemindersRoute =
   ApiPublicCronInstalmentRemindersRouteImport.update({
     id: '/api/public/cron/instalment-reminders',
@@ -101,10 +141,14 @@ const ApiPublicCronInstalmentRemindersRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/student': typeof StudentRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
+  '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
@@ -112,13 +156,19 @@ export interface FileRoutesByFullPath {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/enrolment/$id': typeof AuthenticatedAdminEnrolmentIdRoute
+  '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
   '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/student': typeof StudentRoute
+  '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
+  '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
@@ -126,16 +176,22 @@ export interface FileRoutesByTo {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/enrolment/$id': typeof AuthenticatedAdminEnrolmentIdRoute
+  '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
   '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/$': typeof SplatRoute
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/student': typeof StudentRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
+  '/_authenticated/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/_authenticated/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
@@ -143,16 +199,22 @@ export interface FileRoutesById {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/enrolment/$id': typeof AuthenticatedAdminEnrolmentIdRoute
+  '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
   '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$'
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/student'
     | '/admin'
+    | '/admin/add-student'
+    | '/admin/commissions'
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/referrals'
@@ -160,13 +222,19 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin/'
+    | '/admin/enrolment/$id'
+    | '/api/public/cron/daily-summary'
     | '/api/public/cron/instalment-reminders'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$'
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/student'
+    | '/admin/add-student'
+    | '/admin/commissions'
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/referrals'
@@ -174,15 +242,21 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin'
+    | '/admin/enrolment/$id'
+    | '/api/public/cron/daily-summary'
     | '/api/public/cron/instalment-reminders'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/$'
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/student'
     | '/_authenticated/admin'
+    | '/_authenticated/admin/add-student'
+    | '/_authenticated/admin/commissions'
     | '/_authenticated/admin/enrolments'
     | '/_authenticated/admin/instalments'
     | '/_authenticated/admin/referrals'
@@ -190,17 +264,22 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/enrolment/$id'
+    | '/api/public/cron/daily-summary'
     | '/api/public/cron/instalment-reminders'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  SplatRoute: typeof SplatRoute
   AuthRoute: typeof AuthRoute
   PaymentReturnRoute: typeof PaymentReturnRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  StudentRoute: typeof StudentRoute
   ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
+  ApiPublicCronDailySummaryRoute: typeof ApiPublicCronDailySummaryRoute
   ApiPublicCronInstalmentRemindersRoute: typeof ApiPublicCronInstalmentRemindersRoute
 }
 
@@ -211,6 +290,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -241,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -253,6 +346,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/add-student': {
+      id: '/_authenticated/admin/add-student'
+      path: '/add-student'
+      fullPath: '/admin/add-student'
+      preLoaderRoute: typeof AuthenticatedAdminAddStudentRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/commissions': {
+      id: '/_authenticated/admin/commissions'
+      path: '/commissions'
+      fullPath: '/admin/commissions'
+      preLoaderRoute: typeof AuthenticatedAdminCommissionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/enrolments': {
@@ -297,6 +404,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlutterwaveWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/enrolment/$id': {
+      id: '/_authenticated/admin/enrolment/$id'
+      path: '/enrolment/$id'
+      fullPath: '/admin/enrolment/$id'
+      preLoaderRoute: typeof AuthenticatedAdminEnrolmentIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/cron/daily-summary': {
+      id: '/api/public/cron/daily-summary'
+      path: '/api/public/cron/daily-summary'
+      fullPath: '/api/public/cron/daily-summary'
+      preLoaderRoute: typeof ApiPublicCronDailySummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/instalment-reminders': {
       id: '/api/public/cron/instalment-reminders'
       path: '/api/public/cron/instalment-reminders'
@@ -308,19 +429,25 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAddStudentRoute: typeof AuthenticatedAdminAddStudentRoute
+  AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminEnrolmentsRoute: typeof AuthenticatedAdminEnrolmentsRoute
   AuthenticatedAdminInstalmentsRoute: typeof AuthenticatedAdminInstalmentsRoute
   AuthenticatedAdminReferralsRoute: typeof AuthenticatedAdminReferralsRoute
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminEnrolmentIdRoute: typeof AuthenticatedAdminEnrolmentIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAddStudentRoute: AuthenticatedAdminAddStudentRoute,
+  AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminEnrolmentsRoute: AuthenticatedAdminEnrolmentsRoute,
   AuthenticatedAdminInstalmentsRoute: AuthenticatedAdminInstalmentsRoute,
   AuthenticatedAdminReferralsRoute: AuthenticatedAdminReferralsRoute,
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminEnrolmentIdRoute: AuthenticatedAdminEnrolmentIdRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
@@ -340,11 +467,14 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  SplatRoute: SplatRoute,
   AuthRoute: AuthRoute,
   PaymentReturnRoute: PaymentReturnRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  StudentRoute: StudentRoute,
   ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,
+  ApiPublicCronDailySummaryRoute: ApiPublicCronDailySummaryRoute,
   ApiPublicCronInstalmentRemindersRoute: ApiPublicCronInstalmentRemindersRoute,
 }
 export const routeTree = rootRouteImport

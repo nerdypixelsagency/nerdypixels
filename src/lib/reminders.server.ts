@@ -2,7 +2,7 @@
 import { EMAIL_FROM } from "./payments.server";
 
 export const DUE_DATES: Record<string, string> = { December: "2026-12-01", January: "2027-01-01" };
-const PAY_URL = "https://bootcamp.npdacademy.com/#/pay-instalment";
+const PAY_URL = "https://bootcamp.npdacademy.com/pay-instalment";
 export type Stage = "5d" | "1d" | "due" | "missed" | "manual";
 
 async function admin() {

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -38,7 +38,7 @@ function Enrolments() {
 
   return (
     <>
-      <div className="adm-head"><h1>Enrolments</h1><button className="adm-btn green" onClick={() => download("enrolments.csv", toCsv(rows))}>Export CSV ({rows.length})</button></div>
+      <div className="adm-head"><h1>Enrolments</h1><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Link to="/admin/add-student" className="adm-btn">Add student manually</Link><button className="adm-btn green" onClick={() => download("enrolments.csv", toCsv(rows))}>Export CSV ({rows.length})</button></div></div>
       <div className="adm-card">
         <div className="adm-filters">
           <input className="adm-input" placeholder="Search name, email, phone, code, reference" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -54,7 +54,7 @@ function Enrolments() {
             <tbody>{rows.map((r) => (
               <tr key={r.id}>
                 <td>{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</td>
-                <td><b>{r.name}</b></td>
+                <td><Link to="/admin/enrolment/$id" params={{ id: r.id }} style={{ color: "#6420c9", fontWeight: 700 }}>{r.name}</Link>{r.source_type === "manual" && <><br /><span className="adm-chip" style={{ fontSize: 11 }}>manual</span></>}</td>
                 <td>{r.email}<br /><span style={{ color: "#6b6280" }}>{r.phone}</span></td>
                 <td>{r.kind === "event" ? "Free event" : r.kind === "instalment" ? `${r.instalment_month} instalment` : r.plan === "early" ? "Early bird" : "Monthly plan"}</td>
                 <td>{PERSONAS[r.persona ?? ""] ?? "—"}</td>

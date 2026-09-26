@@ -1,6 +1,7 @@
 
-(function(){
-"use strict";
+const logoDarkA = { url: "/brand/logo-dark.png" };
+const logoLightA = { url: "/brand/logo-light.png" };
+
 /* ============ Config ============ */
 const SITE = { phone:"2349136713644", phoneLabel:"+234 913 671 3644", email:"info@npdacademy.com" };
 const EARLY_END = new Date("2026-10-10T23:59:59+01:00");
@@ -11,7 +12,7 @@ const wa = t => "https://wa.me/" + SITE.phone + "?text=" + encodeURIComponent(t)
 const naira = n => "₦" + Number(n).toLocaleString("en-NG");
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* preview switch: #/...?preview=closed or ?preview=open, remembered for the session */
+/* preview switch: /...?preview=closed or ?preview=open, remembered for the session */
 function earlyOpen(){
   let p = null; try{ p = sessionStorage.getItem("npa-preview"); }catch(e){}
   if (p === "closed") return false;
@@ -133,15 +134,15 @@ const MOD_CERT = '<span class="pill green" style="margin-top:6px">Certification 
 function header(path){
   const on = p => (p === "/" ? path === "/" : path.startsWith(p)) ? ' class="on" aria-current="page"' : "";
   const bar = earlyOpen()
-    ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October.<a href="#/checkout?plan=early">Claim your seat</a></div>`
-    : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months.<a href="#/checkout">Enrol now</a></div>`;
-  return `${bar}<header class="top"><div class="wrap nav">
-<a class="logo" href="#/" aria-label="Nerdy Pixels Academy home"><img src="${(window.__resources&&window.__resources.logoDark)||'assets/logo-dark.png'}" alt="Nerdy Pixels Academy" style="height:50px;width:auto"></a>
-<nav class="menu" aria-label="Main"><a href="#/"${on("/")}>Home</a><a href="#/courses"${on("/courses")}>Courses</a><a href="#/blog"${on("/blog")}>Blog</a><a href="#/faq"${on("/faq")}>FAQ</a><a href="#/contact"${on("/contact")}>Contact Us</a></nav>
-<div class="nav-cta"><a class="btn ghost sm" href="#/events/first-marketing-strategy">Free event</a><a class="btn sm" href="#/checkout">Enrol now</a></div>
+    ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October. <span class="cd" data-countdown="2026-10-10T23:59:59+01:00" data-label="left"></span><a href="/checkout?plan=early">Claim your seat</a></div>`
+    : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months. <span class="cd" data-countdown="2026-11-05T09:00:00+01:00" data-label="until classes start"></span><a href="/checkout">Enrol now</a></div>`;
+  return `<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
+<a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" width="76" height="50" style="height:50px;width:auto"></a>
+<nav class="menu" aria-label="Main"><a href="/"${on("/")}>Home</a><a href="/courses"${on("/courses")}>Courses</a><a href="/blog"${on("/blog")}>Blog</a><a href="/faq"${on("/faq")}>FAQ</a><a href="/contact"${on("/contact")}>Contact Us</a></nav>
+<div class="nav-cta"><a class="btn ghost sm" href="/events/first-marketing-strategy">Free event</a><a class="btn sm" href="/checkout">Enrol now</a></div>
 <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" data-act="menu">${I.menu()}</button>
 </div>
-<nav class="drawer" id="drawer" aria-label="Mobile"><a href="#/">Home</a><a href="#/courses">Courses</a><a href="#/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="#/events/first-marketing-strategy">Free event</a><a href="#/blog">Blog</a><a href="#/faq">FAQ</a><a href="#/contact">Contact Us</a><a class="btn block" style="margin-top:12px;border:0" href="#/checkout">Enrol now</a></nav>
+<nav class="drawer" id="drawer" aria-label="Mobile"><a href="/">Home</a><a href="/courses">Courses</a><a href="/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="/events/first-marketing-strategy">Free event</a><a href="/blog">Blog</a><a href="/faq">FAQ</a><a href="/contact">Contact Us</a><a class="btn block" style="margin-top:12px;border:0" href="/checkout">Enrol now</a></nav>
 </header>`;
 }
 function footer(){
@@ -152,10 +153,10 @@ function footer(){
 <button class="btn deep" type="submit">Subscribe</button></form></div></section>
 <footer><div class="wrap stack" style="gap:36px">
 <div class="grid g4">
-<div class="stack" style="gap:10px"><a class="logo" href="#/"><img src="${(window.__resources&&window.__resources.logoLight)||'assets/logo-light.png'}" alt="Nerdy Pixels Academy" style="width:140px;height:auto"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
-<div class="stack" style="gap:10px"><h3>Learn</h3><a href="#/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="#/curriculum">Curriculum</a><a href="#/courses">All courses</a><a href="#/events/first-marketing-strategy">Free event</a><a href="#/blog">Blog</a></div>
-<div class="stack" style="gap:10px"><h3>Students</h3><a href="#/onboarding">Student onboarding</a><a href="#/pay-instalment">Pay an instalment</a><a href="#/faq">FAQ</a><a href="#/terms">Terms of enrolment</a><a href="#/payment-policy">Payment policy</a><a href="#/privacy">Privacy policy</a></div>
-<div class="stack" style="gap:10px"><h3>Contact</h3><a href="mailto:${SITE.email}">${SITE.email}</a><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a><a href="${wa("Hello Nerdy Pixels Academy, I have a question.")}" target="_blank" rel="noopener">Chat on WhatsApp</a><a href="#/contact">Contact form</a></div>
+<div class="stack" style="gap:10px"><a class="logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" width="140" height="95" loading="lazy" style="width:140px;height:auto"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
+<div class="stack" style="gap:10px"><h3>Learn</h3><a href="/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="/curriculum">Curriculum</a><a href="/courses">All courses</a><a href="/events/first-marketing-strategy">Free event</a><a href="/blog">Blog</a></div>
+<div class="stack" style="gap:10px"><h3>Students</h3><a href="/student">Student login</a><a href="/onboarding">Student onboarding</a><a href="/pay-instalment">Pay an instalment</a><a href="/faq">FAQ</a><a href="/terms">Terms of enrolment</a><a href="/payment-policy">Payment policy</a><a href="/privacy">Privacy policy</a></div>
+<div class="stack" style="gap:10px"><h3>Contact</h3><a href="mailto:${SITE.email}">${SITE.email}</a><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a><a href="${wa("Hello Nerdy Pixels Academy, I have a question.")}" target="_blank" rel="noopener">Chat on WhatsApp</a><a href="/contact">Contact form</a></div>
 </div>
 <p class="small" style="color:#BBAADC;border-top:1px solid var(--deep-line);padding-top:20px">© 2026 Nerdy Pixels Digital. All rights reserved.</p>
 </div></footer>
@@ -169,12 +170,12 @@ function priceCard(){
 ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
        : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
 <ul class="list" style="border-top:1px solid var(--line);padding-top:16px">${check("8 modules, 8 portfolio pieces")}${check("5 industry certifications")}${check("Capstone hackathon on real brand briefs")}${check("Mobile money, card and bank transfer across Africa")}</ul>
-<a class="btn deep block" href="#/checkout${open?"?plan=early":""}">Continue to checkout</a>
+<a class="btn deep block" href="/checkout${open?"?plan=early":""}">Continue to checkout</a>
 <p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} Secure payment. Takes about two minutes.</p></aside>`;
 }
 function eventBand(){
   return `<div class="band"><div class="stack" style="gap:12px"><span class="eyebrow">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2>${EVENT.title}</h2><p class="lead">Not ready to enrol yet? Spend an hour with our instructors, build a simple strategy for a real business, and take home the template.</p></div>
-<div class="stack" style="gap:10px"><a class="btn deep block" href="#/events/first-marketing-strategy">Save my free seat</a><p class="small muted" style="text-align:center">Online. Replay and template sent to everyone who registers.</p></div></div>`;
+<div class="stack" style="gap:10px"><a class="btn deep block" href="/events/first-marketing-strategy">Save my free seat</a><p class="small muted" style="text-align:center">Online. Replay and template sent to everyone who registers.</p></div></div>`;
 }
 function instructors(){
   return `<div class="grid g3">${INSTRUCTORS.map(i=>`<div class="card row" style="flex-wrap:nowrap;padding:18px"><div class="avatar" aria-hidden="true">${i[0]}</div><div><div style="font-weight:600;color:var(--ink)">${i[1]}</div><div class="small muted">${i[2]}</div></div></div>`).join("")}</div>`;
@@ -196,6 +197,9 @@ function formError(form, msg){
   if (!box){ box = document.createElement("p"); box.className = "err"; box.setAttribute("role","alert"); const btn = form.querySelector("[type=submit]"); btn.parentNode.insertBefore(box, btn); }
   box.textContent = msg; box.scrollIntoView({block:"center",behavior:"smooth"});
 }
+const TOPICS = ["SEO","Social media marketing","Google Ads","Meta ads","Web analytics","Content strategy","Email marketing","AI marketing tools","Brand projects","Career launch"];
+function marquee(){ const t = TOPICS.map(x=>`<span>${x}</span>`).join(""); return `<section class="marquee" aria-label="What you'll learn"><div class="marquee-track" aria-hidden="false">${t}</div><div class="marquee-track" aria-hidden="true">${t}</div></section>`; }
+function stickyEnrol(){ return `<div class="sticky-enrol"><div><b>${naira(PRICE_EARLY)}</b><span class="small"> early bird or ${naira(PRICE_MONTH)}/month</span></div><a class="btn green sm" href="/checkout">Enrol now</a></div>`; }
 /* ============ Pages ============ */
 const P = {};
 
@@ -204,47 +208,47 @@ P.home = () => ({ title:"Nerdy Pixels Academy | Digital skills for Africa's emer
 <div class="stack" style="gap:22px"><span class="eyebrow">Nerdy Pixels Academy</span>
 <h1>Practical digital marketing training <span class="accent">for Africa's emerging workforce.</span></h1>
 <p class="lead">Learn the skills companies are hiring for, from marketers who do the work every day. Earn recognised certifications, build a portfolio, and pay from anywhere in Africa.</p>
-<div class="row"><a class="btn green" href="#/courses/digital-marketing">Explore the bootcamp →</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div></div>
+<div class="row"><a class="btn green" href="/courses/digital-marketing">Explore the bootcamp →</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
 ${priceCard()}
-</div></section>
+</div></section>${marquee()}
 <section class="section"><div class="wrap stack" style="gap:28px">
-<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>Enrolling now: Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications and live classes. The next cohort starts ${COHORT_START}.</p></div><a href="#/courses/digital-marketing" style="font-weight:600">View the bootcamp</a></div>
+<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>Enrolling now: Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications and live classes. The next cohort starts ${COHORT_START}.</p></div><a href="/courses/digital-marketing" style="font-weight:600">View the bootcamp</a></div>
 <div class="grid g4">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div class="card"><div style="font-size:28px;font-weight:800;color:var(--ink)">${s[0]}</div><div class="muted">${s[1]}</div></div>`).join("")}</div>
 </div></section>
 <section class="section tint"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2>
 <div class="grid g4">${PERSONAS.map((p,i)=>`<div class="card stack persona" style="gap:8px"><span class="nbadge">${i+1}</span><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div>
-<div><a class="btn" href="#/courses/digital-marketing">Find out if it's right for you</a></div></div></section>
-<section class="section"><div class="wrap stack" style="gap:28px"><div class="row" style="justify-content:space-between;align-items:flex-end"><h2>More programmes</h2><a href="#/courses" style="font-weight:600">All courses</a></div>
-<div class="grid g3">${COURSES.slice(0,3).map(c=>`<div class="card stack" style="gap:10px"><span class="pill">${c.weeks}</span><h3>${c.name}</h3><p class="muted">${c.text}</p><a href="#/waitlist/${c.slug}" style="font-weight:600;margin-top:auto">Join the waitlist</a></div>`).join("")}</div></div></section>
+<div><a class="btn" href="/courses/digital-marketing">Find out if it's right for you</a></div></div></section>
+<section class="section"><div class="wrap stack" style="gap:28px"><div class="row" style="justify-content:space-between;align-items:flex-end"><h2>More programmes</h2><a href="/courses" style="font-weight:600">All courses</a></div>
+<div class="grid g3">${COURSES.slice(0,3).map(c=>`<div class="card stack" style="gap:10px"><span class="pill">${c.weeks}</span><h3>${c.name}</h3><p class="muted">${c.text}</p><a href="/waitlist/${c.slug}" style="font-weight:600;margin-top:auto">Join the waitlist</a></div>`).join("")}</div></div></section>
 <section class="section" style="padding-top:0"><div class="wrap">${eventBand()}</div></section>
 <section class="section tint"><div class="wrap stack" style="gap:28px"><h2>Taught by working marketers</h2>${instructors()}</div></section>
-<section class="section"><div class="wrap stack" style="gap:28px"><div class="row" style="justify-content:space-between;align-items:flex-end"><h2>From the blog</h2><a href="#/blog" style="font-weight:600">All articles</a></div>${postCards()}</div></section>`});
+<section class="section"><div class="wrap stack" style="gap:28px"><div class="row" style="justify-content:space-between;align-items:flex-end"><h2>From the blog</h2><a href="/blog" style="font-weight:600">All articles</a></div>${postCards()}</div></section>`});
 
 P.courses = () => ({ title:"Courses | Nerdy Pixels Academy", html:`
 <section class="hero"><div class="wrap stack" style="gap:16px"><h1>Courses</h1><p class="lead">Start with the flagship bootcamp, or join the waitlist for a specialist programme.</p></div></section>
 <section class="section"><div class="wrap stack" style="gap:28px">
 <article class="card" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:32px;padding:32px;border:2px solid var(--purple)">
 <div class="stack" style="gap:12px"><span class="pill green">Enrolling now</span><h2>Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications, live classes Thursday to Sunday and a capstone hackathon. The next cohort starts ${COHORT_START}.</p>
-<div class="row"><a class="btn" href="#/courses/digital-marketing">View the bootcamp</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div></div>
+<div class="row"><a class="btn" href="/courses/digital-marketing">View the bootcamp</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
 <div class="stack" style="gap:8px;justify-content:center"><div class="price">${earlyOpen()?"₦60,000":"₦40,000"}<small>${earlyOpen()?"paid once, until 10 Oct":"a month for 3 months"}</small></div><p class="muted">${earlyOpen()?"Or ₦40,000 a month for November, December and January.":"November, December and January."}</p></div>
 </article>
 <h2 style="margin-top:12px">Specialist programmes</h2>
-<div class="grid g3">${COURSES.map(c=>`<div class="card stack" style="gap:10px"><span class="pill">${c.weeks}</span><h3>${c.name}</h3><p class="muted">${c.text}</p><a class="btn ghost sm" style="margin-top:auto;align-self:flex-start" href="#/waitlist/${c.slug}">Join the waitlist</a></div>`).join("")}</div>
+<div class="grid g3">${COURSES.map(c=>`<div class="card stack" style="gap:10px"><span class="pill">${c.weeks}</span><h3>${c.name}</h3><p class="muted">${c.text}</p><a class="btn ghost sm" style="margin-top:auto;align-self:flex-start" href="/waitlist/${c.slug}">Join the waitlist</a></div>`).join("")}</div>
 </div></section>`});
 
 P.bootcamp = () => { const open = earlyOpen(); return { title:"Digital Marketing Bootcamp, next cohort | Nerdy Pixels Academy", html:`
-<nav class="subnav" aria-label="On this page"><div class="wrap"><b>Digital Marketing Bootcamp</b>${[["overview","Overview"],["curriculum","Curriculum"],["certifications","Certifications"],["pricing","Pricing"],["event","Free event"],["faq","FAQ"]].map(a=>`<a href="#/courses/digital-marketing?s=${a[0]}">${a[1]}</a>`).join("")}</div></nav>
+<nav class="subnav" aria-label="On this page"><div class="wrap"><b>Digital Marketing Bootcamp</b>${[["overview","Overview"],["curriculum","Curriculum"],["certifications","Certifications"],["pricing","Pricing"],["event","Free event"],["faq","FAQ"]].map(a=>`<a href="/courses/digital-marketing?s=${a[0]}">${a[1]}</a>`).join("")}</div></nav>
 <section class="hero" id="overview"><div class="wrap hero-grid">
 <div class="stack" style="gap:22px"><span class="eyebrow">Professional Digital Marketing Bootcamp. The next cohort starts ${COHORT_START}</span>
 <h1>Become a job-ready digital marketer. <span class="accent">Certified, with a portfolio to prove it.</span></h1>
 <p class="lead">Eight practical modules taught live by working marketers. Every module ends with a portfolio piece, and you finish with a live project for a real brand.</p>
-<div class="row"><a class="btn green" href="#/checkout${open?"?plan=early":""}">Enrol in the next cohort →</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div>
+<div class="row"><a class="btn green" href="/checkout${open?"?plan=early":""}">Enrol in the next cohort →</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div>
 <ul class="list row" style="flex-direction:row;gap:20px">${check("Live classes Thursday to Sunday")}${check("Pay from anywhere in Africa")}${check("Monthly plan available")}</ul></div>
 ${priceCard()}</div></section>
 <section class="stats wrap" aria-label="At a glance" style="padding:0">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div><b>${s[0]}</b><span class="muted small">${s[1]}</span></div>`).join("")}</section>
 <section class="section"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2><div class="grid g4">${PERSONAS.map((p,i)=>`<div class="card stack persona" style="gap:8px"><span class="nbadge">${i+1}</span><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div></div></section>
 <section class="section tint" id="curriculum"><div class="wrap stack" style="gap:24px">
-<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>What you'll learn, and what you'll build</h2><p class="lead">One module a week. Monday to Wednesday is self-paced certification work; Thursday to Sunday is live classes and practice.</p></div><a href="#/curriculum" style="font-weight:600">See the full weekly plan</a></div>
+<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>What you'll learn, and what you'll build</h2><p class="lead">One module a week. Monday to Wednesday is self-paced certification work; Thursday to Sunday is live classes and practice.</p></div><a href="/curriculum" style="font-weight:600">See the full weekly plan</a></div>
 <div class="stack" style="gap:14px">${modulesList()}</div></div></section>
 <section class="section dark" id="certifications"><div class="wrap stack" style="gap:28px">
 <div class="stack" style="gap:12px;max-width:760px"><h2>Five certifications in one programme</h2><p style="font-size:17px">Earn industry-recognised certifications module by module, plus our certificate of completion when you finish.</p></div>
@@ -252,21 +256,21 @@ ${priceCard()}</div></section>
 <section class="section" id="pricing"><div class="wrap stack" style="gap:28px">
 <div class="stack" style="gap:8px"><h2>Choose how you pay</h2><p class="lead">Same bootcamp, same certifications. Pay once at the early-bird price, or spread it over three months.</p></div>
 <div class="grid g2">
-<div class="plan ${open?"on":"off"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Early bird</h3><span class="pill green">${open?"Ends Sat 10 Oct":"Closed"}</span></div><div class="price">₦60,000<small>paid once</small></div><p class="muted">Available Monday 28 September to Saturday 10 October 2026. You save ₦60,000 compared with the monthly plan.</p>${open?`<a class="btn block" href="#/checkout?plan=early">Pay ₦60,000 now</a>`:`<span class="btn ghost block" aria-disabled="true" style="cursor:default">Early bird has closed</span>`}</div>
-<div class="plan ${open?"":"on"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Monthly plan</h3><span class="pill">3 payments</span></div><div class="price">₦40,000<small>a month</small></div><div class="months"><div>November<b>On enrolment</b></div><div>December<b>By 1 Dec</b></div><div>January<b>By 1 Jan</b></div></div><a class="btn deep block" href="#/checkout?plan=monthly">Start with ₦40,000</a></div>
+<div class="plan ${open?"on":"off"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Early bird</h3><span class="pill green">${open?"Ends Sat 10 Oct":"Closed"}</span></div><div class="price">₦60,000<small>paid once</small></div><p class="muted">Available Monday 28 September to Saturday 10 October 2026. You save ₦60,000 compared with the monthly plan.</p>${open?`<a class="btn block" href="/checkout?plan=early">Pay ₦60,000 now</a>`:`<span class="btn ghost block" aria-disabled="true" style="cursor:default">Early bird has closed</span>`}</div>
+<div class="plan ${open?"":"on"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Monthly plan</h3><span class="pill">3 payments</span></div><div class="price">₦40,000<small>a month</small></div><div class="months"><div>November<b>On enrolment</b></div><div>December<b>By 1 Dec</b></div><div>January<b>By 1 Jan</b></div></div><a class="btn deep block" href="/checkout?plan=monthly">Start with ₦40,000</a></div>
 </div>
 <div class="card row" style="flex-wrap:nowrap;align-items:flex-start;background:var(--soft-2)">${I.globe()}<p><b>Paying from outside Nigeria?</b> Choose your country at checkout and pay in local currency: M-Pesa in Kenya and Tanzania, mobile money in Ghana, Uganda, Rwanda, Zambia and francophone West and Central Africa, Instant EFT in South Africa, or card anywhere.</p></div>
 </div></section>
 <section class="section" id="event" style="padding-top:0"><div class="wrap">${eventBand()}</div></section>
 <section class="section tint"><div class="wrap stack" style="gap:28px"><h2>Taught by working marketers</h2>${instructors()}</div></section>
 <section class="section" id="faq"><div class="wrap grid" style="grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:40px">
-<div class="stack" style="gap:14px"><h2>Questions, answered</h2><p class="muted">Still unsure? Talk to an advisor on WhatsApp and get an answer the same day.</p><a class="btn green" style="align-self:flex-start" href="${wa("Hello, I have a question about the Digital Marketing Bootcamp.")}" target="_blank" rel="noopener">${I.wa()} Chat with an advisor</a><a href="#/faq" style="font-weight:600">See all FAQs</a></div>
+<div class="stack" style="gap:14px"><h2>Questions, answered</h2><p class="muted">Still unsure? Talk to an advisor on WhatsApp and get an answer the same day.</p><a class="btn green" style="align-self:flex-start" href="${wa("Hello, I have a question about the Digital Marketing Bootcamp.")}" target="_blank" rel="noopener">${I.wa()} Chat with an advisor</a><a href="/faq" style="font-weight:600">See all FAQs</a></div>
 <div class="stack" style="gap:12px">${faqBlock(FAQS[0][1].slice(0,3).concat(FAQS[1][1].slice(0,3)), true)}</div></div></section>
-<section class="section dark"><div class="wrap row" style="justify-content:space-between;gap:24px"><div class="stack" style="gap:8px"><h2>The next cohort starts ${COHORT_START.replace(" 2026","")}.</h2><p style="font-size:17px">${open?"Early bird ends Saturday 10 October: ₦60,000 paid once.":"₦40,000 a month for November, December and January."}</p></div><a class="btn" href="#/checkout${open?"?plan=early":""}">Enrol now</a></div></section>
+<section class="section dark"><div class="wrap row" style="justify-content:space-between;gap:24px"><div class="stack" style="gap:8px"><h2>The next cohort starts ${COHORT_START.replace(" 2026","")}.</h2><p style="font-size:17px">${open?"Early bird ends Saturday 10 October: ₦60,000 paid once.":"₦40,000 a month for November, December and January."}</p></div><a class="btn" href="/checkout${open?"?plan=early":""}">Enrol now</a></div></section>
 <style>@media (max-width:820px){#faq .wrap{grid-template-columns:1fr!important}}</style>`};};
 
 P.curriculum = () => ({ title:"Curriculum | Digital Marketing Bootcamp | Nerdy Pixels Academy", html:`
-<section class="hero"><div class="wrap stack" style="gap:16px"><span class="eyebrow">Professional Digital Marketing Bootcamp</span><h1>The curriculum, week by week</h1><p class="lead">Eight modules and a capstone hackathon. Each week you learn one discipline, practise it live, and add a finished piece to your portfolio.</p><div class="row"><a class="btn" href="#/checkout">Enrol in the next cohort</a><a class="btn ghost" href="#/courses/digital-marketing">Back to the bootcamp</a></div></div></section>
+<section class="hero"><div class="wrap stack" style="gap:16px"><span class="eyebrow">Professional Digital Marketing Bootcamp</span><h1>The curriculum, week by week</h1><p class="lead">Eight modules and a capstone hackathon. Each week you learn one discipline, practise it live, and add a finished piece to your portfolio.</p><div class="row"><a class="btn" href="/checkout">Enrol in the next cohort</a><a class="btn ghost" href="/courses/digital-marketing">Back to the bootcamp</a></div></div></section>
 <section class="section"><div class="wrap stack" style="gap:24px"><h2>How a week works</h2>
 <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">${[["Mon to Wed","Self-paced","Certification lessons and reading, at your own pace."],["Thursday","Live class","Core concepts for the week."],["Friday","Live class","Going deeper, with the tools."],["Saturday","Live class","Applying it to real examples."],["Sunday","Build session","Your portfolio piece, with feedback."]].map((r,i)=>`<div class="card stack" style="gap:6px;${i?"background:var(--deep);border-color:var(--deep);color:#fff":""}"><b style="font-size:17px;${i?"color:#fff":"color:var(--ink)"}">${r[0]}</b><span class="small" style="font-weight:600;opacity:.85">${r[1]}</span><span class="small">${r[2]}</span></div>`).join("")}</div>
 <p class="muted small">Live classes are online. Session times and the holiday break are confirmed at orientation.</p></div></section>
@@ -279,11 +283,11 @@ P.onboarding = () => { const o = lastOf("orders"); return { title:"Student onboa
 <div class="card stack" style="gap:12px">${[["Orientation","Details sent by email and WhatsApp"],["First live class",COHORT_START.replace(" 2026","")],["December instalment","Due 1 December"],["January instalment","Due 1 January"]].map(r=>`<div class="sumrow" style="border-bottom:1px solid var(--deep-line);padding-bottom:10px"><span style="color:var(--on-dark-2)">${r[0]}</span><b style="color:#fff">${r[1]}</b></div>`).join("")}</div></div></section>
 <section class="section tint" id="checklist"><div class="wrap grid" style="grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:40px">
 <div class="stack" style="gap:10px"><h2>Before your first class</h2><p class="muted">Six steps, about 30 minutes in total. Finish them before orientation.</p></div>
-<ol class="list" style="gap:12px">${[["Join your cohort's WhatsApp group","Class links, reminders and announcements go here first.",`<a class="btn green sm" href="${wa("Hello, I've enrolled in the bootcamp. Please add me to my cohort's WhatsApp group.")}" target="_blank" rel="noopener">${I.wa("#06301A",18)} Request my group link</a>`],["Complete your student profile","Name for your certificate, country, and your goal for the bootcamp.",`<a class="btn ghost sm" href="https://forms.gle/9Yt5Pa5kT5F19MYN8" target="_blank" rel="noopener">Complete my profile</a>`],["Create your learning accounts","Set up the free certification platform accounts listed in your welcome email.",""],["Set up your tools","A laptop or smartphone with a stable internet connection and a Google account.",""],["Attend orientation","Meet your instructors and cohort, and get the week-by-week calendar.",""],["Save your payment dates","Monthly plan: December and January instalments are due on the 1st.",`<a class="btn ghost sm" href="#/pay-instalment">Pay an instalment</a>`]].map((c,i)=>`<li class="card row" style="flex-wrap:nowrap;align-items:flex-start"><span class="avatar" style="width:36px;height:36px;font-size:15px">${i+1}</span><div class="stack" style="gap:8px"><b style="color:var(--ink)">${c[0]}</b><span class="muted">${c[1]}</span>${c[2]?`<div>${c[2]}</div>`:""}</div></li>`).join("")}</ol></div></section>
-<section class="section"><div class="wrap stack" style="gap:16px"><h2>Your curriculum</h2><p class="lead">Eight modules and a capstone hackathon, one module a week.</p><div><a class="btn" href="#/curriculum">Open the full curriculum</a></div></div></section>
+<ol class="list" style="gap:12px">${[["Join your cohort's WhatsApp group","Class links, reminders and announcements go here first.",`<a class="btn green sm" href="${wa("Hello, I've enrolled in the bootcamp. Please add me to my cohort's WhatsApp group.")}" target="_blank" rel="noopener">${I.wa("#06301A",18)} Request my group link</a>`],["Complete your student profile","Name for your certificate, country, and your goal for the bootcamp.",`<a class="btn ghost sm" href="https://forms.gle/9Yt5Pa5kT5F19MYN8" target="_blank" rel="noopener">Complete my profile</a>`],["Create your learning accounts","Set up the free certification platform accounts listed in your welcome email.",""],["Set up your tools","A laptop or smartphone with a stable internet connection and a Google account.",""],["Attend orientation","Meet your instructors and cohort, and get the week-by-week calendar.",""],["Save your payment dates","Monthly plan: December and January instalments are due on the 1st.",`<a class="btn ghost sm" href="/pay-instalment">Pay an instalment</a>`]].map((c,i)=>`<li class="card row" style="flex-wrap:nowrap;align-items:flex-start"><span class="avatar" style="width:36px;height:36px;font-size:15px">${i+1}</span><div class="stack" style="gap:8px"><b style="color:var(--ink)">${c[0]}</b><span class="muted">${c[1]}</span>${c[2]?`<div>${c[2]}</div>`:""}</div></li>`).join("")}</ol></div></section>
+<section class="section"><div class="wrap stack" style="gap:16px"><h2>Your curriculum</h2><p class="lead">Eight modules and a capstone hackathon, one module a week.</p><div><a class="btn" href="/curriculum">Open the full curriculum</a></div></div></section>
 <section class="section tint" id="payments"><div class="wrap grid g2" style="gap:32px;align-items:start">
 <div class="stack" style="gap:12px"><h2>Your payments</h2><p class="lead">If you paid the ₦60,000 early-bird price, you're fully paid. On the monthly plan, pay ₦40,000 by the 1st of December and January. We send a payment link three days before each date, and you can pay with the same methods you used at checkout.</p></div>
-<div class="card stack" style="gap:12px">${o?`<div class="sumrow"><span>Your plan</span><b>${o.plan==="early"?"Early bird, paid in full":"Monthly plan"}</b></div>`:""}<div class="sumrow"><span>November</span><b style="color:var(--green-ink)">Paid at enrolment</b></div><div class="sumrow"><span>December</span><b>₦40,000 by 1 Dec</b></div><div class="sumrow"><span>January</span><b>₦40,000 by 1 Jan</b></div><a class="btn block" href="#/pay-instalment">Pay my next instalment</a></div></div></section>
+<div class="card stack" style="gap:12px">${o?`<div class="sumrow"><span>Your plan</span><b>${o.plan==="early"?"Early bird, paid in full":"Monthly plan"}</b></div>`:""}<div class="sumrow"><span>November</span><b style="color:var(--green-ink)">Paid at enrolment</b></div><div class="sumrow"><span>December</span><b>₦40,000 by 1 Dec</b></div><div class="sumrow"><span>January</span><b>₦40,000 by 1 Jan</b></div><a class="btn block" href="/pay-instalment">Pay my next instalment</a></div></div></section>
 <section class="section"><div class="wrap band"><div class="stack" style="gap:6px"><h2 style="font-size:26px">Need help getting set up?</h2><p>Message the student support team on WhatsApp or email ${SITE.email}.</p></div><a class="btn green" href="${wa("Hello, I need help with my bootcamp onboarding.")}" target="_blank" rel="noopener">${I.wa()} Message student support</a></div></section>
 <style>@media (max-width:820px){#checklist .wrap{grid-template-columns:1fr!important}}</style>`};};
 P.event = () => ({ title:EVENT.title + " | Free event | Nerdy Pixels Academy", html:`
@@ -295,7 +299,7 @@ P.event = () => ({ title:EVENT.title + " | Free event | Nerdy Pixels Academy", h
 <ul class="list">${check("How to pick one audience and describe them in a sentence")}${check("How to write a positioning line people remember")}${check("Which two or three channels to start with, and why")}${check("How to set a goal you can measure in 30 days")}</ul>
 <h2 style="font-size:24px;margin-top:8px">Everyone who registers gets</h2>
 <div class="grid g3">${[["The strategy template","The one-page template used in class."],["The full replay","Sent within 24 hours, even if you miss it."],["Live Q&amp;A","Ask our instructors about careers in marketing."]].map(r=>`<div class="card stack" style="gap:6px"><b style="color:var(--ink)">${r[0]}</b><span class="small muted">${r[1]}</span></div>`).join("")}</div>
-<p class="muted">Want a head start? Read <a href="#/blog/first-marketing-strategy">How to create your first marketing strategy on one page</a>.</p>
+<p class="muted">Want a head start? Read <a href="/blog/first-marketing-strategy">How to create your first marketing strategy on one page</a>.</p>
 </div>
 <form class="price-card" data-form="event" novalidate>
 <h2 style="font-size:24px">Save your free seat</h2>
@@ -306,7 +310,7 @@ P.event = () => ({ title:EVENT.title + " | Free event | Nerdy Pixels Academy", h
 <label class="f">Which best describes you?${personaSelect("")}</label>
 <label class="f">Referral code (optional)<input name="ref"></label>
 <button class="btn block" type="submit">Register for free</button>
-<p class="small muted">We'll send your joining link and reminders by email and WhatsApp. See our <a href="#/privacy">privacy policy</a>.</p>
+<p class="small muted">We'll send your joining link and reminders by email and WhatsApp. See our <a href="/privacy">privacy policy</a>.</p>
 </form></div></section>
 <section class="section"><div class="wrap stack" style="gap:24px"><h2>Your hosts</h2><p class="lead">Led by Nerdy Pixels Academy instructors who run marketing for brands every day.</p>${instructors()}</div></section>`});
 
@@ -318,8 +322,8 @@ P.eventDone = () => { const r = lastOf("events"); const open = earlyOpen();
 <h1 style="font-size:clamp(30px,4vw,44px)">You're registered${r?", "+esc(r.first):""}.</h1>
 <p class="lead">Your joining link for ${EVENT.title} is on its way${r?" to "+esc(r.email):""}. It's on ${EVENT.dateLabel} at ${EVENT.timeLabel}. Two quick things so you don't miss it:</p>
 <div class="grid g2"><a class="btn deep" href="${gcal}" target="_blank" rel="noopener">Add to Google Calendar</a><a class="btn green" href="${wa("Hi, I registered for " + EVENT.title + ". Please send me reminders on WhatsApp.")}" target="_blank" rel="noopener">${I.wa()} Get reminders on WhatsApp</a></div>
-<div class="card stack" style="gap:10px;margin-top:10px"><h2 style="font-size:22px">Ready for the full programme?</h2><p class="muted">${open?"Early bird is ₦60,000 paid once, until Saturday 10 October.":"The next cohort starts " + COHORT_START + ". Join from ₦40,000 a month for three months."}</p><div class="row"><a class="btn" href="#/checkout${open?"?plan=early":""}">See plans for the next cohort</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div></div>
-<a href="#/blog" style="font-weight:600">Read our beginner guides while you wait</a>
+<div class="card stack" style="gap:10px;margin-top:10px"><h2 style="font-size:22px">Ready for the full programme?</h2><p class="muted">${open?"Early bird is ₦60,000 paid once, until Saturday 10 October.":"The next cohort starts " + COHORT_START + ". Join from ₦40,000 a month for three months."}</p><div class="row"><a class="btn" href="/checkout${open?"?plan=early":""}">See plans for the next cohort</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
+<a href="/blog" style="font-weight:600">Read our beginner guides while you wait</a>
 </div></div></section>`};};
 
 /* ---------- Checkout ---------- */
@@ -350,14 +354,14 @@ function coRender(){
 <label class="f">Which best describes you?${personaSelect(c.persona)}</label>
 <label class="f">How did you hear about us?<select name="source"><option value="">Select one</option>${[["blog","Our blog"],["landing","Our website"],["partner","A partner organisation"],["email","Email from us"],["whatsapp","WhatsApp"],["friend","A friend or graduate"],["event","The free event"],["other","Somewhere else"]].map(o=>`<option value="${o[0]}"${o[0]===c.source?" selected":""}>${o[1]}</option>`).join("")}</select></label>
 <label class="f">Referral code (optional)<input name="ref" value="${esc(c.ref)}" placeholder="For example AMB-TOLU"></label></div>
-<label class="check" style="cursor:pointer"><input type="checkbox" name="agree" ${c.agree?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span class="small">I accept the <a href="#/terms" target="_blank">terms of enrolment</a> and <a href="#/payment-policy" target="_blank">payment policy</a>, and I'm happy to receive class updates on WhatsApp and email.</span></label>
+<label class="check" style="cursor:pointer"><input type="checkbox" name="agree" ${c.agree?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span class="small">I accept the <a href="/terms" target="_blank">terms of enrolment</a> and <a href="/payment-policy" target="_blank">payment policy</a>, and I'm happy to receive class updates on WhatsApp and email.</span></label>
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="1">Back</button><button class="btn" type="submit" style="flex:1">Continue to payment</button></div></form>`;
   if (c.step===3) body = `<h1 style="font-size:clamp(26px,3vw,34px)">How would you like to pay?</h1><p class="muted" style="margin-top:-12px">Options for ${esc(ct.name)}. <button type="button" class="linkish" data-act="co-step" data-v="1" style="border:0;background:none;padding:0;color:var(--purple-ink);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer">Change country</button></p>
 <div class="stack" style="gap:12px" role="radiogroup" aria-label="Payment method">${ct.methods.map(m=>`<button type="button" role="radio" aria-checked="${m[0]===method}" class="choice ${m[0]===method?"on":""}" data-act="co-method" data-v="${m[0]}"><span class="radio"></span><span class="stack" style="gap:2px;flex:1"><b style="color:var(--ink)">${m[1]}</b><span class="small muted">${m[2]}</span></span></button>`).join("")}</div>
 ${local?localNote:""}
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="2">Back</button><button class="btn green" type="button" data-act="co-pay" style="flex:1">${I.lock("#06301A")} Pay ${naira(amount)}${local?" in "+ct.cur:""}</button></div>
 <p class="small muted">Payments are processed securely by our licensed payment partner. We never see or store your card details or wallet PIN.</p>`;
-  document.getElementById("co").innerHTML = `<a href="#/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${steps}<div class="mobile-due"><span class="small">${plan==="early"?"Early bird, paid once":"Monthly plan, due today"}</span><b style="font-size:20px;color:var(--ink)">${naira(amount)}</b></div>${body}`;
+  document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${steps}<div class="mobile-due"><span class="small">${plan==="early"?"Early bird, paid once":"Monthly plan, due today"}</span><b style="font-size:20px;color:var(--ink)">${naira(amount)}</b></div>${body}`;
   document.getElementById("co-sum").innerHTML = `<h2 style="font-size:18px">Order summary</h2><div><b style="color:var(--ink)">Professional Digital Marketing Bootcamp</b><div class="small muted">Next cohort, classes start ${COHORT_START.replace(" 2026","")}</div></div>
 <div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px"><span>Plan</span><b style="color:var(--ink)">${plan==="early"?"Early bird, paid once":"Monthly plan, 3 payments"}</b></div>
 ${plan==="monthly"?`<div class="sumrow"><span>Total over 3 months</span><span>₦120,000</span></div>`:""}
@@ -375,8 +379,8 @@ ${o.plan==="monthly"?`<div class="sumrow" style="border-top:1px solid var(--line
 <h2 style="font-size:20px">Your next three steps</h2>
 <div class="stack" style="gap:12px">
 <a class="btn green" style="justify-content:flex-start" href="${wa("Hello, I've just enrolled (order " + o.ref + "). Please add me to my cohort's WhatsApp group.")}" target="_blank" rel="noopener">${I.wa()} 1. Join your cohort's WhatsApp group</a>
-<a class="btn deep" style="justify-content:flex-start" href="#/onboarding">2. Complete your onboarding checklist</a>
-<a class="btn ghost" style="justify-content:flex-start" href="#/curriculum">3. Look through the curriculum</a></div>
+<a class="btn deep" style="justify-content:flex-start" href="/onboarding">2. Complete your onboarding checklist</a>
+<a class="btn ghost" style="justify-content:flex-start" href="/curriculum">3. Look through the curriculum</a></div>
 </div></div></section>`};};
 
 /* ---------- Instalments ---------- */
@@ -389,28 +393,28 @@ P.instalment = () => { const o = lastOf("orders") || {};
 <label class="f">Which instalment?<select name="month"><option value="December">December (due 1 Dec)</option><option value="January">January (due 1 Jan)</option></select></label>
 <label class="f">Order reference (optional)<input name="ref" value="${esc(o.ref||"")}" placeholder="For example NPA-48213"></label></div>
 <button class="btn green" type="submit">${I.lock("#06301A")} Continue to pay ₦40,000</button>
-<p class="small muted">Paid in full at the early-bird price? You have nothing more to pay. Questions: <a href="#/contact?topic=payment">contact us</a>.</p></form>
-<aside class="summary"><h2 style="font-size:18px">Monthly plan schedule</h2><div class="sumrow"><span>November</span><b style="color:var(--green-ink)">Paid on enrolment</b></div><div class="sumrow"><span>December</span><b>₦40,000 by 1 Dec</b></div><div class="sumrow"><span>January</span><b>₦40,000 by 1 Jan</b></div><p class="small muted">Read the <a href="#/payment-policy">payment policy</a>.</p></aside>
+<p class="small muted">Paid in full at the early-bird price? You have nothing more to pay. Questions: <a href="/contact?topic=payment">contact us</a>.</p></form>
+<aside class="summary"><h2 style="font-size:18px">Monthly plan schedule</h2><div class="sumrow"><span>November</span><b style="color:var(--green-ink)">Paid on enrolment</b></div><div class="sumrow"><span>December</span><b>₦40,000 by 1 Dec</b></div><div class="sumrow"><span>January</span><b>₦40,000 by 1 Jan</b></div><p class="small muted">Read the <a href="/payment-policy">payment policy</a>.</p></aside>
 </div></section>`};};
 P.instalmentDone = () => { const p = sget("npa-last-instalment"); if (!p) return P.notFound();
-  return { title:"Instalment received | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">Thank you, ${esc(p.first)}.</h1><p class="lead">Your ${esc(p.month)} instalment of ₦40,000 has been received. A receipt is on its way to ${esc(p.email)}. Reference <b>${esc(p.ref)}</b>.</p><div class="row"><a class="btn deep" href="#/onboarding">Back to onboarding</a><a class="btn ghost" href="#/curriculum">View the curriculum</a></div></div></div></section>`};};
+  return { title:"Instalment received | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">Thank you, ${esc(p.first)}.</h1><p class="lead">Your ${esc(p.month)} instalment of ₦40,000 has been received. A receipt is on its way to ${esc(p.email)}. Reference <b>${esc(p.ref)}</b>.</p><div class="row"><a class="btn deep" href="/onboarding">Back to onboarding</a><a class="btn ghost" href="/curriculum">View the curriculum</a></div></div></div></section>`};};
 /* ---------- Blog ---------- */
-function postCards(){ return `<div class="grid g3">${POSTS.map(p=>`<article class="card stack" style="gap:10px"><span class="small muted">${p.date}, ${p.mins}</span><h3><a href="#/blog/${p.slug}" style="color:var(--ink);text-decoration:none">${p.title}</a></h3><p class="muted small">${p.intro}</p><a href="#/blog/${p.slug}" style="font-weight:600;margin-top:auto">Read the article</a></article>`).join("")}</div>`; }
+function postCards(){ return `<div class="grid g3">${POSTS.map(p=>`<article class="card stack" style="gap:10px"><span class="small muted">${p.date}, ${p.mins}</span><h3><a href="/blog/${p.slug}" style="color:var(--ink);text-decoration:none">${p.title}</a></h3><p class="muted small">${p.intro}</p><a href="/blog/${p.slug}" style="font-weight:600;margin-top:auto">Read the article</a></article>`).join("")}</div>`; }
 P.blog = () => ({ title:"Blog | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Blog</h1><p class="lead">Plain-English guides to digital marketing, careers and growth, written for African marketers.</p></div></section><section class="section"><div class="wrap stack" style="gap:40px">${postCards()}${eventBand()}</div></section>`});
 P.post = (q, slug) => { const p = POSTS.find(x=>x.slug===slug); if (!p) return P.notFound(); const open = earlyOpen();
-  const cta = `<aside class="inline-cta" aria-label="Free event"><span class="eyebrow" style="font-size:13.5px">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2 style="font-size:24px;margin:0">Put this into practice: ${EVENT.title.toLowerCase().replace("creating","create")}</h2><p>One hour, live with our instructors. Leave with a one-page strategy and the template.</p><div><a class="btn" href="#/events/first-marketing-strategy">Save my free seat</a></div></aside>`;
+  const cta = `<aside class="inline-cta" aria-label="Free event"><span class="eyebrow" style="font-size:13.5px">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2 style="font-size:24px;margin:0">Put this into practice: ${EVENT.title.toLowerCase().replace("creating","create")}</h2><p>One hour, live with our instructors. Leave with a one-page strategy and the template.</p><div><a class="btn" href="/events/first-marketing-strategy">Save my free seat</a></div></aside>`;
   const parts = p.body.split("<h2>"); const mid = Math.min(2, parts.length-1);
   const body = parts.map((s,i)=>(i?"<h2>":"")+s+(i===mid?cta:"")).join("");
   return { title:p.title + " | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap grid" style="grid-template-columns:minmax(0,1fr) 300px;gap:48px;align-items:start" id="post">
-<article class="article stack" style="gap:18px"><a href="#/blog" style="font-weight:600;text-decoration:none">Blog</a><span class="small muted">${p.date}, ${p.mins}</span><h1 style="font-size:clamp(30px,4vw,44px)">${p.title}</h1><p class="lead">${p.intro}</p>${body}
-<div class="card stack" style="gap:10px;margin-top:16px"><h2 style="font-size:22px;margin:0">Learn it properly, with feedback</h2><p>Our Professional Digital Marketing Bootcamp covers strategy, content, social, SEO, paid media, email and analytics in eight practical modules.</p><div class="row"><a class="btn" href="#/courses/digital-marketing">See the bootcamp</a><a class="btn ghost" href="#/curriculum">See the curriculum</a></div></div></article>
-<aside class="summary"><span class="pill green" style="align-self:flex-start">Next cohort enrolling</span><h2 style="font-size:20px">Learn it properly in 8 modules</h2><p class="small">Five certifications, live classes and a portfolio. ${open?"₦60,000 paid once until 10 October, or ₦40,000 a month.":"From ₦40,000 a month for three months."}</p><a class="btn deep block" href="#/courses/digital-marketing">See the bootcamp</a></aside>
+<article class="article stack" style="gap:18px"><a href="/blog" style="font-weight:600;text-decoration:none">Blog</a><span class="small muted">${p.date}, ${p.mins}</span><h1 style="font-size:clamp(30px,4vw,44px)">${p.title}</h1><p class="lead">${p.intro}</p>${body}
+<div class="card stack" style="gap:10px;margin-top:16px"><h2 style="font-size:22px;margin:0">Learn it properly, with feedback</h2><p>Our Professional Digital Marketing Bootcamp covers strategy, content, social, SEO, paid media, email and analytics in eight practical modules.</p><div class="row"><a class="btn" href="/courses/digital-marketing">See the bootcamp</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div></article>
+<aside class="summary"><span class="pill green" style="align-self:flex-start">Next cohort enrolling</span><h2 style="font-size:20px">Learn it properly in 8 modules</h2><p class="small">Five certifications, live classes and a portfolio. ${open?"₦60,000 paid once until 10 October, or ₦40,000 a month.":"From ₦40,000 a month for three months."}</p><a class="btn deep block" href="/courses/digital-marketing">See the bootcamp</a></aside>
 </div><style>@media (max-width:900px){#post{grid-template-columns:1fr!important}}</style></section>`};};
 
 /* ---------- FAQ, contact, waitlist ---------- */
 P.faq = () => ({ title:"FAQ | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Frequently asked questions</h1><p class="lead">About the bootcamp, paying from anywhere in Africa, and the free event.</p></div></section>
 <section class="section"><div class="wrap stack" style="gap:40px;max-width:900px">${FAQS.map(g=>`<div class="stack" style="gap:12px"><h2 style="font-size:26px">${g[0]}</h2>${faqBlock(g[1],false)}</div>`).join("")}
-<div class="band"><div class="stack" style="gap:6px"><h2 style="font-size:24px">Still have a question?</h2><p>Talk to an advisor on WhatsApp and get an answer the same day.</p></div><div class="stack" style="gap:10px"><a class="btn green" href="${wa("Hello, I have a question about Nerdy Pixels Academy.")}" target="_blank" rel="noopener">${I.wa()} Chat on WhatsApp</a><a class="btn ghost" href="#/contact">Send us a message</a></div></div></div></section>`});
+<div class="band"><div class="stack" style="gap:6px"><h2 style="font-size:24px">Still have a question?</h2><p>Talk to an advisor on WhatsApp and get an answer the same day.</p></div><div class="stack" style="gap:10px"><a class="btn green" href="${wa("Hello, I have a question about Nerdy Pixels Academy.")}" target="_blank" rel="noopener">${I.wa()} Chat on WhatsApp</a><a class="btn ghost" href="/contact">Send us a message</a></div></div></div></section>`});
 P.contact = (q) => ({ title:"Contact us | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Contact us</h1><p class="lead">Questions about courses, payments or your enrolment? We usually reply the same working day.</p></div></section>
 <section class="section"><div class="wrap co">
 <form class="stack" data-form="contact" style="gap:16px" novalidate><div class="grid g2"><label class="f">Full name<input name="name" autocomplete="name"></label><label class="f">Email address<input type="email" name="email" autocomplete="email"></label>
@@ -420,15 +424,15 @@ P.contact = (q) => ({ title:"Contact us | Nerdy Pixels Academy", html:`<section 
 <button class="btn" type="submit">Send message</button></form>
 <aside class="summary"><h2 style="font-size:18px">Other ways to reach us</h2><a class="btn green block" href="${wa("Hello Nerdy Pixels Academy.")}" target="_blank" rel="noopener">${I.wa()} WhatsApp us</a><div class="sumrow"><span>Email</span><a href="mailto:${SITE.email}">${SITE.email}</a></div><div class="sumrow"><span>Phone</span><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a></div><p class="small muted">Partnership enquiries are welcome from schools, communities and employers across Africa.</p></aside>
 </div></section>`});
-P.contactDone = () => { const m = lastOf("messages"); return { title:"Message sent | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">Thanks${m?", "+esc(m.first):""}. We've got your message.</h1><p class="lead">We'll reply to ${m?esc(m.email):"you"} within one working day. For anything urgent, message us on WhatsApp.</p><div class="row"><a class="btn green" href="${wa("Hello, I just sent a message through your website.")}" target="_blank" rel="noopener">${I.wa()} WhatsApp us</a><a class="btn ghost" href="#/">Back to home</a></div></div></div></section>`};};
+P.contactDone = () => { const m = lastOf("messages"); return { title:"Message sent | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">Thanks${m?", "+esc(m.first):""}. We've got your message.</h1><p class="lead">We'll reply to ${m?esc(m.email):"you"} within one working day. For anything urgent, message us on WhatsApp.</p><div class="row"><a class="btn green" href="${wa("Hello, I just sent a message through your website.")}" target="_blank" rel="noopener">${I.wa()} WhatsApp us</a><a class="btn ghost" href="/">Back to home</a></div></div></div></section>`};};
 P.waitlist = (q, slug) => { const c = COURSES.find(x=>x.slug===slug); if (!c) return P.notFound();
-  return { title:c.name + " waitlist | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap hero-grid" style="align-items:start"><div class="stack" style="gap:18px"><span class="pill" style="align-self:flex-start">${c.weeks}</span><h1>${c.name}</h1><p class="lead">${c.text}</p><p>Dates and pricing for the next intake are not announced yet. Join the waitlist and we'll tell you first, before enrolment opens to everyone.</p><p class="muted">Want to start now? The <a href="#/courses/digital-marketing">Professional Digital Marketing Bootcamp</a> covers the foundations of every specialist programme.</p></div>
+  return { title:c.name + " waitlist | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap hero-grid" style="align-items:start"><div class="stack" style="gap:18px"><span class="pill" style="align-self:flex-start">${c.weeks}</span><h1>${c.name}</h1><p class="lead">${c.text}</p><p>Dates and pricing for the next intake are not announced yet. Join the waitlist and we'll tell you first, before enrolment opens to everyone.</p><p class="muted">Want to start now? The <a href="/courses/digital-marketing">Professional Digital Marketing Bootcamp</a> covers the foundations of every specialist programme.</p></div>
 <form class="price-card" data-form="waitlist" data-course="${c.slug}" novalidate><h2 style="font-size:22px">Join the waitlist</h2><label class="f">Full name<input name="name" autocomplete="name"></label><label class="f">Email address<input type="email" name="email" autocomplete="email"></label><label class="f">Country<select name="country">${countryOptions("NG")}</select></label><button class="btn block" type="submit">Join the waitlist</button><p class="small muted">No spam. One email when enrolment opens.</p></form></div></section>`};};
 P.waitlistDone = (q, slug) => { const c = COURSES.find(x=>x.slug===slug) || {name:"the programme"};
-  return { title:"You're on the waitlist | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">You're on the ${esc(c.name)} waitlist.</h1><p class="lead">We'll email you as soon as dates and pricing are confirmed. In the meantime, the free event is a good place to start.</p><div class="row"><a class="btn" href="#/events/first-marketing-strategy">Join the free event</a><a class="btn ghost" href="#/courses">Back to courses</a></div></div></div></section>`};};
+  return { title:"You're on the waitlist | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">You're on the ${esc(c.name)} waitlist.</h1><p class="lead">We'll email you as soon as dates and pricing are confirmed. In the meantime, the free event is a good place to start.</p><div class="row"><a class="btn" href="/events/first-marketing-strategy">Join the free event</a><a class="btn ghost" href="/courses">Back to courses</a></div></div></div></section>`};};
 
 /* ---------- Policies ---------- */
-const legal = (title, updated, sections) => ({ title:title + " | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap article stack" style="gap:18px"><h1 style="font-size:clamp(30px,4vw,44px)">${title}</h1><p class="muted">Last updated ${updated}</p>${sections.map(s=>`<h2>${s[0]}</h2>${s[1].map(p=>`<p>${p}</p>`).join("")}`).join("")}<p>Questions? Email <a href="mailto:${SITE.email}">${SITE.email}</a> or <a href="#/contact">contact us</a>.</p></div></section>`});
+const legal = (title, updated, sections) => ({ title:title + " | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap article stack" style="gap:18px"><h1 style="font-size:clamp(30px,4vw,44px)">${title}</h1><p class="muted">Last updated ${updated}</p>${sections.map(s=>`<h2>${s[0]}</h2>${s[1].map(p=>`<p>${p}</p>`).join("")}`).join("")}<p>Questions? Email <a href="mailto:${SITE.email}">${SITE.email}</a> or <a href="/contact">contact us</a>.</p></div></section>`});
 P.terms = () => legal("Terms of enrolment","September 2026",[
  ["About these terms",["These terms apply when you enrol in the Professional Digital Marketing Bootcamp run by Nerdy Pixels Academy, a brand of Nerdy Pixels Digital. By completing checkout, you agree to them."]],
  ["Your place in the cohort",["Your seat is confirmed once your first payment is received. Seats are personal and cannot be transferred to someone else without our written agreement."]],
@@ -452,7 +456,7 @@ P.privacy = () => legal("Privacy policy","September 2026",[
  ["How long we keep it",["We keep student records for as long as needed to issue certificates and meet legal and accounting requirements. You can ask us to delete marketing data at any time."]],
  ["Your rights",["You can ask to see, correct or delete the personal data we hold about you, in line with the Nigeria Data Protection Act 2023 and other applicable laws. Email us to make a request."]]
 ]);
-P.notFound = () => ({ title:"Page not found | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap stack" style="gap:18px;max-width:720px"><h1>We couldn't find that page.</h1><p class="lead">The link may be out of date. These pages are a good place to start:</p><div class="row"><a class="btn" href="#/courses/digital-marketing">Digital Marketing Bootcamp</a><a class="btn ghost" href="#/">Home</a><a class="btn ghost" href="#/contact">Contact us</a></div></div></section>`});
+P.notFound = () => ({ title:"Page not found | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap stack" style="gap:18px;max-width:720px"><h1>We couldn't find that page.</h1><p class="lead">The link may be out of date. These pages are a good place to start:</p><div class="row"><a class="btn" href="/courses/digital-marketing">Digital Marketing Bootcamp</a><a class="btn ghost" href="/">Home</a><a class="btn ghost" href="/contact">Contact us</a></div></div></section>`});
 /* ============ Payment window (demo) ============
    On the live site, replace startPayment() with your payment partner's inline checkout
    (for example Flutterwave or Paystack), passing amount, currency, email, phone and reference.
@@ -489,8 +493,9 @@ const ROUTES = [
  [/^\/terms$/, P.terms], [/^\/payment-policy$/, P.payment], [/^\/privacy$/, P.privacy]
 ];
 let current = "";
-function parse(){ const h = location.hash.replace(/^#/, "") || "/"; const [path, qs] = h.split("?"); const q = {}; (qs||"").split("&").filter(Boolean).forEach(kv=>{ const [k,v] = kv.split("="); q[decodeURIComponent(k)] = decodeURIComponent(v||""); }); return { path: path.replace(/\/+$/,"") || "/", q }; }
-function go(h){ location.hash = h; }
+function parseQS(qs){ const q = {}; (qs||"").replace(/^\?/,"").split("&").filter(Boolean).forEach(kv=>{ const [k,v] = kv.split("="); q[decodeURIComponent(k)] = decodeURIComponent((v||"").replace(/\+/g," ")); }); return q; }
+function parse(){ return { path: location.pathname.replace(/\/+$/,"") || "/", q: parseQS(location.search) }; }
+function go(h){ h = h.replace(/^/, ""); if (window.__npaNav) window.__npaNav(h); else location.href = h; }
 function render(){
   const { path, q } = parse();
   if (q.preview === "open" || q.preview === "closed" || q.preview === "auto"){ try{ q.preview==="auto" ? sessionStorage.removeItem("npa-preview") : sessionStorage.setItem("npa-preview", q.preview); }catch(e){} }
@@ -502,14 +507,20 @@ function render(){
   document.title = page.title;
   document.getElementById("app").innerHTML = header(path) + `<main id="main" tabindex="-1">${page.html}</main>` + footer();
   if (page.mount) page.mount();
+  if (/^\/courses\/digital-marketing$/.test(path)) document.getElementById("main").insertAdjacentHTML("beforeend", stickyEnrol());
+  if (window.__npaTick) window.__npaTick();
   if (/^\/(checkout|pay-instalment)/.test(path)){ const f = document.querySelector(".wa-float"); if (f) f.remove(); }
   if (q.s) setTimeout(()=>scrollToId(q.s), 30); else window.scrollTo(0, 0);
   const h1 = document.querySelector("main h1"); if (h1 && !q.s) { document.getElementById("main").focus({preventScroll:true}); }
 }
 function scrollToId(id){ const el = document.getElementById(id); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); }
-window.addEventListener("hashchange", render);
 
 /* ============ Interactions ============ */
+let booted = false;
+export function boot(){
+if (booted) return; booted = true;
+const tick = () => document.querySelectorAll("[data-countdown]").forEach(el => { const ms = new Date(el.dataset.countdown) - Date.now(); if (ms <= 0){ el.textContent = ""; return; } const d = Math.floor(ms/864e5), h = Math.floor(ms%864e5/36e5), m = Math.floor(ms%36e5/6e4); el.textContent = `${d}d ${h}h ${m}m ${el.dataset.label}`; });
+tick(); setInterval(tick, 30000); window.__npaTick = tick;
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-act]"); if (!a) return;
   const act = a.dataset.act, v = a.dataset.v;
@@ -546,11 +557,11 @@ document.addEventListener("submit", e => {
     need((d.name||"").trim(), "Enter your full name.");
     need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com.");
     const first = d.name.trim().split(" ")[0];
-    if (kind === "event"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can send your joining link."); save("events", {...d, first}); if (window.__npaEvent) window.__npaEvent({...d}).catch(()=>{}); go("#/events/first-marketing-strategy/registered"); }
+    if (kind === "event"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can send your joining link."); save("events", {...d, first}); if (window.__npaEvent) window.__npaEvent({...d}).catch(()=>{}); go("/events/first-marketing-strategy/registered"); }
     if (kind === "co-details"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can add you to your cohort's group."); need(d.agree, "Tick the box to accept the terms and payment policy.");
       const c = coState(); Object.assign(c, d, {agree:true, step:3}); coSave(c); coRender(); window.scrollTo({top:0,behavior:"smooth"}); }
-    if (kind === "contact"){ need((d.message||"").trim().length >= 5, "Write a short message so we know how to help."); save("messages", {...d, first}); go("#/contact/sent"); }
-    if (kind === "waitlist"){ save("waitlist", {...d, first, course:f.dataset.course}); go("#/waitlist/" + f.dataset.course + "/joined"); }
+    if (kind === "contact"){ need((d.message||"").trim().length >= 5, "Write a short message so we know how to help."); save("messages", {...d, first}); go("/contact/sent"); }
+    if (kind === "waitlist"){ save("waitlist", {...d, first, course:f.dataset.course}); go("/waitlist/" + f.dataset.course + "/joined"); }
     if (kind === "instalment"){ need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can send your receipt.");
       const ct = country(d.country); formError(f, "");
       const btn = f.querySelector('button[type="submit"]'); if (btn){ btn.disabled = true; btn.textContent = "Opening secure payment…"; }
@@ -560,5 +571,21 @@ document.addEventListener("submit", e => {
     }
   }catch(err){ if (err !== 0) throw err; }
 });
-render();
-})();
+
+document.addEventListener("click", e => {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest("a[href]"); if (!a || a.target || a.hasAttribute("download")) return;
+  const href = a.getAttribute("href"); if (!href || !href.startsWith("/") || href.startsWith("//")) return;
+  if (/^\/(admin|auth|api|student|reset-password|payment-return|sitemap|robots)/.test(href)) return;
+  e.preventDefault(); go(href);
+});
+}
+export function renderNow(){ render(); }
+export function renderStatic(path, search){
+  path = (path || "/").replace(/\/+$/,"") || "/"; const q = parseQS(search || "");
+  let page = null;
+  for (const [re, fn] of ROUTES){ const m = path.match(re); if (m){ try{ page = fn(q, m[1]); }catch(e){ page = null; } break; } }
+  const found = !!page; if (!page) page = P.notFound();
+  return { title: page.title, found, html: header(path) + `<main id="main" tabindex="-1">${page.html}</main>` + footer() };
+}
+
