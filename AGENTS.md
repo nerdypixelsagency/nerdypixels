@@ -15,3 +15,4 @@
 - Admin access uses `user_roles` + `is_admin`/`has_role`; the owner email self-claims super_admin via `claim_super_admin()` only when verified. Why: roles must never live on profiles or the client.
 
 - Auth emails go through the Supabase Send Email hook at `/api/public/auth-email-hook`, sent via Resend (`src/lib/auth-emails.server.ts`). Why: external Supabase project; user chose Resend over Supabase default sender.
+- Deployments without backend env (Vercel custom domain) relay /_serverFn calls to nerdypixels.lovable.app via relayMiddleware in src/start.ts; auth sign-up/reset links are generated server-side (admin.generateLink) and sent by Resend. Why: Vercel lacks secrets; avoids Supabase email rate limits.
