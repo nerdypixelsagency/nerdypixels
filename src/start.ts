@@ -37,7 +37,9 @@ const relayMiddleware = createMiddleware().server(async ({ request, next }) => {
   headers.set("referer", `${RELAY_TARGET}/`);
   headers.delete("host");
   const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
-  const res = await fetch(`${RELAY_TARGET}${url.pathname}${url.search}`, { method: request.method, headers, body });
+  const init: RequestInit = { method: request.method, headers };
+  if (body) init.body = body;
+  const res = await fetch(`${RELAY_TARGET}${url.pathname}${url.search}`, init);
   return new Response(res.body, { status: res.status, headers: res.headers }) as never;
 });
 
