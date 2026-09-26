@@ -137,7 +137,7 @@ function header(path){
     ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October. <span class="cd" data-countdown="2026-10-10T23:59:59+01:00" data-label="left"></span><a href="/checkout?plan=early">Claim your seat</a></div>`
     : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months. <span class="cd" data-countdown="2026-11-05T09:00:00+01:00" data-label="until classes start"></span><a href="/checkout">Enrol now</a></div>`;
   return `<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
-<a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" style="height:50px;width:auto"></a>
+<a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" width="76" height="50" style="height:50px;width:auto"></a>
 <nav class="menu" aria-label="Main"><a href="/"${on("/")}>Home</a><a href="/courses"${on("/courses")}>Courses</a><a href="/blog"${on("/blog")}>Blog</a><a href="/faq"${on("/faq")}>FAQ</a><a href="/contact"${on("/contact")}>Contact Us</a></nav>
 <div class="nav-cta"><a class="btn ghost sm" href="/events/first-marketing-strategy">Free event</a><a class="btn sm" href="/checkout">Enrol now</a></div>
 <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" data-act="menu">${I.menu()}</button>
@@ -153,7 +153,7 @@ function footer(){
 <button class="btn deep" type="submit">Subscribe</button></form></div></section>
 <footer><div class="wrap stack" style="gap:36px">
 <div class="grid g4">
-<div class="stack" style="gap:10px"><a class="logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" style="width:140px;height:auto"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
+<div class="stack" style="gap:10px"><a class="logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" width="140" height="95" loading="lazy" style="width:140px;height:auto"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
 <div class="stack" style="gap:10px"><h3>Learn</h3><a href="/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="/curriculum">Curriculum</a><a href="/courses">All courses</a><a href="/events/first-marketing-strategy">Free event</a><a href="/blog">Blog</a></div>
 <div class="stack" style="gap:10px"><h3>Students</h3><a href="/onboarding">Student onboarding</a><a href="/pay-instalment">Pay an instalment</a><a href="/faq">FAQ</a><a href="/terms">Terms of enrolment</a><a href="/payment-policy">Payment policy</a><a href="/privacy">Privacy policy</a></div>
 <div class="stack" style="gap:10px"><h3>Contact</h3><a href="mailto:${SITE.email}">${SITE.email}</a><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a><a href="${wa("Hello Nerdy Pixels Academy, I have a question.")}" target="_blank" rel="noopener">Chat on WhatsApp</a><a href="/contact">Contact form</a></div>
