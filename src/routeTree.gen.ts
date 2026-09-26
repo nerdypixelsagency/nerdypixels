@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
 import { Route as ApiPublicAuthEmailHookRouteImport } from './routes/api/public/auth-email-hook'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
+import { Route as ApiPublicCronDailySummaryRouteImport } from './routes/api/public/cron/daily-summary'
 import { Route as ApiPublicCronInstalmentRemindersRouteImport } from './routes/api/public/cron/instalment-reminders'
 
 const IndexRoute = IndexRouteImport.update({
@@ -98,6 +99,12 @@ const ApiPublicFlutterwaveWebhookRoute =
     path: '/api/public/flutterwave-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCronDailySummaryRoute =
+  ApiPublicCronDailySummaryRouteImport.update({
+    id: '/api/public/cron/daily-summary',
+    path: '/api/public/cron/daily-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCronInstalmentRemindersRoute =
   ApiPublicCronInstalmentRemindersRouteImport.update({
     id: '/api/public/cron/instalment-reminders',
@@ -119,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
   '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRoutesByTo {
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
   '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRoutesById {
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
   '/api/public/cron/instalment-reminders': typeof ApiPublicCronInstalmentRemindersRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin/'
+    | '/api/public/cron/daily-summary'
     | '/api/public/cron/instalment-reminders'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/admin'
+    | '/api/public/cron/daily-summary'
     | '/api/public/cron/instalment-reminders'
   id:
     | '__root__'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
     | '/_authenticated/admin/'
+    | '/api/public/cron/daily-summary'
     | '/api/public/cron/instalment-reminders'
   fileRoutesById: FileRoutesById
 }
@@ -214,6 +227,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
+  ApiPublicCronDailySummaryRoute: typeof ApiPublicCronDailySummaryRoute
   ApiPublicCronInstalmentRemindersRoute: typeof ApiPublicCronInstalmentRemindersRoute
 }
 
@@ -317,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlutterwaveWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/daily-summary': {
+      id: '/api/public/cron/daily-summary'
+      path: '/api/public/cron/daily-summary'
+      fullPath: '/api/public/cron/daily-summary'
+      preLoaderRoute: typeof ApiPublicCronDailySummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/instalment-reminders': {
       id: '/api/public/cron/instalment-reminders'
       path: '/api/public/cron/instalment-reminders'
@@ -366,6 +387,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,
+  ApiPublicCronDailySummaryRoute: ApiPublicCronDailySummaryRoute,
   ApiPublicCronInstalmentRemindersRoute: ApiPublicCronInstalmentRemindersRoute,
 }
 export const routeTree = rootRouteImport
