@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getMyRole } from "@/lib/admin.functions";
+import { getMyRole, getPaymentModeFn, setPaymentMode } from "@/lib/admin.functions";
 import logoDark from "@/assets/logo-dark.png.asset.json";
 import "@/components/admin/admin.css";
 
@@ -23,6 +23,16 @@ function AdminLayout() {
   const roleFn = useServerFn(getMyRole);
   const { data, isLoading } = useQuery({ queryKey: ["admin-role"], queryFn: () => roleFn() });
   const qc = useQueryClient();
+  const modeFn = useServerFn(getPaymentModeFn);
+  const setModeFn = useServerFn(setPaymentMode);
+  const { data: modeData } = useQuery({ queryKey: ["pay-mode"], queryFn: () => modeFn(), enabled: !!data?.role });
+  const mode = modeData?.mode ?? "live";
+  async function toggleMode() {
+    const next = mode === "live" ? "test" : "live";
+    if (!confirm(next === "test" ? "Switch to TEST mode? Buyers won't be charged real money." : "Switch to LIVE mode? Buyers will be charged real money.")) return;
+    await setModeFn({ data: { mode: next } });
+    qc.invalidateQueries();
+  }
   const navigate = useNavigate();
 
   async function signOut() {
@@ -72,9 +82,17 @@ function AdminLayout() {
       </aside>
       <main className="adm-main">
         <div className="adm-top">
+          {data.role === "super_admin" ? (
+            <button className="adm-btn ghost" onClick={toggleMode} title="Switch payment mode" style={mode === "test" ? { background: "#fff4d6", borderColor: "#e0a800", color: "#7a5a00" } : undefined}>
+              Payments: <b>{mode === "test" ? "TEST" : "LIVE"}</b> · switch
+            </button>
+          ) : (
+            <span className="adm-chip">Payments: {mode === "test" ? "TEST" : "LIVE"}</span>
+          )}
           <span className="adm-chip">{data.role === "super_admin" ? "Super admin" : "Admin"}</span>
           <button className="adm-btn ghost" onClick={signOut}><LogOut size={14} style={{ verticalAlign: -2 }} /> Sign out</button>
         </div>
+        {mode === "test" && <div className="adm-card" style={{ background: "#fff4d6", marginBottom: 16, fontSize: 14 }}>Test mode is on. Checkout uses Flutterwave test keys and only test records are shown.</div>}
         <Outlet />
       </main>
     </div>
