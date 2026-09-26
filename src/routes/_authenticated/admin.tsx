@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminLayout() {
   const { user } = Route.useRouteContext();
   const roleFn = useServerFn(getMyRole);
-  const { data, isLoading } = useQuery({ queryKey: ["admin-role"], queryFn: () => roleFn() });
+  const { data, isLoading, error } = useQuery({ queryKey: ["admin-role"], queryFn: () => roleFn(), retry: false });
   const qc = useQueryClient();
   const modeFn = useServerFn(getPaymentModeFn);
   const setModeFn = useServerFn(setPaymentMode);
@@ -43,13 +43,24 @@ function AdminLayout() {
   }
 
   if (isLoading) return <div className="adm-auth" style={{ color: "#fff" }}>Loading…</div>;
+  if (error)
+    return (
+      <div className="adm-auth">
+        <div style={{ background: "#fff", borderRadius: 18, padding: 32, maxWidth: 420 }}>
+          <h1 style={{ fontSize: 22 }}>Access check failed</h1>
+          <p style={{ color: "#574e68" }}>We couldn't verify your admin access. Please refresh the page or sign in again.</p>
+          <button className="adm-btn" onClick={() => window.location.reload()}>Try again</button>
+          <button className="adm-btn ghost" onClick={signOut} style={{ marginLeft: 8 }}>Sign out</button>
+        </div>
+      </div>
+    );
   if (!data?.role)
     return (
       <div className="adm-auth">
         <div style={{ background: "#fff", borderRadius: 18, padding: 32, maxWidth: 420 }}>
           <h1 style={{ fontSize: 22 }}>No admin access</h1>
           <p style={{ color: "#574e68" }}>
-            {user.email} isn't an admin yet. If this is the owner account, confirm your email first. Otherwise ask the super admin to add you.
+            {user.email} isn't an admin. Ask the super admin to add this account from the Admins page.
           </p>
           <button className="adm-btn" onClick={signOut}>Sign out</button>
         </div>
