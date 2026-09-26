@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PaymentReturnRouteImport } from './routes/payment-return'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StudentRouteImport } from './routes/student'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAddStudentRouteImport } from './routes/_authenticated/admin.add-student'
@@ -56,6 +57,11 @@ const PaymentReturnRoute = PaymentReturnRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/student': typeof StudentRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/student': typeof StudentRoute
   '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/student': typeof StudentRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/_authenticated/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/student'
     | '/admin'
     | '/admin/add-student'
     | '/admin/commissions'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/student'
     | '/admin/add-student'
     | '/admin/commissions'
     | '/admin/enrolments'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/student'
     | '/_authenticated/admin'
     | '/_authenticated/admin/add-student'
     | '/_authenticated/admin/commissions'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   PaymentReturnRoute: typeof PaymentReturnRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  StudentRoute: typeof StudentRoute
   ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
   ApiPublicCronDailySummaryRoute: typeof ApiPublicCronDailySummaryRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -451,6 +471,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   PaymentReturnRoute: PaymentReturnRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  StudentRoute: StudentRoute,
   ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,
   ApiPublicCronDailySummaryRoute: ApiPublicCronDailySummaryRoute,
