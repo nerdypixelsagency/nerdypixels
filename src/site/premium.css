@@ -104,3 +104,5 @@ footer a,.drawer a{min-height:32px;display:inline-flex;align-items:center}
   @keyframes npa-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 }
 @media (prefers-reduced-motion:reduce){.marquee-track{animation:none}}
+.stats{margin:-40px clamp(8px,1.5vw,16px) 0;padding:0 clamp(16px,4vw,32px)}
+@media (max-width:900px){.hero .price-card .pill{max-width:62%}}
