@@ -32,8 +32,39 @@ export type Database = {
         }
         Relationships: []
       }
+      commission_payouts: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          mode: string
+          note: string | null
+          paid_by: string | null
+          referral_code: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          mode?: string
+          note?: string | null
+          paid_by?: string | null
+          referral_code: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          mode?: string
+          note?: string | null
+          paid_by?: string | null
+          referral_code?: string
+        }
+        Relationships: []
+      }
       enrolments: {
         Row: {
+          admin_notes: string | null
           amount: number
           country: string | null
           created_at: string
@@ -54,11 +85,13 @@ export type Database = {
           plan: string | null
           referral_code: string | null
           source: string | null
+          source_type: string
           status: string
           tx_ref: string | null
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           amount?: number
           country?: string | null
           created_at?: string
@@ -79,11 +112,13 @@ export type Database = {
           plan?: string | null
           referral_code?: string | null
           source?: string | null
+          source_type?: string
           status?: string
           tx_ref?: string | null
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           amount?: number
           country?: string | null
           created_at?: string
@@ -104,6 +139,7 @@ export type Database = {
           plan?: string | null
           referral_code?: string | null
           source?: string | null
+          source_type?: string
           status?: string
           tx_ref?: string | null
           updated_at?: string
