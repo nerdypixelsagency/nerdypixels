@@ -17,6 +17,11 @@ export type Enrolment = {
   tx_ref: string | null;
   paid_at: string | null;
   created_at: string;
+  source_type?: string | null;
+  admin_notes?: string | null;
+  payment_method?: string | null;
+  email_sent_at?: string | null;
+  mode?: string;
 };
 
 export const enrolmentsQuery = (fn: () => Promise<unknown>) =>
