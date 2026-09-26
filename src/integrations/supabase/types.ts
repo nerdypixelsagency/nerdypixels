@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       enrolments: {
         Row: {
           amount: number
@@ -26,6 +44,7 @@ export type Database = {
           id: string
           instalment_month: string | null
           kind: string
+          mode: string
           name: string
           notes: string | null
           paid_at: string | null
@@ -50,6 +69,7 @@ export type Database = {
           id?: string
           instalment_month?: string | null
           kind?: string
+          mode?: string
           name: string
           notes?: string | null
           paid_at?: string | null
@@ -74,6 +94,7 @@ export type Database = {
           id?: string
           instalment_month?: string | null
           kind?: string
+          mode?: string
           name?: string
           notes?: string | null
           paid_at?: string | null
