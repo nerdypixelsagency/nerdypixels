@@ -4,8 +4,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 
 async function roleOf(ctx: { supabase: any; userId: string }) {
-  await ctx.supabase.rpc("claim_super_admin");
-  const { data } = await ctx.supabase.from("user_roles").select("role").eq("user_id", ctx.userId);
+  const { error: claimError } = await ctx.supabase.rpc("claim_super_admin");
+  if (claimError) throw new Error(`Could not verify admin access: ${claimError.message}`);
+
+  const { data, error: roleError } = await ctx.supabase.from("user_roles").select("role").eq("user_id", ctx.userId);
+  if (roleError) throw new Error(`Could not load admin access: ${roleError.message}`);
   const roles = (data ?? []).map((r: { role: string }) => r.role);
   return roles.includes("super_admin") ? "super_admin" : roles.includes("admin") ? "admin" : null;
 }
