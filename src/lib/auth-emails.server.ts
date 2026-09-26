@@ -17,7 +17,7 @@ const COPY: Record<string, Copy> = {
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export function renderAuthEmail(type: string, link: string, token: string) {
-  const c = COPY[type] ?? COPY.magiclink;
+  const c: Copy = COPY[type] ?? COPY["magiclink"]!;
   const action = c.cta
     ? `<a href="${esc(link)}" style="display:inline-block;background:#22c55e;color:#ffffff;text-decoration:none;font-weight:600;padding:14px 28px;border-radius:999px">${c.cta} &rarr;</a>
        <p style="font-size:12px;color:#6b6b80;margin-top:20px">Or use this code: <strong>${esc(token)}</strong></p>`
