@@ -38,4 +38,5 @@
 - Migration: `public.enrolments` table with grants to anon (insert only) and service_role, RLS enabled, insert-only anon policy with basic validation, updated_at trigger.
 - `src/lib/enrolments.functions.ts`: public `createServerFn` validating input with zod, inserting the row, then sending via Resend REST API using `RESEND_API_KEY` read inside the handler; email failure does not block enrolment.
 - `src/routes/index.tsx` wires the bridge from the plain JS bundle to the server function.
-- Needed from you: Resend key, sender address/domain, WhatsApp group link.
+- Flutterwave: server fn creates a Standard checkout (`POST /v3/payments`) with `tx_ref` = enrolment id, amount set server-side from plan (never trusted from browser), meta includes referral code; redirect back to `#/checkout?tx_ref=...`. Server route `/api/public/flutterwave-webhook` verifies the `verif-hash` header against `FLW_SECRET_HASH`, re-verifies via `GET /v3/transactions/:id/verify` (amount + currency NGN), marks row paid, then sends the Resend email. Secrets: `FLW_SECRET_KEY`, `FLW_PUBLIC_KEY`, `FLW_SECRET_HASH`.
+- Needed from you: Resend key, sender address/domain, WhatsApp group link, Flutterwave keys (entered via secure form).
