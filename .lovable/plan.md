@@ -17,8 +17,16 @@
 - After an enrolment is saved, send a welcome email with: plan and amount, cohort dates, the WhatsApp group link and the Google profile form link.
 - Emails are sent from your verified Resend domain. Until it is verified, only test sends to your own address will work.
 
-## 4. Check it works
-- Walk through checkout, confirm the record appears in Supabase and the email arrives.
+## 4. Real payments with Flutterwave
+- Save your Flutterwave keys securely (secret key, public key, and a webhook secret hash).
+- At checkout, "Pay" opens Flutterwave's payment page (card, bank transfer, USSD) for the exact amount: pay once, or the first instalment.
+- Flutterwave tells the site when a payment succeeds. Only then is the enrolment marked "paid" and the welcome email sent.
+- The referral code is attached to each payment so it also shows on your Flutterwave receipts.
+- "Pay an instalment" uses the same flow for later monthly payments.
+- Test with Flutterwave's test keys first, then switch to live keys.
+
+## 5. Check it works
+- Make a test payment, confirm the record shows "paid" in Supabase and the email arrives.
 
 ## Not included this round
 - Instalment reminder emails (needs a scheduled job; can follow).
