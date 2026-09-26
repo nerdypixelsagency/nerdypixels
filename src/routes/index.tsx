@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
+import { startPayment, registerEvent } from "@/lib/payments.functions";
 import "../site/site.css";
 import "../site/brand.css";
 import logoDark from "@/assets/logo-dark.png.asset.json";
@@ -30,11 +32,14 @@ export const Route = createFileRoute("/")({
 let started = false;
 
 function Index() {
+  const pay = useServerFn(startPayment);
+  const event = useServerFn(registerEvent);
   useEffect(() => {
-    (window as unknown as { __resources: Record<string, string> }).__resources = {
-      logoDark: logoDark.url,
-      logoLight: logoLight.url,
-    };
+    const w = window as unknown as Record<string, unknown>;
+    w.__resources = { logoDark: logoDark.url, logoLight: logoLight.url };
+    w.__npaPay = (d: unknown) => pay({ data: d as never });
+    w.__npaEvent = (d: { name: string; email: string; phone?: string }) =>
+      event({ data: { name: d.name, email: d.email, phone: d.phone } });
     document.documentElement.style.setProperty("--astro", `url(${astronaut.url})`);
     if (!started) {
       started = true;
