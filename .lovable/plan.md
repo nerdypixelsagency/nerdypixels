@@ -13,7 +13,13 @@ Same Nerdy Pixels Academy: same content, prices, checkout, payments, emails and 
 - Google Search Console: I set up everything on the site side. You still need to verify the domain (see below).
 
 ## Stage B: Premium look and mobile overhaul (brief sections 04–18, 37–48)
-- Uses the Halo reference only for principles: tighter headings, a clear type scale, even spacing, rounder panels, a clear order of buttons, subtle motion that turns off for people who prefer less motion. Brand purple and green, Poppins and all wording stay the same.
+- Takes design ideas only from the Halo reference you shared, never its wording, logo, font, videos or black-and-grey colours:
+  - A full-screen opening panel with rounded corners and a thin navigation bar across the top. The headline sits top-left with very tight letter spacing, plus one strong main button and one lighter secondary button.
+  - A soft off-white page background, with large rounded panels (about 24px corners) holding each section.
+  - A slow scrolling strip of partner and certification logos (Google, Meta, HubSpot and similar, as already on the site).
+  - Split sections with the text on one side and a large rounded image panel on the other (for example, "Who it's for" and "Outcomes").
+  - Round arrow buttons for "Know more" style links, smooth colour changes on hover, and nothing heavier than semi-bold type.
+- Kept as they are: brand purple and green, Poppins, and all current wording and images. Motion stays subtle and turns off for people who prefer less motion.
 - Mobile first: a thumb-friendly menu and sticky header, tap targets at least 44px, no sideways scrolling, headlines that fit the screen, a sticky "Enrol" bar on the bootcamp page, and single-column checkout with a clear order summary.
 - Forms: visible labels, inline errors, the right phone and email keyboards, clear loading and success states.
 - Accessibility: contrast, focus outlines, alt text, skip link, one H1 per page with headings in order.
