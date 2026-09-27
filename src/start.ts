@@ -29,12 +29,33 @@ const csrfMiddleware = createCsrfMiddleware({
 // Vercel custom-domain copy) forward server-function calls to the fully
 // configured Lovable deployment.
 const RELAY_TARGET = "https://nerdypixels.lovable.app";
+let healthy: { ok: boolean; at: number } | null = null;
+async function backendHealthy() {
+  if (healthy && Date.now() - healthy.at < 5 * 60_000) return healthy.ok;
+  const u = process.env["SUPABASE_URL"];
+  const k = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  const hasFlw = !!(process.env["FLW_SECRET_KEY"] || process.env["FLW_TEST_SECRET_KEY"]);
+  let ok = false;
+  if (u && k && hasFlw) {
+    try {
+      const r = await fetch(`${u}/rest/v1/app_settings?select=key&limit=1`, { headers: { apikey: k, Authorization: `Bearer ${k}` } });
+      ok = r.ok;
+      if (!ok) console.error("Backend health check failed", r.status);
+    } catch (e) {
+      console.error("Backend health check error", e);
+    }
+  } else console.error("Backend env incomplete; relaying");
+  healthy = { ok, at: Date.now() };
+  return ok;
+}
 const relayMiddleware = createMiddleware().server(async ({ request, next }) => {
   const url = new URL(request.url);
-  if (!url.pathname.startsWith("/_serverFn") || process.env["SUPABASE_URL"] || url.origin === RELAY_TARGET) return next();
+  if (!url.pathname.startsWith("/_serverFn") || url.origin === RELAY_TARGET || url.hostname === "localhost" || url.hostname.endsWith(".lovable.app")) return next();
+  if (await backendHealthy()) return next();
   const headers = new Headers(request.headers);
   headers.set("origin", RELAY_TARGET);
   headers.set("referer", `${RELAY_TARGET}/`);
+  headers.set("x-npa-origin", url.origin);
   headers.delete("host");
   const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
   const init: RequestInit = { method: request.method, headers };
