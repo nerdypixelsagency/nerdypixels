@@ -19,6 +19,8 @@ const startSchema = z.object({
 function originOf() {
   const req = getRequest();
   const url = new URL(req.url);
+  const relayed = req.headers.get("x-npa-origin");
+  if (relayed && /^https:\/\/([a-z0-9-]+\.)*npdacademy\.com$/.test(relayed)) return relayed;
   const fwd = url.hostname === "localhost" ? req.headers.get("x-forwarded-host") : null;
   return fwd ? `https://${fwd}` : url.origin;
 }
@@ -51,7 +53,7 @@ export const startPayment = createServerFn({ method: "POST" })
       mode,
     });
     if (error) {
-      console.error("Insert enrolment failed", error);
+      console.error("[startPayment:db_insert]", error.code, error.message);
       throw new Error("We couldn't start the payment. Please try again.");
     }
     const link = await flwCreatePayment({
