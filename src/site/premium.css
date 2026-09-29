@@ -6,7 +6,7 @@
 }
 body{background:var(--canvas);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 h1{font-weight:700;letter-spacing:-.04em;line-height:1.02;font-size:clamp(30px,5vw,56px);text-wrap:balance}
-.hero h1{font-size:clamp(28px,3.6vw,44px)}
+.hero h1{font-size:clamp(25px,3.6vw,44px)}
 h2{font-weight:700;letter-spacing:-.035em;line-height:1.05;font-size:clamp(28px,4vw,48px);text-wrap:balance}
 h3{letter-spacing:-.02em}
 .lead{text-wrap:pretty}
