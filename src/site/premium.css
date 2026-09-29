@@ -41,10 +41,14 @@ h3{letter-spacing:-.02em}
 /* hero: rounded panel inset from the edges */
 .hero{margin:12px clamp(8px,1.5vw,16px) 0;border-radius:var(--panel-r);padding:clamp(28px,4vw,48px) 0 clamp(32px,4vw,56px)}
 .hero .hero-grid{gap:clamp(24px,3.5vw,44px);align-items:center}
-.hero .price-card{gap:12px;padding:clamp(18px,2.4vw,26px)}
-.hero .price-card .lead-slot{padding-top:12px}
+.hero .price-card{gap:10px;padding:clamp(18px,2.2vw,24px)}
+.hero .price-card .price{font-size:clamp(30px,3vw,38px)}
 .hero .price-card form{gap:8px}
-.hero .price-card input,.hero .price-card select{height:46px}
+.hero .price-card form .grid{gap:8px}
+.hero .price-card label.f{gap:4px;font-size:12.5px}
+.hero .price-card input,.hero .price-card select{height:44px}
+.hero .price-card .btn{min-height:46px}
+.hero .price-card>p.small{margin-top:-2px}
 .hero .lead{font-size:clamp(16px,1.5vw,19px)}
 .hero .btn.green{padding:0 28px}
 
