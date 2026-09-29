@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as PaymentReturnRouteImport } from './routes/payment-return'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -57,6 +58,11 @@ const PaymentReturnRoute = PaymentReturnRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudentRoute = StudentRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/student': typeof StudentRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/student': typeof StudentRoute
   '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/payment-return': typeof PaymentReturnRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/student': typeof StudentRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/student'
     | '/admin'
     | '/admin/add-student'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/student'
     | '/admin/add-student'
     | '/admin/commissions'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/payment-return'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/student'
     | '/_authenticated/admin'
     | '/_authenticated/admin/add-student'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   PaymentReturnRoute: typeof PaymentReturnRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StudentRoute: typeof StudentRoute
   ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
@@ -325,6 +338,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/student': {
@@ -471,6 +491,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   PaymentReturnRoute: PaymentReturnRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StudentRoute: StudentRoute,
   ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,

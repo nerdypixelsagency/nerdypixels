@@ -20,3 +20,4 @@
 
 - Brand images the site, admin and emails use live in `public/brand/` as real files, not asset pointers. Why: the Vercel custom domain can't serve Lovable asset URLs.
 - Admin tools live in `src/lib/admin-tools.functions.ts`; students sign in with a Resend magic link at `/student` and their records are matched by verified email on the server. Why: no student role and no client-side filtering.
+- Blog content comes live from WordPress (blog.npdacademy.com) via `src/lib/wordpress.server.ts` → `getBlogData` loader in `src/routes/$.tsx`/`index.tsx`, primed into app.js with `primeBlog()`; HTML sanitized server-side with sanitize-html. Why: one API client, no CORS, crawlable articles on our domain.
