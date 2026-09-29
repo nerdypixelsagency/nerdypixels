@@ -577,7 +577,7 @@ document.addEventListener("submit", e => {
 
 document.addEventListener("click", e => {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-  const a = e.target.closest("a[href]"); if (!a || a.target || a.hasAttribute("download")) return;
+  const a = e.target.closest("a[href]"); if (!a || a.target || a.hasAttribute("download") || a.hasAttribute("data-reload")) return;
   const href = a.getAttribute("href"); if (!href || !href.startsWith("/") || href.startsWith("//")) return;
   if (/^\/(admin|auth|api|student|reset-password|payment-return|sitemap|robots)/.test(href)) return;
   e.preventDefault(); go(href);

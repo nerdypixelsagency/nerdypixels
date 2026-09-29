@@ -31,11 +31,6 @@ const M: Record<string, Meta> = {
     title: "Digital Marketing Blog | Nerdy Pixels Academy",
     description: "Practical guides on marketing strategy, social media, SEO and building a digital marketing career in Africa.",
   },
-  "/blog/first-marketing-strategy": {
-    title: "How to Write Your First Marketing Strategy | Nerdy Pixels Academy",
-    description: "A marketing strategy does not need to be a 40-page document. For most businesses one clear page is enough. Here is how to write it.",
-    type: "article",
-  },
   "/events/first-marketing-strategy": {
     title: "Free Live Class: Creating Your First Marketing Strategy | Nerdy Pixels Academy",
     description: "Join our free live online class on Saturday 10 October 2026, 11:00 AM WAT. Register with your WhatsApp number to get the joining link.",
@@ -124,8 +119,13 @@ export function jsonLdFor(path: string) {
   return out;
 }
 
-export function headFor(path: string) {
-  const m = metaFor(path);
+type BlogHeadData = { kind: string; post?: { title: string; excerpt: string; image: string | null; author: string; dateIso: string; modifiedIso: string } | null } | null | undefined;
+
+export function headFor(path: string, blog?: BlogHeadData) {
+  const post = blog && blog.kind === "post" ? blog.post : undefined;
+  if (post === null) return { meta: [{ title: "Article not found | Nerdy Pixels Academy" }, { name: "robots", content: "noindex" }] };
+  const base = metaFor(path);
+  const m = post ? { ...base, title: `${post.title} | Nerdy Pixels Academy`, description: post.excerpt || base.description, type: "article" } : base;
   const p = path.replace(/\/+$/, "") || "/";
   const url = `${SITE_URL}${p === "/" ? "/" : p}`;
   const meta: Record<string, string>[] = [
