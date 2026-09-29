@@ -95,3 +95,33 @@ export const registerEvent = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const submitLead = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        firstName: z.string().trim().min(1).max(60),
+        lastName: z.string().trim().min(1).max(60),
+        email: z.string().trim().email().max(200),
+        phone: z.string().trim().min(7).max(40),
+        country: z.string().trim().max(60).optional().default(""),
+        source: z.string().trim().max(60).optional().default(""),
+        website: z.string().max(200).optional().default(""),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    if (data.website) return { ok: true }; // honeypot
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = data.email.toLowerCase();
+    const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: recent } = await supabaseAdmin.from("leads" as never).select("id").eq("email", email).gte("created_at", since).limit(1);
+    if (recent && (recent as unknown[]).length) return { ok: true };
+    const { data: m } = await supabaseAdmin.from("app_settings").select("value").eq("key", "payment_mode").maybeSingle();
+    const { error } = await supabaseAdmin.from("leads" as never).insert({
+      first_name: data.firstName, last_name: data.lastName, email, phone: data.phone,
+      country: data.country || null, source: data.source || null, mode: m?.value === "test" ? "test" : "live",
+    } as never);
+    if (error) { console.error("lead insert", error); throw new Error("Could not save your details."); }
+    return { ok: true };
+  });

@@ -134,9 +134,17 @@ function priceCard(){
   return `<aside class="price-card" aria-label="Price">
 ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
        : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
-<ul class="list" style="border-top:1px solid var(--line);padding-top:16px">${check("8 modules, 8 portfolio pieces")}${check("5 industry certifications")}${check("Capstone hackathon on real brand briefs")}${check("Mobile money, card and bank transfer across Africa")}</ul>
-<a class="btn deep block" href="/checkout${open?"?plan=early":""}">Continue to checkout</a>
-<p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} Secure payment. Takes about two minutes.</p></aside>`;
+<div class="lead-slot" style="border-top:1px solid var(--line);padding-top:16px">
+<form class="stack" data-form="lead" novalidate style="gap:10px">
+<div class="grid g2" style="gap:10px"><label class="f">First name<input name="first" autocomplete="given-name" maxlength="60" required></label><label class="f">Last name<input name="last" autocomplete="family-name" maxlength="60" required></label></div>
+<label class="f">Email<input name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" required></label>
+<label class="f">WhatsApp number<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required></label>
+<label class="f">Country<select name="country">${countryOptions("NG")}</select></label>
+<label class="f">Where did you hear about us?<select name="source"><option value="">Choose one</option>${["Instagram","Facebook","LinkedIn","X (Twitter)","TikTok","WhatsApp","Google","Friend or referral","Event","Other"].map(s=>`<option>${s}</option>`).join("")}</select></label>
+<input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+<button class="btn green block" type="submit">Get the details</button>
+</form></div>
+<p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} We'll only use this to contact you about the bootcamp. <a href="/checkout${open?"?plan=early":""}">Enrol now</a></p></aside>`;
 }
 function eventBand(){
   return `<div class="band"><div class="stack" style="gap:12px"><span class="eyebrow">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2>${EVENT.title}</h2><p class="lead">Not ready to enrol yet? Spend an hour with our instructors, build a simple strategy for a real business, and take home the template.</p></div>
@@ -557,6 +565,17 @@ document.addEventListener("submit", e => {
   try{
     if (kind === "blog-search"){ const u = new URLSearchParams(); if ((d.search||"").trim()) u.set("search", d.search.trim()); if (d.cat) u.set("cat", d.cat); go("/blog" + (u.toString() ? "?" + u : "")); return; }
     if (kind === "newsletter"){ need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com."); save("subscribers", {email:d.email}); f.reset(); formError(f, ""); toast("You're subscribed. Look out for our next email."); return; }
+    if (kind === "lead"){
+      need((d.first||"").trim(), "Enter your first name."); need((d.last||"").trim(), "Enter your last name.");
+      need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com.");
+      need(digits(d.phone).length >= 7, "Enter your WhatsApp number so we can reach you.");
+      formError(f, ""); const ct = country(d.country); const btn = f.querySelector('button[type="submit"]'); btn.disabled = true; btn.textContent = "Sending…";
+      const done = () => { const slot = f.closest(".lead-slot"); slot.innerHTML = `<div class="stack" style="gap:8px"><h3>Thanks, ${esc(d.first.trim())}!</h3><p>We've got your details and will reach out on WhatsApp shortly.</p><a class="btn deep block" href="/checkout?plan=early">Enrol now</a></div>`; };
+      if (!window.__npaLead){ done(); return; }
+      window.__npaLead({ firstName:d.first, lastName:d.last, email:d.email, phone:ct.dial+" "+d.phone, country:ct.name||d.country, source:d.source||"", website:d.website||"" })
+        .then(done).catch(() => { btn.disabled = false; btn.textContent = "Get the details"; formError(f, "We couldn't send your details. Please try again."); });
+      return;
+    }
     need((d.name||"").trim(), "Enter your full name.");
     need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com.");
     const first = d.name.trim().split(" ")[0];
