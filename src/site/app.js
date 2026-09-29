@@ -134,17 +134,15 @@ function priceCard(){
   return `<aside class="price-card" aria-label="Price">
 ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
        : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
-<div class="lead-slot" style="border-top:1px solid var(--line);padding-top:16px">
+<div class="lead-slot">
 <form class="stack" data-form="lead" novalidate style="gap:10px">
 <div class="grid g2" style="gap:10px"><label class="f">First name<input name="first" autocomplete="given-name" maxlength="60" required></label><label class="f">Last name<input name="last" autocomplete="family-name" maxlength="60" required></label></div>
-<label class="f">Email<input name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" required></label>
-<label class="f">WhatsApp number<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required></label>
-<label class="f">Country<select name="country">${countryOptions("NG")}</select></label>
-<label class="f">Where did you hear about us?<select name="source"><option value="">Choose one</option>${["Instagram","Facebook","LinkedIn","X (Twitter)","TikTok","WhatsApp","Google","Friend or referral","Event","Other"].map(s=>`<option>${s}</option>`).join("")}</select></label>
+<div class="grid g2" style="gap:10px"><label class="f">Email<input name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" required></label><label class="f">WhatsApp number<input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required></label></div>
+<div class="grid g2" style="gap:10px"><label class="f">Country<select name="country">${countryOptions("NG")}</select></label><label class="f">Where did you hear about us?<select name="source"><option value="">Choose one</option>${["Instagram","Facebook","LinkedIn","X (Twitter)","TikTok","WhatsApp","Google","Friend or referral","Event","Other"].map(s=>`<option>${s}</option>`).join("")}</select></label></div>
 <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
 <button class="btn green block" type="submit">Get the details</button>
 </form></div>
-<p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} We'll only use this to contact you about the bootcamp. <a href="/checkout${open?"?plan=early":""}">Enrol now</a></p></aside>`;
+<p class="small muted row" style="justify-content:center;gap:6px">${I.lock()} We'll only use this to contact you about the bootcamp. <a href="/checkout${open?"?plan=early":""}">Enrol now</a></p></aside>`;
 }
 function eventBand(){
   return `<div class="band"><div class="stack" style="gap:12px"><span class="eyebrow">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2>${EVENT.title}</h2><p class="lead">Not ready to enrol yet? Spend an hour with our instructors, build a simple strategy for a real business, and take home the template.</p></div>
