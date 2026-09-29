@@ -132,3 +132,6 @@ footer a,.drawer a{min-height:32px;display:inline-flex;align-items:center}
 .wp-content pre{overflow-x:auto}
 .skel{border-radius:12px;background:linear-gradient(90deg,#eee 25%,#f6f6f6 50%,#eee 75%);background-size:200% 100%;animation:skel 1.2s infinite}
 @keyframes skel{to{background-position:-200% 0}}
+.wp-content h2{font-size:clamp(24px,3vw,30px);margin:32px 0 12px}
+.wp-content h3{font-size:clamp(20px,2.4vw,24px);margin:26px 0 10px}
+.wp-content p,.wp-content ul,.wp-content ol{margin:0 0 16px}

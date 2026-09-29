@@ -88,6 +88,7 @@ function safeContent(html: string) {
         const ext = /^https?:\/\//i.test(href);
         return { tagName: "a", attribs: ext ? { href, target: "_blank", rel: "noopener noreferrer" } : { href } };
       },
+      h1: "h2",
       img: (tag, attribs) => ({ tagName: "img", attribs: { ...attribs, loading: "lazy" } }),
     },
   });
@@ -144,7 +145,7 @@ export async function wpListPosts(opts: { page?: number | undefined; category?: 
 
 export async function wpCategories(): Promise<BlogCategory[]> {
   const r = await wp<{ id: number; name: string; slug: string; count: number }[]>(`/categories?per_page=100`);
-  return r.data.filter((c) => c.count > 0 && c.slug !== "uncategorized").map((c) => ({ id: c.id, name: decode(c.name), slug: c.slug, count: c.count }));
+  return r.data.filter((c) => c.slug !== "uncategorized").map((c) => ({ id: c.id, name: decode(c.name), slug: c.slug, count: c.count }));
 }
 
 export async function wpPost(slug: string): Promise<BlogPost | null> {
