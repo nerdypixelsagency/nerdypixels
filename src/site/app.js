@@ -94,41 +94,6 @@ const FAQS = [
   ["What if I can't attend live?","Register anyway. Everyone who registers gets the replay and the template within 24 hours."]
  ]]
 ];
-const POSTS = [
- {slug:"what-is-digital-marketing", title:"What is digital marketing? A plain-English guide for beginners", date:"September 2026", mins:"6 min read",
-  intro:"Digital marketing is how businesses find, win and keep customers using the internet. Here is what it actually involves, and how people start a career in it.",
-  body:`<p>Digital marketing is the work of reaching people online and persuading them to take an action: buy, sign up, call, visit or come back. It uses the same channels you already use every day, including search engines, social media, email, WhatsApp and websites.</p>
-<p>What makes it different from traditional marketing is that almost everything can be measured. You can see how many people saw a post, clicked a link, filled a form or paid. That makes it easier to learn what works and to spend money more carefully.</p>
-<h2>The main parts of digital marketing</h2>
-<ul><li><b>Strategy:</b> deciding who you are trying to reach, what you are offering and which channels to use.</li><li><b>Content marketing:</b> creating useful posts, articles and videos that attract the right people.</li><li><b>Social media marketing:</b> building an audience and a community on platforms like Instagram, TikTok, LinkedIn and X.</li><li><b>Search engine optimisation (SEO):</b> helping your pages show up when people search on Google and in AI search tools.</li><li><b>Paid media:</b> running ads on Meta and Google to reach people faster.</li><li><b>Email and CRM:</b> staying in touch with customers and leads through email and WhatsApp.</li><li><b>Analytics:</b> tracking results so you know what to keep, fix or stop.</li></ul>
-<h2>Why it matters for businesses in Africa</h2>
-<p>Most customers now discover businesses on their phones. A small shop in Lagos, Accra or Nairobi can reach buyers in other cities, or other countries, without opening a new branch. Businesses that understand digital marketing grow faster and waste less money.</p>
-<h2>Do you need a degree to work in digital marketing?</h2>
-<p>No. Employers and clients care more about what you can show than what you studied. A portfolio of real work, recognised certifications and the ability to explain your results matter most. That is why practical training that makes you build things is more useful than theory alone.</p>
-<h2>How to get started</h2>
-<p>Start with strategy, because every other skill depends on it. Pick one business, describe its customer in one sentence, and choose two channels to focus on. Then learn one channel properly before adding the next.</p>`},
- {slug:"first-marketing-strategy", title:"How to create your first marketing strategy on one page", date:"September 2026", mins:"5 min read",
-  intro:"A marketing strategy does not need to be a 40-page document. For most businesses, one clear page is enough to start. Here is how to write it.",
-  body:`<p>A good marketing strategy answers four questions: who are we trying to reach, why should they care, where will we reach them, and how will we know it is working. If you can answer these clearly on one page, you have a strategy.</p>
-<h2>1. Describe one customer in one sentence</h2>
-<p>Resist the urge to say "everyone". Pick the customer most likely to buy first. For example: "Working mothers in Lagos who want healthy home-cooked meals but have no time to cook on weekdays." A specific customer makes every other decision easier.</p>
-<h2>2. Write your positioning line</h2>
-<p>Complete this sentence: "For [customer], we are the [category] that [main benefit], unlike [alternative]." It forces you to say what makes you different in words a customer would understand.</p>
-<h2>3. Choose two or three channels</h2>
-<p>Go where your customer already spends time. A business selling to young professionals might start with Instagram and WhatsApp. A business selling to companies might start with LinkedIn and email. Doing two channels well beats doing six badly.</p>
-<h2>4. Set one goal you can measure in 30 days</h2>
-<p>Make it a number: 50 new WhatsApp enquiries, 20 sales, 300 email subscribers. Then decide what you will check each week to see if you are on track.</p>
-<h2>5. Put it on one page</h2>
-<p>Customer, positioning, channels, goal and weekly checks. Share it with anyone who works on your marketing, and review it every month.</p>`},
- {slug:"digital-marketing-bootcamp-fees-nigeria", title:"Digital marketing bootcamp fees in Nigeria: what you should be paying for", date:"September 2026", mins:"4 min read",
-  intro:"Bootcamp prices vary a lot. The price matters less than what you get for it. Here is a simple checklist to compare options before you pay.",
-  body:`<p>If you are comparing digital marketing courses, you will see prices from free to several hundred thousand naira. Free resources are useful, but they rarely give you structure, feedback or proof of your skills. When you do pay, make sure you are paying for the things that make a difference.</p>
-<h2>What to look for</h2>
-<ul><li><b>Practical work:</b> do you build real things, like a strategy, an SEO audit or an ad campaign, or only watch videos?</li><li><b>Feedback:</b> does someone review your work and tell you how to improve it?</li><li><b>Recognised certifications:</b> will you finish with credentials employers and clients already trust?</li><li><b>Practising instructors:</b> are the teachers doing the work today, not just teaching it?</li><li><b>A portfolio at the end:</b> will you have work to show in an interview or a client pitch?</li><li><b>Flexible payment:</b> can you spread the cost if you need to?</li></ul>
-<h2>How our bootcamp is priced</h2>
-<p>Our Professional Digital Marketing Bootcamp costs ₦60,000 paid once during the early-bird week, from Monday 28 September to Saturday 10 October 2026. After that, it is ₦40,000 a month for three months: November, December and January. Both options include the same eight modules, five certifications, live classes and capstone project.</p>
-<p>You can pay from Nigeria or anywhere else in Africa, in your local currency, with mobile money, card or bank transfer.</p>`}
-];
 const MOD_CERT = '<span class="pill green" style="margin-top:6px">Certification included</span>';
 /* ============ Layout ============ */
 function header(path){
@@ -299,7 +264,7 @@ P.event = () => ({ title:EVENT.title + " | Free event | Nerdy Pixels Academy", h
 <ul class="list">${check("How to pick one audience and describe them in a sentence")}${check("How to write a positioning line people remember")}${check("Which two or three channels to start with, and why")}${check("How to set a goal you can measure in 30 days")}</ul>
 <h2 style="font-size:24px;margin-top:8px">Everyone who registers gets</h2>
 <div class="grid g3">${[["The strategy template","The one-page template used in class."],["The full replay","Sent within 24 hours, even if you miss it."],["Live Q&amp;A","Ask our instructors about careers in marketing."]].map(r=>`<div class="card stack" style="gap:6px"><b style="color:var(--ink)">${r[0]}</b><span class="small muted">${r[1]}</span></div>`).join("")}</div>
-<p class="muted">Want a head start? Read <a href="/blog/first-marketing-strategy">How to create your first marketing strategy on one page</a>.</p>
+<p class="muted">Want a head start? Read our <a href="/blog">beginner guides on the blog</a>.</p>
 </div>
 <form class="price-card" data-form="event" novalidate>
 <h2 style="font-size:24px">Save your free seat</h2>
@@ -399,17 +364,54 @@ P.instalment = () => { const o = lastOf("orders") || {};
 P.instalmentDone = () => { const p = sget("npa-last-instalment"); if (!p) return P.notFound();
   return { title:"Instalment received | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">Thank you, ${esc(p.first)}.</h1><p class="lead">Your ${esc(p.month)} instalment of ₦40,000 has been received. A receipt is on its way to ${esc(p.email)}. Reference <b>${esc(p.ref)}</b>.</p><div class="row"><a class="btn deep" href="/onboarding">Back to onboarding</a><a class="btn ghost" href="/curriculum">View the curriculum</a></div></div></div></section>`};};
 /* ---------- Blog ---------- */
-function postCards(){ return `<div class="grid g3">${POSTS.map(p=>`<article class="card stack" style="gap:10px"><span class="small muted">${p.date}, ${p.mins}</span><h3><a href="/blog/${p.slug}" style="color:var(--ink);text-decoration:none">${p.title}</a></h3><p class="muted small">${p.intro}</p><a href="/blog/${p.slug}" style="font-weight:600;margin-top:auto">Read the article</a></article>`).join("")}</div>`; }
-P.blog = () => ({ title:"Blog | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Blog</h1><p class="lead">Plain-English guides to digital marketing, careers and growth, written for African marketers.</p></div></section><section class="section"><div class="wrap stack" style="gap:40px">${postCards()}${eventBand()}</div></section>`});
-P.post = (q, slug) => { const p = POSTS.find(x=>x.slug===slug); if (!p) return P.notFound(); const open = earlyOpen();
-  const cta = `<aside class="inline-cta" aria-label="Free event"><span class="eyebrow" style="font-size:13.5px">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2 style="font-size:24px;margin:0">Put this into practice: ${EVENT.title.toLowerCase().replace("creating","create")}</h2><p>One hour, live with our instructors. Leave with a one-page strategy and the template.</p><div><a class="btn" href="/events/first-marketing-strategy">Save my free seat</a></div></aside>`;
-  const parts = p.body.split("<h2>"); const mid = Math.min(2, parts.length-1);
-  const body = parts.map((s,i)=>(i?"<h2>":"")+s+(i===mid?cta:"")).join("");
-  return { title:p.title + " | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap grid" style="grid-template-columns:minmax(0,1fr) 300px;gap:48px;align-items:start" id="post">
-<article class="article stack" style="gap:18px"><a href="/blog" style="font-weight:600;text-decoration:none">Blog</a><span class="small muted">${p.date}, ${p.mins}</span><h1 style="font-size:clamp(30px,4vw,44px)">${p.title}</h1><p class="lead">${p.intro}</p>${body}
-<div class="card stack" style="gap:10px;margin-top:16px"><h2 style="font-size:22px;margin:0">Learn it properly, with feedback</h2><p>Our Professional Digital Marketing Bootcamp covers strategy, content, social, SEO, paid media, email and analytics in eight practical modules.</p><div class="row"><a class="btn" href="/courses/digital-marketing">See the bootcamp</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div></article>
-<aside class="summary"><span class="pill green" style="align-self:flex-start">Next cohort enrolling</span><h2 style="font-size:20px">Learn it properly in 8 modules</h2><p class="small">Five certifications, live classes and a portfolio. ${open?"₦60,000 paid once until 10 October, or ₦40,000 a month.":"From ₦40,000 a month for three months."}</p><a class="btn deep block" href="/courses/digital-marketing">See the bootcamp</a></aside>
-</div><style>@media (max-width:900px){#post{grid-template-columns:1fr!important}}</style></section>`};};
+/* ---------- Blog (live from WordPress via getBlogData) ---------- */
+let BLOG = null;
+export function primeBlog(d){ BLOG = d || null; }
+const FALLBACK_IMG = "/og-image.jpg";
+function bImg(p, cls, eager){ return `<img class="${cls}" src="${esc(p.image || FALLBACK_IMG)}" alt="${esc(p.imageAlt || "")}" ${eager?'fetchpriority="high"':'loading="lazy"'} decoding="async" onerror="this.onerror=null;this.src='${FALLBACK_IMG}'">`; }
+function bMeta(p){ return `<span class="small muted">${esc(p.date)} · ${esc(p.author)}</span>`; }
+function bCard(p){ return `<article class="card blog-card"><a class="blog-media" href="/blog/${esc(p.slug)}" tabindex="-1" aria-hidden="true">${bImg(p,"")}</a><div class="stack" style="gap:10px;padding:18px 20px 22px;flex:1">${p.category?`<span class="pill" style="align-self:flex-start">${esc(p.category)}</span>`:""}<h3><a href="/blog/${esc(p.slug)}" style="color:var(--ink);text-decoration:none">${esc(p.title)}</a></h3><p class="muted small">${esc(p.excerpt)}</p>${bMeta(p)}<a href="/blog/${esc(p.slug)}" style="font-weight:600;margin-top:auto">Read article</a></div></article>`; }
+function bSkeleton(n){ return `<div class="grid g3" aria-busy="true" aria-label="Loading articles">${Array.from({length:n}).map(()=>`<div class="card blog-card"><div class="skel" style="aspect-ratio:16/9"></div><div class="stack" style="gap:10px;padding:18px 20px 22px"><div class="skel" style="height:22px;width:80%"></div><div class="skel" style="height:14px"></div><div class="skel" style="height:14px;width:60%"></div></div></div>`).join("")}</div>`; }
+function bError(msg, href){ return `<div class="card stack" role="alert" style="gap:12px;text-align:center;align-items:center;padding:36px"><h2 style="font-size:22px;margin:0">${esc(msg || "We couldn't load the blog right now.")}</h2><p class="muted">Please check your connection and try again.</p><a class="btn" href="${esc(href)}" data-reload>Try again</a></div>`; }
+function postCards(){
+  const posts = BLOG && BLOG.kind === "home" ? BLOG.latest : null;
+  if (!posts) return bSkeleton(3);
+  if (!posts.length) return `<p class="muted">New articles are on the way. Check back soon.</p>`;
+  return `<div class="grid g3">${posts.map(bCard).join("")}</div>`;
+}
+function blogUrl(o){ const q = new URLSearchParams(); if (o.search) q.set("search", o.search); if (o.cat) q.set("cat", o.cat); if (o.page && o.page > 1) q.set("page", o.page); const s = q.toString(); return "/blog" + (s ? "?" + s : ""); }
+P.blog = (q) => {
+  const d = BLOG && BLOG.kind === "list" ? BLOG : null;
+  const search = d ? d.search : (q.search || ""), cat = d ? d.cat : (Number(q.cat) || null);
+  const chips = d && d.cats.length ? `<nav class="blog-chips" aria-label="Categories"><a href="${blogUrl({search})}"${!cat?' aria-current="true"':""}>All</a>${d.cats.map(c=>`<a href="${blogUrl({search,cat:c.id})}"${cat===c.id?' aria-current="true"':""}>${esc(c.name)}</a>`).join("")}</nav>` : "";
+  const form = `<form class="blog-search" data-form="blog-search" role="search"><label class="sr-only" for="blog-q">Search articles</label><input id="blog-q" name="search" type="search" placeholder="Search articles" value="${esc(search)}" maxlength="100">${cat?`<input type="hidden" name="cat" value="${cat}">`:""}<button class="btn" type="submit">Search</button></form>`;
+  let body;
+  if (BLOG && BLOG.kind === "error") body = bError(BLOG.error, blogUrl({search, cat, page:Number(q.page)||1}));
+  else if (!d) body = bSkeleton(6);
+  else if (!d.list.posts.length) body = `<div class="card stack" style="gap:12px;text-align:center;align-items:center;padding:36px"><h2 style="font-size:22px;margin:0">No articles found</h2><p class="muted">${search?`Nothing matched “${esc(search)}”. Try another word.`:"There are no articles here yet."}</p><a class="btn ghost" href="/blog">See all articles</a></div>`;
+  else {
+    const posts = d.list.posts.slice(); const page = d.list.page, total = d.list.totalPages;
+    const feat = page === 1 && !search && !cat ? posts.shift() : null;
+    const featured = feat ? `<article class="card blog-feature"><a class="blog-media" href="/blog/${esc(feat.slug)}" tabindex="-1" aria-hidden="true">${bImg(feat,"",true)}</a><div class="stack" style="gap:14px;padding:28px"><span class="eyebrow">Latest article${feat.category?" · "+esc(feat.category):""}</span><h2 style="font-size:clamp(24px,3vw,34px);margin:0"><a href="/blog/${esc(feat.slug)}" style="color:var(--ink);text-decoration:none">${esc(feat.title)}</a></h2><p class="muted">${esc(feat.excerpt)}</p>${bMeta(feat)}<a class="btn" style="align-self:flex-start" href="/blog/${esc(feat.slug)}">Read article</a></div></article>` : "";
+    const pager = total > 1 ? `<nav class="blog-pager" aria-label="Pages">${page>1?`<a class="btn ghost" href="${blogUrl({search,cat,page:page-1})}">Newer</a>`:"<span></span>"}<span class="small muted">Page ${page} of ${total}</span>${page<total?`<a class="btn ghost" href="${blogUrl({search,cat,page:page+1})}">Older</a>`:"<span></span>"}</nav>` : "";
+    body = featured + (posts.length ? `<div class="grid g3">${posts.map(bCard).join("")}</div>` : "") + pager;
+  }
+  return { title:"Blog | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Blog</h1><p class="lead">Plain-English guides to digital marketing, careers and growth, written for African marketers.</p>${form}</div></section><section class="section"><div class="wrap stack" style="gap:32px">${chips}${search?`<p class="muted">Results for “${esc(search)}”</p>`:""}${body}${eventBand()}</div></section>`};
+};
+P.post = (q, slug) => {
+  const d = BLOG && BLOG.kind === "post" && BLOG.slug === decodeURIComponent(slug) ? BLOG : null;
+  if (BLOG && BLOG.kind === "error") return { title:"Blog | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:760px">${bError(BLOG.error, "/blog/" + slug)}<p style="margin-top:16px"><a href="/blog">Back to blog</a></p></div></section>` };
+  if (d && !d.post) return P.notFound();
+  const open = earlyOpen();
+  const aside = `<aside class="summary"><span class="pill green" style="align-self:flex-start">Next cohort enrolling</span><h2 style="font-size:20px">Learn it properly in 8 modules</h2><p class="small">Five certifications, live classes and a portfolio. ${open?"₦60,000 paid once until 10 October, or ₦40,000 a month.":"From ₦40,000 a month for three months."}</p><a class="btn deep block" href="/courses/digital-marketing">See the bootcamp</a><a class="btn ghost block" href="/events/first-marketing-strategy">Join the free event</a></aside>`;
+  if (!d) return { title:"Blog | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:760px" aria-busy="true"><div class="stack" style="gap:16px"><div class="skel" style="height:40px;width:85%"></div><div class="skel" style="aspect-ratio:16/9"></div><div class="skel" style="height:14px"></div><div class="skel" style="height:14px;width:70%"></div></div></div></section>` };
+  const p = d.post;
+  const related = d.related.length ? `<section class="stack" style="gap:18px;margin-top:40px"><h2 style="font-size:24px;margin:0">Related articles</h2><div class="grid g3">${d.related.map(bCard).join("")}</div></section>` : "";
+  return { title:p.title + " | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap"><div class="grid" style="grid-template-columns:minmax(0,1fr) 300px;gap:48px;align-items:start" id="post">
+<article class="article stack" style="gap:18px"><a href="/blog" style="font-weight:600;text-decoration:none">← Back to blog</a>${p.category?`<span class="pill" style="align-self:flex-start">${esc(p.category)}</span>`:""}<h1 style="font-size:clamp(30px,4vw,44px)">${esc(p.title)}</h1>${bMeta(p)}${p.image?`<figure class="blog-hero">${bImg(p,"",true)}</figure>`:""}<div class="wp-content">${p.content}</div>
+<div class="card stack" style="gap:10px;margin-top:16px"><h2 style="font-size:22px;margin:0">Learn it properly, with feedback</h2><p>Our Professional Digital Marketing Bootcamp covers strategy, content, social, SEO, paid media, email and analytics in eight practical modules.</p><div class="row"><a class="btn" href="/courses/digital-marketing">See the bootcamp</a><a class="btn ghost" href="/curriculum">View the curriculum</a></div></div></article>
+${aside}</div>${related}</div><style>@media (max-width:900px){#post{grid-template-columns:1fr!important}}</style></section>`};
+};
 
 /* ---------- FAQ, contact, waitlist ---------- */
 P.faq = () => ({ title:"FAQ | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Frequently asked questions</h1><p class="lead">About the bootcamp, paying from anywhere in Africa, and the free event.</p></div></section>
@@ -488,7 +490,7 @@ const ROUTES = [
  [/^\/$/, P.home], [/^\/courses$/, P.courses], [/^\/courses\/digital-marketing$/, P.bootcamp], [/^\/curriculum$/, P.curriculum],
  [/^\/onboarding$/, P.onboarding], [/^\/events\/first-marketing-strategy$/, P.event], [/^\/events\/first-marketing-strategy\/registered$/, P.eventDone],
  [/^\/checkout$/, P.checkout], [/^\/checkout\/success$/, P.checkoutDone], [/^\/pay-instalment$/, P.instalment], [/^\/pay-instalment\/success$/, P.instalmentDone],
- [/^\/blog$/, P.blog], [/^\/blog\/([a-z0-9-]+)$/, P.post], [/^\/faq$/, P.faq], [/^\/contact$/, P.contact], [/^\/contact\/sent$/, P.contactDone],
+ [/^\/blog$/, P.blog], [/^\/blog\/([^/]+)$/, P.post], [/^\/faq$/, P.faq], [/^\/contact$/, P.contact], [/^\/contact\/sent$/, P.contactDone],
  [/^\/waitlist\/([a-z0-9-]+)$/, P.waitlist], [/^\/waitlist\/([a-z0-9-]+)\/joined$/, P.waitlistDone],
  [/^\/terms$/, P.terms], [/^\/payment-policy$/, P.payment], [/^\/privacy$/, P.privacy]
 ];
@@ -553,6 +555,7 @@ document.addEventListener("submit", e => {
   const d = Object.fromEntries(new FormData(f).entries()); const kind = f.dataset.form;
   const need = (cond, msg) => { if (!cond){ formError(f, msg); throw 0; } };
   try{
+    if (kind === "blog-search"){ const u = new URLSearchParams(); if ((d.search||"").trim()) u.set("search", d.search.trim()); if (d.cat) u.set("cat", d.cat); go("/blog" + (u.toString() ? "?" + u : "")); return; }
     if (kind === "newsletter"){ need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com."); save("subscribers", {email:d.email}); f.reset(); formError(f, ""); toast("You're subscribed. Look out for our next email."); return; }
     need((d.name||"").trim(), "Enter your full name.");
     need(validEmail(d.email), "Enter a valid email address, for example ada@gmail.com.");
