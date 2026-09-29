@@ -4,17 +4,19 @@ import { useEffect, useMemo } from "react";
 import { startPayment, registerEvent } from "@/lib/payments.functions";
 const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
-import { renderStatic, boot, renderNow } from "./app.js";
+import { renderStatic, boot, renderNow, primeBlog } from "./app.js";
+import type { BlogData } from "@/lib/blog.functions";
 import "./site.css";
 import "./brand.css";
 import "./premium.css";
 
-export function SitePage() {
+export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   const router = useRouter();
   const loc = useRouterState({ select: (s) => s.location });
   const pay = useServerFn(startPayment);
   const event = useServerFn(registerEvent);
   // Server-rendered HTML so crawlers see full page content without running JS.
+  primeBlog(blog);
   const html = useMemo(() => renderStatic(loc.pathname, loc.searchStr).html as string, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -34,8 +36,9 @@ export function SitePage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    primeBlog(blog);
     renderNow();
-  }, [loc.href]);
+  }, [loc.href, blog]);
 
   return <div id="app" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
 }
