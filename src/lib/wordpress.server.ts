@@ -127,7 +127,7 @@ function card(p: RawPost): BlogCard {
   };
 }
 
-export async function wpListPosts(opts: { page?: number; category?: number; search?: string; perPage?: number; exclude?: number }) {
+export async function wpListPosts(opts: { page?: number | undefined; category?: number | undefined; search?: string | undefined; perPage?: number | undefined; exclude?: number | undefined }) {
   const q = new URLSearchParams({ _embed: "1", per_page: String(Math.min(opts.perPage ?? PER_PAGE, 100)), page: String(opts.page ?? 1) });
   if (opts.category) q.set("categories", String(opts.category));
   if (opts.search) q.set("search", opts.search);

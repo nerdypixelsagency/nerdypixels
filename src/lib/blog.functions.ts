@@ -29,7 +29,7 @@ export const getBlogData = createServerFn({ method: "GET" })
       }
       const m = path.match(/^\/blog\/([^/]+)$/);
       if (m) {
-        const slug = decodeURIComponent(m[1]);
+        const slug = decodeURIComponent(m[1] ?? "");
         const post = await wpPost(slug);
         let related: Awaited<ReturnType<typeof wpListPosts>>["posts"] = [];
         if (post) {
