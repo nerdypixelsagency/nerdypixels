@@ -86,8 +86,13 @@ label.f{font-weight:600;color:var(--ink)}
   .sticky-enrol .small{color:var(--on-dark-2)}
   body:has(.sticky-enrol) .wa-float{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   body:has(.sticky-enrol) footer{padding-bottom:110px}
-  .hero{margin:8px 8px 0}
+  .hero{margin:8px 8px 0;padding:24px 0 32px}
   .hero .row .btn{flex:1 1 100%}
+  .hero .hero-grid{gap:24px}
+  .hero .price-card{padding:18px 16px;border-radius:22px}
+  .hero .price-card .price{font-size:34px}
+  .hero .price-card input,.hero .price-card select{height:48px;font-size:16px}
+  .hero .price-card .btn{min-height:50px}
   .nav{height:62px}
   .logo img{height:36px!important}
   .subnav{top:62px}
