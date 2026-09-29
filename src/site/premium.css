@@ -5,7 +5,8 @@
   --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:96px;
 }
 body{background:var(--canvas);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-h1{font-weight:700;letter-spacing:-.04em;line-height:1.02;font-size:clamp(34px,6.2vw,68px);text-wrap:balance}
+h1{font-weight:700;letter-spacing:-.04em;line-height:1.02;font-size:clamp(30px,5vw,56px);text-wrap:balance}
+.hero h1{font-size:clamp(25px,3.6vw,44px)}
 h2{font-weight:700;letter-spacing:-.035em;line-height:1.05;font-size:clamp(28px,4vw,48px);text-wrap:balance}
 h3{letter-spacing:-.02em}
 .lead{text-wrap:pretty}
@@ -38,8 +39,12 @@ h3{letter-spacing:-.02em}
 .subnav{top:68px}
 
 /* hero: rounded panel inset from the edges */
-.hero{margin:12px clamp(8px,1.5vw,16px) 0;border-radius:var(--panel-r);padding:clamp(48px,8vw,104px) 0 clamp(56px,8vw,112px)}
-.hero .hero-grid{gap:clamp(32px,5vw,64px)}
+.hero{margin:12px clamp(8px,1.5vw,16px) 0;border-radius:var(--panel-r);padding:clamp(28px,4vw,48px) 0 clamp(32px,4vw,56px)}
+.hero .hero-grid{gap:clamp(24px,3.5vw,44px);align-items:center}
+.hero .price-card{gap:12px;padding:clamp(18px,2.4vw,26px)}
+.hero .price-card .lead-slot{padding-top:12px}
+.hero .price-card form{gap:8px}
+.hero .price-card input,.hero .price-card select{height:46px}
 .hero .lead{font-size:clamp(16px,1.5vw,19px)}
 .hero .btn.green{padding:0 28px}
 
@@ -81,8 +86,13 @@ label.f{font-weight:600;color:var(--ink)}
   .sticky-enrol .small{color:var(--on-dark-2)}
   body:has(.sticky-enrol) .wa-float{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
   body:has(.sticky-enrol) footer{padding-bottom:110px}
-  .hero{margin:8px 8px 0}
+  .hero{margin:8px 8px 0;padding:24px 0 32px}
   .hero .row .btn{flex:1 1 100%}
+  .hero .hero-grid{gap:24px}
+  .hero .price-card{padding:18px 16px;border-radius:22px}
+  .hero .price-card .price{font-size:34px}
+  .hero .price-card input,.hero .price-card select{height:48px;font-size:16px}
+  .hero .price-card .btn{min-height:50px}
   .nav{height:62px}
   .logo img{height:36px!important}
   .subnav{top:62px}
