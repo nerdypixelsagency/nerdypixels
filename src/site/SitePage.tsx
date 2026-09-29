@@ -1,7 +1,7 @@
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo } from "react";
-import { startPayment, registerEvent } from "@/lib/payments.functions";
+import { startPayment, registerEvent, submitLead } from "@/lib/payments.functions";
 const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
 import { renderStatic, boot, renderNow, primeBlog } from "./app.js";
@@ -15,6 +15,7 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   const loc = useRouterState({ select: (s) => s.location });
   const pay = useServerFn(startPayment);
   const event = useServerFn(registerEvent);
+  const lead = useServerFn(submitLead);
   // Server-rendered HTML so crawlers see full page content without running JS.
   primeBlog(blog);
   const html = useMemo(() => renderStatic(loc.pathname, loc.searchStr).html as string, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -30,6 +31,7 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
     w["__npaPay"] = (d: unknown) => pay({ data: d as never });
     w["__npaEvent"] = (d: { name: string; email: string; phone?: string }) =>
       event({ data: { name: d.name, email: d.email, phone: d.phone } });
+    w["__npaLead"] = (d: unknown) => lead({ data: d as never });
     w["__npaNav"] = (href: string) => router.navigate({ href });
     document.documentElement.style.setProperty("--astro", `url(${astronaut.url})`);
     boot();

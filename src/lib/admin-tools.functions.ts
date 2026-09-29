@@ -160,3 +160,13 @@ export const setCommissionRate = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const getLeads = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const mode = await modeOf(context);
+    const { data, error } = await context.supabase.from("leads").select("*").eq("mode", mode).order("created_at", { ascending: false }).limit(5000);
+    if (error) throw new Error(error.message);
+    return { mode, rows: (data ?? []) as { id: string; first_name: string; last_name: string; email: string; phone: string; country: string | null; source: string | null; created_at: string }[] };
+  });
