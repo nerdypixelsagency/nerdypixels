@@ -129,7 +129,7 @@ function footer(){
 }
 
 /* ============ Shared blocks ============ */
-function priceCard(){
+function leadCard(){
   const open = earlyOpen();
   return `<aside class="price-card" aria-label="Price">
 ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
@@ -143,6 +143,15 @@ ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><d
 <button class="btn green block" type="submit">Get the details</button>
 </form></div>
 <p class="small muted row" style="justify-content:center;gap:6px">${I.lock()} We'll only use this to contact you about the bootcamp. <a href="/checkout${open?"?plan=early":""}">Enrol now</a></p></aside>`;
+}
+function priceCard(){
+  const open = earlyOpen();
+  return `<aside class="price-card course-price-card" aria-label="Price">
+${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
+       : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
+<ul class="list" style="border-top:1px solid var(--line);padding-top:16px">${check("8 modules, 8 portfolio pieces")}${check("5 industry certifications")}${check("Capstone hackathon on real brand briefs")}${check("Mobile money, card and bank transfer worldwide")}</ul>
+<a class="btn deep block" href="/checkout${open?"?plan=early":"?plan=monthly"}">Continue to checkout</a>
+<p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} Secure payment. Takes about two minutes.</p></aside>`;
 }
 function eventBand(){
   return `<div class="band"><div class="stack" style="gap:12px"><span class="eyebrow">Free live event, ${EVENT.dateLabel.replace(" 2026","")}</span><h2>${EVENT.title}</h2><p class="lead">Not ready to enrol yet? Spend an hour with our instructors, build a simple strategy for a real business, and take home the template.</p></div>
@@ -178,9 +187,9 @@ P.home = () => ({ title:"Nerdy Pixels Academy | Digital skills for Africa's emer
 <section class="hero"><div class="wrap hero-grid">
 <div class="stack" style="gap:22px"><span class="eyebrow">Nerdy Pixels Academy</span>
 <h1>Practical digital marketing training <span class="accent">for Africa's emerging workforce.</span></h1>
-<p class="lead">Learn the skills companies are hiring for, from marketers who do the work every day. Earn recognised certifications, build a portfolio, and pay from anywhere in Africa.</p>
+<p class="lead">Learn the skills companies are hiring for, from marketers who do the work every day. Earn recognised certifications, build a portfolio, and pay from anywhere in the world.</p>
 <div class="row"><a class="btn green" href="/courses/digital-marketing">Explore the bootcamp →</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
-${priceCard()}
+${leadCard()}
 </div></section>${marquee()}
 <section class="section"><div class="wrap stack" style="gap:28px">
 <div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>Enrolling now: Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications and live classes. The next cohort starts ${COHORT_START}.</p></div><a href="/courses/digital-marketing" style="font-weight:600">View the bootcamp</a></div>
@@ -214,7 +223,7 @@ P.bootcamp = () => { const open = earlyOpen(); return { title:"Digital Marketing
 <h1>Become a job-ready digital marketer. <span class="accent">Certified, with a portfolio to prove it.</span></h1>
 <p class="lead">Eight practical modules taught live by working marketers. Every module ends with a portfolio piece, and you finish with a live project for a real brand.</p>
 <div class="row"><a class="btn green" href="/checkout${open?"?plan=early":""}">Enrol in the next cohort →</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div>
-<ul class="list row" style="flex-direction:row;gap:20px">${check("Live classes Thursday to Sunday")}${check("Pay from anywhere in Africa")}${check("Monthly plan available")}</ul></div>
+<ul class="list row" style="flex-direction:row;gap:20px">${check("Live classes Thursday to Sunday")}${check("Pay from anywhere in the world")}${check("Monthly plan available")}</ul></div>
 ${priceCard()}</div></section>
 <section class="stats wrap" aria-label="At a glance" style="padding:0">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div><b>${s[0]}</b><span class="muted small">${s[1]}</span></div>`).join("")}</section>
 <section class="section"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2><div class="grid g4">${PERSONAS.map((p,i)=>`<div class="card stack persona" style="gap:8px"><span class="nbadge">${i+1}</span><h3>${p[0]}</h3><p class="muted">${p[1]}</p></div>`).join("")}</div></div></section>
