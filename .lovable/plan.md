@@ -47,6 +47,14 @@ Turn the admin area into the source of truth for payment mode, courses, cohorts,
 - Align it consistently with the footer content on desktop and mobile.
 - Verify that the footer does not stretch, clip, or shift across common viewport sizes.
 
+### 6. Modernize search and filters across admin screens
+- Replace oversized stacked filters with the selected **Unified horizontal toolbar** on every applicable data screen, including enrolments, leads, referrals, instalments, commissions, cohorts, and admin lists where filtering is useful.
+- Use the locked **Brand crisp** palette, **Outfit** headings, and **Figtree** interface text while preserving the established Nerdy Pixels identity.
+- Give search the dominant space, group related filters compactly, treat date range as one control, and show reset only when filters are active.
+- Surface active filters clearly and preserve each screen’s existing filter capabilities, results, exports, and actions.
+- On smaller screens, collapse secondary controls behind a labelled Filters action while keeping search immediately available; all controls remain keyboard accessible and at least 44px high.
+- Use semantic design tokens and shared toolbar styles/components rather than page-specific hardcoded colors.
+
 ## Admin permissions
 - **Super admin:** can change payment mode and all commercial/global settings.
 - **Admin and super admin:** can manage courses/cohorts and use read-only previews.
@@ -57,6 +65,7 @@ Turn the admin area into the source of truth for payment mode, courses, cohorts,
 - Continue using the existing `app_settings` table for global settings such as payment mode; course/cohort commercial content belongs on course/cohort records.
 - Add validated authenticated server functions for CMS editing and student preview, plus a minimal public settings reader that returns only safe published fields.
 - Refactor the student dashboard into reusable display components so live student view and admin preview stay visually consistent while preview actions remain disabled.
+- Create a reusable admin search/filter toolbar pattern so every applicable screen shares the selected composition, responsive behavior, focus states, and active-filter feedback.
 - Preserve the existing server-side Flutterwave verification flow, referral calculation rules, analytics safeguards, and WordPress integration.
 
 ## Verification
@@ -66,4 +75,5 @@ Turn the admin area into the source of truth for payment mode, courses, cohorts,
 - Confirm displayed totals equal the amount the server sends to Flutterwave in both payment modes.
 - Preview guest and student experiences as both admin roles; confirm the target user session never replaces the administrator session and all state-changing actions are unavailable.
 - Confirm preview access is logged.
+- Verify search, each filter, combined filters, active-filter reset, and exports on every updated admin screen.
 - Check the footer logo and all touched flows on desktop and mobile, then confirm the preview build is clean.
