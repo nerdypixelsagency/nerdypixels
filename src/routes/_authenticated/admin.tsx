@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox } from "lucide-react";
+import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn, setPaymentMode } from "@/lib/admin.functions";
 const logoDark = { url: "/brand/logo-dark.png" };
