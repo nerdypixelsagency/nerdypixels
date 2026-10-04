@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ambassadors: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -29,6 +62,42 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string
+        }
+        Relationships: []
+      }
+      cohorts: {
+        Row: {
+          course: string
+          created_at: string
+          end_date: string | null
+          id: string
+          name: string
+          start_date: string | null
+          status: string
+          updated_at: string
+          whatsapp_link: string | null
+        }
+        Insert: {
+          course?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          name: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp_link?: string | null
+        }
+        Update: {
+          course?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          name?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp_link?: string | null
         }
         Relationships: []
       }
@@ -66,6 +135,7 @@ export type Database = {
         Row: {
           admin_notes: string | null
           amount: number
+          cohort_id: string | null
           country: string | null
           created_at: string
           currency: string
@@ -93,6 +163,7 @@ export type Database = {
         Insert: {
           admin_notes?: string | null
           amount?: number
+          cohort_id?: string | null
           country?: string | null
           created_at?: string
           currency?: string
@@ -120,6 +191,7 @@ export type Database = {
         Update: {
           admin_notes?: string | null
           amount?: number
+          cohort_id?: string | null
           country?: string | null
           created_at?: string
           currency?: string
@@ -144,7 +216,15 @@ export type Database = {
           tx_ref?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "enrolments_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       instalment_reminders: {
         Row: {

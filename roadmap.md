@@ -8,3 +8,9 @@
 - [x] Phase 5: student login, countdowns
 - [ ] Google Search Console verification (waiting on user)
 - [ ] Add https://bootcamp.npdacademy.com/student to Supabase redirect URLs (waiting on user)
+- [ ] Hide super admin from other admins (Admins page + RLS)
+- [ ] Invite-admin flow with set-password email; invite hayjay.okunolaa@gmail.com
+- [ ] Referral programme: import 33 ambassador codes, % commissions on confirmed payments only (outright + instalment rates), shareable ?ref= links, checkout code check, student referral link in /student
+- [ ] Cohorts & courses admin page; enrolments tagged to cohort; welcome email uses cohort data
+- [ ] Import existing students from Excel (waiting on user's student file)
+- [ ] Premium redesign of all admin screens
