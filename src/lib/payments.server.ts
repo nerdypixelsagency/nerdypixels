@@ -8,7 +8,7 @@ export const WHATSAPP_GROUP =
   "https://wa.me/2349136713644?text=" +
   encodeURIComponent("Hello, I've enrolled in the bootcamp. Please add me to my cohort's WhatsApp group.");
 // Change once your domain is verified in Resend.
-export const EMAIL_FROM = "Nerdy Pixels Academy <info@npdacademy.com>";
+export const EMAIL_FROM = "Nerdy Pixels Academy <info@hello.npdacademy.com>";
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
