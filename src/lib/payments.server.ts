@@ -100,6 +100,15 @@ export async function sendReceiptEmail(row: Row) {
   const key = process.env["RESEND_API_KEY"];
   if (!key) return;
   const first = esc(row.name.trim().split(" ")[0]);
+  // Pull the open cohort so the welcome email always carries current dates and WhatsApp link.
+  let cohortStart = COHORT_START, whatsapp = WHATSAPP_GROUP;
+  try {
+    const db = await admin();
+    const { data: c } = await db.from("cohorts" as never).select("start_date, whatsapp_link").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const co = c as { start_date?: string; whatsapp_link?: string } | null;
+    if (co?.start_date) cohortStart = co.start_date;
+    if (co?.whatsapp_link) whatsapp = co.whatsapp_link;
+  } catch { /* fall back to defaults */ }
   const isInst = row.kind === "instalment";
   const subject = isInst ? `Receipt: ${row.instalment_month} instalment received` : "Welcome to the Nerdy Pixels Academy bootcamp";
   const planLine = isInst

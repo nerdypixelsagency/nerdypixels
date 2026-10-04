@@ -53,7 +53,8 @@ export const startPayment = createServerFn({ method: "POST" })
       payment_method: data.method ?? null,
       tx_ref: txRef,
       mode,
-    });
+      cohort_id: cohort ? (cohort as { id: string }).id : null,
+    } as never);
     if (error) {
       console.error("[startPayment:db_insert]", error.code, error.message);
       throw new Error("We couldn't start the payment. Please try again.");
