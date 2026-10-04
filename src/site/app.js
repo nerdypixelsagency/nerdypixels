@@ -543,6 +543,8 @@ function scrollToId(id){ const el = document.getElementById(id); if (el) el.scro
 let booted = false;
 export function boot(){
 if (booted) return; booted = true;
+// Remember a referral link (?ref=CODE) so checkout can prefill the code.
+try{ const rc = new URLSearchParams(location.search).get("ref"); if (rc) localStorage.setItem("npa-ref", rc.trim().toUpperCase()); }catch(e){}
 const track = (name, params) => { if (typeof window.gtag === "function") window.gtag("event", name, params); };
 const tick = () => document.querySelectorAll("[data-countdown]").forEach(el => { const ms = new Date(el.dataset.countdown) - Date.now(); if (ms <= 0){ el.textContent = ""; return; } const d = Math.floor(ms/864e5), h = Math.floor(ms%864e5/36e5), m = Math.floor(ms%36e5/6e4); el.textContent = `${d}d ${h}h ${m}m ${el.dataset.label}`; });
 tick(); setInterval(tick, 30000); window.__npaTick = tick;
