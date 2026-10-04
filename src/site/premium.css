@@ -149,3 +149,8 @@ footer a,.drawer a{min-height:32px;display:inline-flex;align-items:center}
 .wp-content h2{font-size:clamp(24px,3vw,30px);margin:32px 0 12px}
 .wp-content h3{font-size:clamp(20px,2.4vw,24px);margin:26px 0 10px}
 .wp-content p,.wp-content ul,.wp-content ol{margin:0 0 16px}
+
+/* Referral code live check note */
+.ref-note{display:block;margin-top:6px;font-size:12.5px;font-weight:500}
+.ref-note.ok{color:#0F7A3C}
+.ref-note.bad{color:#B3261E}

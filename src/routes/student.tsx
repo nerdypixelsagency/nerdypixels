@@ -109,6 +109,7 @@ function Dashboard() {
       ) : (
         <div className="card"><b>You're all paid up.</b> <span className="muted">Classes start Thursday 5 November 2026.</span></div>
       )}
+      <ReferralCard />
       <div className="card"><h2 style={{ fontSize: 20, marginBottom: 12 }}>Payment history</h2>
         {rows.length === 0 ? <p className="muted">No payments yet.</p> : (
           <div className="tw"><table className="table"><thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th><th>Receipt ref</th></tr></thead><tbody>
