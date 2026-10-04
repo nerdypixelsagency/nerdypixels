@@ -113,29 +113,35 @@ export const getCommissions = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const role = await requireAdmin(context);
     const mode = await modeOf(context);
-    const [{ data: rate }, { data: rows }, { data: payouts }] = await Promise.all([
-      context.supabase.from("app_settings").select("value").eq("key", "commission_rate").maybeSingle(),
-      context.supabase.from("enrolments").select("referral_code, amount, status, name, created_at").eq("mode", mode).eq("status", "paid").not("referral_code", "is", null).limit(5000),
+    const [{ data: rates }, { data: rows }, { data: payouts }, { data: ambs }] = await Promise.all([
+      context.supabase.from("app_settings").select("key, value").in("key", ["commission_outright_pct", "commission_instalment_pct"]),
+      // Commission counts on confirmed (paid) payments only — never pending, failed or refunded.
+      context.supabase.from("enrolments").select("referral_code, amount, plan, kind").eq("mode", mode).eq("status", "paid").not("referral_code", "is", null).limit(5000),
       context.supabase.from("commission_payouts").select("*").eq("mode", mode).order("created_at", { ascending: false }),
+      context.supabase.from("ambassadors").select("code, name").limit(5000),
     ]);
-    const pct = Number(rate?.value ?? 10);
-    const by: Record<string, { code: string; sales: number; revenue: number; paidOut: number }> = {};
+    const rm = Object.fromEntries((rates ?? []).map((r: { key: string; value: string }) => [r.key, r.value]));
+    const outrightPct = Number(rm["commission_outright_pct"] ?? 10);
+    const instalmentPct = Number(rm["commission_instalment_pct"] ?? 10);
+    const names: Record<string, string> = {};
+    for (const a of ambs ?? []) names[(a as { code: string }).code.toUpperCase()] = (a as { name: string }).name;
+    const by: Record<string, { code: string; name: string; sales: number; revenue: number; earned: number; paidOut: number }> = {};
+    const slot = (code: string) => (by[code] ??= { code, name: names[code] ?? "", sales: 0, revenue: 0, earned: 0, paidOut: 0 });
     for (const r of rows ?? []) {
       const code = String(r.referral_code || "").trim().toUpperCase();
       if (!code) continue;
-      by[code] ??= { code, sales: 0, revenue: 0, paidOut: 0 };
-      by[code].sales++;
-      by[code].revenue += r.amount;
+      const s = slot(code);
+      s.sales++;
+      s.revenue += r.amount;
+      // Outright (early bird) uses the outright rate; every confirmed monthly payment uses the instalment rate.
+      const pct = r.plan === "early" ? outrightPct : instalmentPct;
+      s.earned += Math.round((r.amount * pct) / 100);
     }
-    for (const p of payouts ?? []) {
-      const code = p.referral_code.toUpperCase();
-      by[code] ??= { code, sales: 0, revenue: 0, paidOut: 0 };
-      by[code].paidOut += p.amount;
-    }
+    for (const p of payouts ?? []) slot(p.referral_code.toUpperCase()).paidOut += p.amount;
     const list = Object.values(by)
-      .map((x) => ({ ...x, earned: Math.round((x.revenue * pct) / 100), owed: Math.max(0, Math.round((x.revenue * pct) / 100) - x.paidOut) }))
+      .map((x) => ({ ...x, owed: Math.max(0, x.earned - x.paidOut) }))
       .sort((a, b) => b.owed - a.owed || b.revenue - a.revenue);
-    return { role, mode, rate: pct, list, payouts: payouts ?? [] };
+    return { role, mode, outrightPct, instalmentPct, list, payouts: payouts ?? [] };
   });
 
 export const recordPayout = createServerFn({ method: "POST" })
