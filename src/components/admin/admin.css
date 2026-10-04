@@ -26,6 +26,9 @@
   grid-template-columns: 248px 1fr;
 }
 .adm a { color: inherit; }
+.adm a.adm-btn { color: #fff; }
+.adm a.adm-btn.green { color: #06301a; }
+.adm a.adm-btn.ghost { color: var(--a-ink); }
 
 /* ---- Sidebar ---- */
 .adm-side {
