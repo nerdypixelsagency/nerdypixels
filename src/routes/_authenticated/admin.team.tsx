@@ -39,7 +39,7 @@ function Team() {
           <input className="adm-input" type="email" required placeholder="colleague@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           <button className="adm-btn">Add admin</button>
           {msg && <span style={{ fontSize: 13, color: "#6b6280" }}>{msg}</span>}
-          <p style={{ width: "100%", margin: 0, fontSize: 12, color: "#6b6280" }}>They must first create an account on the admin sign-in page.</p>
+          <p style={{ width: "100%", margin: 0, fontSize: 12, color: "#6b6280" }}>No account needed first — we'll email them a link to set their password.</p>
         </form>
       )}
       <div className="adm-card">
