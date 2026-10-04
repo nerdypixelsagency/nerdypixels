@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getCommissions, recordPayout, setCommissionRate } from "@/lib/admin-tools.functions";
+import { getCommissions, recordPayout, setCommissionRates } from "@/lib/admin-tools.functions";
 import { naira } from "@/components/admin/data";
 
 export const Route = createFileRoute("/_authenticated/admin/commissions")({ component: Commissions });
@@ -10,10 +10,11 @@ export const Route = createFileRoute("/_authenticated/admin/commissions")({ comp
 function Commissions() {
   const fn = useServerFn(getCommissions);
   const payFn = useServerFn(recordPayout);
-  const rateFn = useServerFn(setCommissionRate);
+  const rateFn = useServerFn(setCommissionRates);
   const qc = useQueryClient();
   const { data, isLoading, error } = useQuery({ queryKey: ["commissions"], queryFn: () => fn() });
-  const [rate, setRate] = useState("");
+  const [outRate, setOutRate] = useState("");
+  const [instRate, setInstRate] = useState("");
   const [msg, setMsg] = useState("");
 
   async function payOut(code: string, owed: number) {
