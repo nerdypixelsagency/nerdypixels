@@ -40,7 +40,17 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
     w["__npaEvent"] = (d: { name: string; email: string; phone?: string }) =>
       event({ data: { name: d.name, email: d.email, phone: d.phone } });
     w["__npaLead"] = (d: unknown) => lead({ data: d as never });
-    w["__npaNav"] = (href: string) => router.navigate({ href });
+    w["__npaNav"] = (href: string) => {
+      const target = new URL(href, location.origin);
+      const current = new URLSearchParams(location.search);
+      for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content"]) {
+        if (!target.searchParams.has(key)) {
+          const value = current.get(key);
+          if (value) target.searchParams.set(key, value);
+        }
+      }
+      router.navigate({ href: target.pathname + target.search + target.hash });
+    };
     document.documentElement.style.setProperty("--astro", `url(${astronaut.url})`);
     boot();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
