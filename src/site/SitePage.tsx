@@ -1,6 +1,6 @@
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { startPayment, registerEvent, submitLead } from "@/lib/payments.functions";
 const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
@@ -16,7 +16,6 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   const pay = useServerFn(startPayment);
   const event = useServerFn(registerEvent);
   const lead = useServerFn(submitLead);
-  const initialPageView = useRef(true);
   // Server-rendered HTML so crawlers see full page content without running JS.
   primeBlog(blog);
   const html = useMemo(() => renderStatic(loc.pathname, loc.searchStr).html as string, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -49,18 +48,6 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   useEffect(() => {
     primeBlog(blog);
     renderNow();
-    if (initialPageView.current) {
-      initialPageView.current = false;
-      return;
-    }
-    const analyticsWindow = window as Window & { gtag?: (...args: unknown[]) => void };
-    if (typeof analyticsWindow.gtag === "function") {
-      analyticsWindow.gtag("event", "page_view", {
-        page_path: location.pathname + location.search,
-        page_location: location.href,
-        page_title: document.title,
-      });
-    }
   }, [loc.href, blog]);
 
   return <div id="app" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
