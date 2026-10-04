@@ -22,9 +22,9 @@ function Team() {
     e.preventDefault();
     setMsg("");
     try {
-      await addFn({ data: { email } });
+      const r = await addFn({ data: { email } });
       setEmail("");
-      setMsg("Admin added.");
+      setMsg(r.invited ? "Admin added — a set-password email is on its way to them." : "Admin added — a fresh set-password email has been sent to them.");
       qc.invalidateQueries({ queryKey: ["admin-team"] });
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "Couldn't add admin.");

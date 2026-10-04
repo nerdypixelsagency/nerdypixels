@@ -56,9 +56,9 @@ function Commissions() {
       <div className="adm-card">
         {data.list.length === 0 ? <p className="adm-empty">No paid sales with a referral code yet</p> : (
           <div className="adm-scroll"><table className="adm-table">
-            <thead><tr><th>Code</th><th className="num">Paid sales</th><th className="num">Revenue</th><th className="num">Earned</th><th className="num">Paid out</th><th className="num">Owed</th><th></th></tr></thead>
+            <thead><tr><th>Ambassador</th><th>Code</th><th className="num">Paid sales</th><th className="num">Revenue</th><th className="num">Earned</th><th className="num">Paid out</th><th className="num">Owed</th><th></th></tr></thead>
             <tbody>{data.list.map((x) => (
-              <tr key={x.code}><td><b>{x.code}</b></td><td className="num">{x.sales}</td><td className="num money">{naira(x.revenue)}</td><td className="num">{naira(x.earned)}</td><td className="num">{naira(x.paidOut)}</td>
+              <tr key={x.code}><td>{x.name || "—"}</td><td><b>{x.code}</b></td><td className="num">{x.sales}</td><td className="num money">{naira(x.revenue)}</td><td className="num">{naira(x.earned)}</td><td className="num">{naira(x.paidOut)}</td>
                 <td className="num money"><b>{naira(x.owed)}</b></td>
                 <td><button className="adm-btn green" style={{ padding: "6px 12px" }} disabled={x.owed <= 0} onClick={() => payOut(x.code, x.owed)}>Mark paid out</button></td></tr>
             ))}</tbody>
