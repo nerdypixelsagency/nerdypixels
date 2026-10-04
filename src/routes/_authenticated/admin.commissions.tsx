@@ -26,10 +26,10 @@ function Commissions() {
     try { await payFn({ data: { code, amount, note } }); setMsg(`Recorded ${naira(amount)} paid to ${code}.`); qc.invalidateQueries({ queryKey: ["commissions"] }); }
     catch (e) { setMsg((e as Error).message); }
   }
-  async function saveRate() {
-    const n = Number(rate);
-    if (!(n >= 0 && n <= 100)) return setMsg("Rate must be between 0 and 100.");
-    try { await rateFn({ data: { rate: n } }); setRate(""); setMsg(`Commission rate set to ${n}%.`); qc.invalidateQueries({ queryKey: ["commissions"] }); }
+  async function saveRates() {
+    const o = Number(outRate), i = Number(instRate);
+    if (!(o >= 0 && o <= 100) || !(i >= 0 && i <= 100)) return setMsg("Rates must be between 0 and 100.");
+    try { await rateFn({ data: { outright: o, instalment: i } }); setOutRate(""); setInstRate(""); setMsg(`Rates set: ${o}% outright, ${i}% per instalment.`); qc.invalidateQueries({ queryKey: ["commissions"] }); }
     catch (e) { setMsg((e as Error).message); }
   }
 
@@ -41,15 +41,17 @@ function Commissions() {
     <>
       <div className="adm-head"><h1>Referral commissions</h1>
         {data.role === "super_admin" && (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <input className="adm-input" style={{ width: 110 }} type="number" inputMode="decimal" placeholder={`${data.rate}%`} value={rate} onChange={(e) => setRate(e.target.value)} aria-label="Commission rate" />
-            <button className="adm-btn ghost" onClick={saveRate}>Set rate</button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <input className="adm-input" style={{ width: 130 }} type="number" inputMode="decimal" placeholder={`Outright ${data.outrightPct}%`} value={outRate} onChange={(e) => setOutRate(e.target.value)} aria-label="Outright commission rate" />
+            <input className="adm-input" style={{ width: 140 }} type="number" inputMode="decimal" placeholder={`Instalment ${data.instalmentPct}%`} value={instRate} onChange={(e) => setInstRate(e.target.value)} aria-label="Instalment commission rate" />
+            <button className="adm-btn ghost" onClick={saveRates}>Set rates</button>
           </div>
         )}
       </div>
       {msg && <div className="adm-card" style={{ marginBottom: 16, fontSize: 14 }} role="status">{msg}</div>}
       <div className="adm-card" style={{ marginBottom: 16 }}>
-        <b>Commission rate: {data.rate}%</b> of paid sales · <b>Total owed: {naira(totalOwed)}</b>
+        <b>{data.outrightPct}%</b> of each outright payment · <b>{data.instalmentPct}%</b> of each confirmed monthly payment · <b>Total owed: {naira(totalOwed)}</b>
+        <p style={{ margin: "6px 0 0", fontSize: 13, color: "#6b6280" }}>Commission counts on confirmed payments only — pending, failed or refunded payments earn nothing.</p>
       </div>
       <div className="adm-card">
         {data.list.length === 0 ? <p className="adm-empty">No paid sales with a referral code yet</p> : (
