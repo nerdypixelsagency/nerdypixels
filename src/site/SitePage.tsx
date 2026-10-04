@@ -1,6 +1,6 @@
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { startPayment, registerEvent, submitLead } from "@/lib/payments.functions";
 const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
@@ -16,6 +16,7 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   const pay = useServerFn(startPayment);
   const event = useServerFn(registerEvent);
   const lead = useServerFn(submitLead);
+  const initialPageView = useRef(true);
   // Server-rendered HTML so crawlers see full page content without running JS.
   primeBlog(blog);
   const html = useMemo(() => renderStatic(loc.pathname, loc.searchStr).html as string, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -24,8 +25,16 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
     // Old "#/path" links keep working.
     if (location.hash.startsWith("#/")) {
       const target = location.hash.slice(1);
-      history.replaceState(null, "", target);
-      router.navigate({ href: target, replace: true });
+      const targetUrl = new URL(target, location.origin);
+      for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content"]) {
+        if (!targetUrl.searchParams.has(key)) {
+          const value = new URLSearchParams(location.search).get(key);
+          if (value) targetUrl.searchParams.set(key, value);
+        }
+      }
+      const preservedTarget = targetUrl.pathname + targetUrl.search + targetUrl.hash;
+      history.replaceState(null, "", preservedTarget);
+      router.navigate({ href: preservedTarget, replace: true });
     }
     const w = window as unknown as Record<string, unknown>;
     w["__npaPay"] = (d: unknown) => pay({ data: d as never });
@@ -40,6 +49,18 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   useEffect(() => {
     primeBlog(blog);
     renderNow();
+    if (initialPageView.current) {
+      initialPageView.current = false;
+      return;
+    }
+    const analyticsWindow = window as Window & { gtag?: (...args: unknown[]) => void };
+    if (typeof analyticsWindow.gtag === "function") {
+      analyticsWindow.gtag("event", "page_view", {
+        page_path: location.pathname + location.search,
+        page_location: location.href,
+        page_title: document.title,
+      });
+    }
   }, [loc.href, blog]);
 
   return <div id="app" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
