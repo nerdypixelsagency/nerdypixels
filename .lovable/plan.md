@@ -1,4 +1,4 @@
-# Add GA4 tracking across Lovable, Vercel, and the custom domain
+# Add GA4 tracking to bootcamp.npdacademy.com and all deployments
 
 ## Configuration and deployment coverage
 
@@ -6,8 +6,9 @@
 - Add GA4 through the shared TanStack document head, which is this site’s equivalent of `index.html`, so every public, student, authentication, payment-return, and admin page receives the tag.
 - Read the measurement ID through a server-served analytics configuration so the existing runtime variable works without exposing private environment data. The GA measurement ID itself is sent to the browser, as GA4 requires.
 - Fail safely when the variable is absent: the site continues working, while analytics remains inactive rather than loading a malformed Google URL.
+- Treat `https://bootcamp.npdacademy.com` as the primary analytics domain and verify the deployed Google tag there.
 - Publish the completed change to the Lovable live domain.
-- For the separately hosted Vercel/custom domain, confirm `GOOGLE_ANALYTICS_MEASUREMENT_ID` exists in Vercel’s Production environment and redeploy the frontend. This external Vercel setting cannot be changed from the project code, but the implementation will use the same variable name on both hosts.
+- For the separately hosted Vercel custom domain, use the same `GOOGLE_ANALYTICS_MEASUREMENT_ID` variable and redeploy the frontend. Confirm the variable exists in Vercel’s Production environment; this external dashboard setting cannot be changed from project code.
 
 ## Page views and campaign URLs
 
@@ -28,8 +29,8 @@
 
 ## Verification
 
-- Confirm Google’s script loads once with the configured ID on the Lovable deployment.
+- Confirm Google’s script loads once with the configured ID on both the Lovable deployment and `https://bootcamp.npdacademy.com`.
 - Test a URL containing all four UTM parameters through multiple internal navigations and confirm they remain visible and readable.
 - Capture emitted GA calls to verify the initial page view, one page view per route change, correct detailed CTA locations, and lead tracking only after successful storage.
 - Re-test lead submission, checkout navigation, free-event navigation, WhatsApp, and page loading with analytics blocked or unavailable.
-- Publish after the build and browser checks pass, then report the live Lovable URL and the exact Vercel redeploy requirement.
+- Publish after the build and browser checks pass, then verify the Lovable URL. After the Vercel redeploy, verify `bootcamp.npdacademy.com` receives page views and custom events without redirecting away its UTM parameters.
