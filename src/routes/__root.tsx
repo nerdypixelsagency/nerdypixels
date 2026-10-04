@@ -143,14 +143,17 @@ function AnalyticsPageViews() {
       firstView.current = false;
       return;
     }
-    const analyticsWindow = window as Window & { gtag?: (...args: unknown[]) => void };
-    if (typeof analyticsWindow.gtag === "function") {
-      analyticsWindow.gtag("event", "page_view", {
-        page_path: location.pathname + location.search,
-        page_location: location.href,
-        page_title: document.title,
-      });
-    }
+    const timer = window.setTimeout(() => {
+      const analyticsWindow = window as Window & { gtag?: (...args: unknown[]) => void };
+      if (typeof analyticsWindow.gtag === "function") {
+        analyticsWindow.gtag("event", "page_view", {
+          page_path: location.pathname + location.search,
+          page_location: location.href,
+          page_title: document.title,
+        });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [href]);
 
   return null;
