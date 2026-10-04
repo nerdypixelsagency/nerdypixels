@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { getEnrolments, listReminders, sendInstalmentReminder } from "@/lib/admin.functions";
 import { enrolmentsQuery } from "@/components/admin/data";
+import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/instalments")({ component: Instalments });
 
@@ -17,6 +18,7 @@ function Instalments() {
   const sendFn = useServerFn(sendInstalmentReminder);
   const { data: rems, refetch } = useQuery({ queryKey: ["reminders"], queryFn: () => remFn() });
   const [busy, setBusy] = useState("");
+  const [search, setSearch] = useState("");
   const lastSent = (email: string, month: string) => {
     const r = (rems ?? []).find((x) => x.email === email.toLowerCase() && x.month === month);
     return r ? new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : null;
@@ -42,8 +44,9 @@ function Instalments() {
       m[k] ??= { name: r.name, email: r.email, phone: r.phone, paid: new Set() };
       if (r.instalment_month) m[k].paid.add(r.instalment_month);
     });
-    return Object.values(m);
-  }, [data]);
+    const t = search.trim().toLowerCase();
+    return Object.values(m).filter((s) => !t || [s.name,s.email,s.phone].some((v) => v?.toLowerCase().includes(t)));
+  }, [data, search]);
 
   const now = new Date();
   const isOverdue = (mo: string) => (mo === "December" ? now >= new Date("2026-12-04") : mo === "January" ? now >= new Date("2027-01-04") : false);
@@ -52,6 +55,7 @@ function Instalments() {
   return (
     <>
       <div className="adm-head"><h1>Instalments</h1></div>
+      <FilterToolbar search={search} onSearch={setSearch} placeholder="Search student name, email, or phone" active={!!search} onReset={() => setSearch("")} />
       <div className="adm-card">
         <p style={{ margin: 0, color: "#6b6280", fontSize: 13 }}>Students on the monthly plan (₦40,000 × 3). Green is paid, amber is due, red is overdue (3+ days late), grey is not yet due. Reminders are emailed automatically 5 days before, 1 day before, on the 1st, and 3 days after if unpaid.</p>
         {isLoading ? <p className="adm-empty">Loading…</p> : students.length === 0 ? <p className="adm-empty">No monthly-plan students yet</p> : (
