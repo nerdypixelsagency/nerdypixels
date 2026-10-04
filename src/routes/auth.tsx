@@ -50,7 +50,7 @@ function AuthPage() {
       } else {
         const r = await signupFn({ data: { email, password } });
         if (!r.ok) throw new Error(r.error);
-        setOk("Check your email (from info@npdacademy.com) to confirm your account, then sign in.");
+        setOk("Check your email (from info@hello.npdacademy.com) to confirm your account, then sign in.");
         setMode("in");
       }
     } catch (e) {
@@ -67,7 +67,7 @@ function AuthPage() {
     try {
       const r = await resetFn({ data: { email } });
       if (!r.ok) setErr(r.error ?? "Couldn't send the email.");
-      else setOk("If that account exists, a reset link is on its way from info@npdacademy.com.");
+      else setOk("If that account exists, a reset link is on its way from info@hello.npdacademy.com.");
     } catch (e) {
       setErr(friendly(e instanceof Error ? e.message : ""));
     } finally {

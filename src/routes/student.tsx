@@ -61,7 +61,7 @@ function SignIn() {
     <div className="card stack" style={{ gap: 18, padding: 32 }}>
       <h1 style={{ fontSize: "clamp(28px,5vw,40px)" }}>Student area</h1>
       {state === "sent" ? (
-        <p className="lead">If <b>{email}</b> is enrolled, a sign-in link is on its way from info@npdacademy.com. Open it on this device.</p>
+        <p className="lead">If <b>{email}</b> is enrolled, a sign-in link is on its way from info@hello.npdacademy.com. Open it on this device.</p>
       ) : (
         <form className="stack" style={{ gap: 14 }} onSubmit={submit} noValidate>
           <p className="muted">Enter the email you used at checkout. We'll email you a one-time sign-in link, no password needed.</p>
