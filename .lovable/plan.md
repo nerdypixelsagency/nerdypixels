@@ -18,26 +18,30 @@ All five phases are built. Still waiting on you:
 - The "they must create an account first" note goes away.
 
 ## 3. Referral programme, automated (your spreadsheet becomes the system)
-Your file has 33 ambassadors, each with a unique code (like RUTH-FH9W) and a shareable link. We replace the manual spreadsheet with the site doing the work:
+Your file has 33 ambassadors, each with a unique code (like RUTH-FH9W). The site replaces the manual spreadsheet:
 - Import all 33 ambassadors (name, email, code) into the admin area. Admins can add more later.
-- Shareable links that work: bootcamp.npdacademy.com/?ref=CODE. The code is remembered and filled in at checkout automatically, so nobody has to type it.
+- Shareable links that work: bootcamp.npdacademy.com/?ref=CODE. The code is remembered and filled in at checkout automatically.
 - Checkout checks the code live: "Code applied — referred by Ruth" or "Code not recognised".
-- Commissions are calculated automatically per ambassador: sign-ups, money collected, commission earned, paid out, and balance owed. No more manual counting.
-- Commission per plan type: you set one rate for outright (pay-once) payments and one for instalments. Instalment commission is counted as each monthly payment is actually paid, so you never owe commission on money not yet received. Your sheet suggests ₦1,000 per sign-up — I'll seed that as the default outright amount; you can change it in admin.
-- The Commissions page keeps its "mark as paid out" button, now matched to ambassador names.
+- New students get their own referral code and link in their student profile (/student), ready to share — every student can become an ambassador automatically.
 
-## 4. Cohorts and courses
+## 4. Commissions — percentage of confirmed payments only
+- Commission is a percentage of the fee, calculated only on payments confirmed paid (verified by Flutterwave or marked paid by an admin). Pending, failed or refunded payments earn nothing.
+- Two rates you control in admin: one % for outright (pay-once) payments, one % for instalment payments.
+- Instalment commission is earned as each monthly payment is actually confirmed — you never owe commission on money not yet received.
+- Per ambassador: sign-ups, confirmed revenue, commission earned, paid out, and balance owed — all automatic. The Commissions page keeps its "mark as paid out" button, now with ambassador names.
+
+## 5. Cohorts and courses
 - A new "Cohorts" admin page: create a cohort (name, course, start/end dates, WhatsApp group link, status: open/closed).
 - Enrolments are tagged to a cohort. The welcome email pulls the cohort's dates and WhatsApp link automatically — no more hardcoded links.
 - The current November 2026 bootcamp becomes the first cohort. Future courses/cohorts reuse the same checkout and emails.
 
-## 5. Import existing students
+## 6. Import existing students
 - Send me the Excel file of existing students (this referral file only has ambassadors). I'll import them as paid/manual enrolments in the right cohort, so reminders, receipts and the student portal work for them too.
 
-## 6. Student account (already built, now connected)
-- Students already sign in at /student with an email link to see payments and pay the next instalment. With cohorts and imported students, their portal shows their cohort, payment history and next due payment.
+## 7. Student account (already built, now connected)
+- Students already sign in at /student with an email link to see payments and pay the next instalment. With cohorts and imported students, their portal shows their cohort, payment history, next due payment — and their personal referral link.
 
-## 7. Upgrade the admin area
+## 8. Upgrade the admin area
 Give every admin page the same premium standard as the public site:
 - A shared page header with a title, short subtitle and actions. Uniform stat cards with icons. Better tables: sticky header, row hover, status pills, empty states and loading skeletons.
 - Fix the low-contrast "View all enrolments" button (dark text on purple in your screenshot).
@@ -47,7 +51,8 @@ Give every admin page the same premium standard as the public site:
 
 ## Technical details
 - Migration 1: user_roles SELECT policy becomes `user_id = auth.uid() OR has_role(auth.uid(),'super_admin') OR (is_admin(auth.uid()) AND role <> 'super_admin')`; listAdmins filters super_admin for non-super callers.
-- Migration 2: `ambassadors` (name, email, code unique, active) and `cohorts` (name, course, start/end dates, whatsapp_link, status) tables with admin-only RLS + grants; enrolments gain `cohort_id`; app_settings gain `commission_outright` and `commission_instalment` keys.
+- Migration 2: `ambassadors` (name, email, code unique, source: imported|student, active) and `cohorts` (name, course, dates, whatsapp_link, status) with admin-only RLS + grants; enrolments gain `cohort_id`; app_settings gain `commission_outright_pct` and `commission_instalment_pct`.
 - addAdmin: if no user exists, `supabaseAdmin.auth.admin.createUser({email, email_confirm:true})`, upsert role, `generateLink({type:'recovery'})`, send a new "admin invite" Resend template.
-- Referrals: import the 33 codes via run_sql; public server fn validates a code and returns the ambassador's first name only; app.js stores `?ref=` in localStorage and pre-fills checkout; getCommissions joins ambassadors and applies per-plan rates (instalment rows count when paid).
+- Referrals: import the 33 codes via run_sql; public server fn validates a code and returns the ambassador's first name only; app.js stores `?ref=` in localStorage and pre-fills checkout; on first confirmed payment a student gets an auto-generated ambassador code (NAME-XXXX pattern like your sheet).
+- Commissions: getCommissions joins ambassadors, filters `status='paid'` only, applies outright % to pay-once rows and instalment % to paid instalment rows.
 - Admin UI: rework admin.css tokens plus shared PageHeader/StatCard/EmptyState components.
