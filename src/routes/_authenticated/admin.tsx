@@ -89,6 +89,7 @@ function AdminLayout() {
     { to: "/admin/referrals", label: "Referrals", icon: Ticket },
     { to: "/admin/instalments", label: "Instalments", icon: CalendarClock },
     { to: "/admin/commissions", label: "Commissions", icon: HandCoins },
+    { to: "/admin/cohorts", label: "Cohorts", icon: GraduationCap },
     { to: "/admin/team", label: "Admins", icon: ShieldCheck },
   ] as const;
 
