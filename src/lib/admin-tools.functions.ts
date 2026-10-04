@@ -157,13 +157,15 @@ export const recordPayout = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const setCommissionRate = createServerFn({ method: "POST" })
+export const setCommissionRates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ rate: z.number().min(0).max(100) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ outright: z.number().min(0).max(100), instalment: z.number().min(0).max(100) }).parse(d))
   .handler(async ({ data, context }) => {
-    if ((await roleOf(context)) !== "super_admin") throw new Error("Only the super admin can change the commission rate.");
-    const { error } = await context.supabase.from("app_settings").update({ value: String(data.rate) }).eq("key", "commission_rate");
-    if (error) throw new Error(error.message);
+    if ((await roleOf(context)) !== "super_admin") throw new Error("Only the super admin can change commission rates.");
+    for (const [key, value] of [["commission_outright_pct", data.outright], ["commission_instalment_pct", data.instalment]] as const) {
+      const { error } = await context.supabase.from("app_settings").update({ value: String(value) }).eq("key", key);
+      if (error) throw new Error(error.message);
+    }
     return { ok: true };
   });
 
