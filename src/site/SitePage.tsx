@@ -17,6 +17,7 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   const pay = useServerFn(startPayment);
   const event = useServerFn(registerEvent);
   const lead = useServerFn(submitLead);
+  const refCheck = useServerFn(validateReferralCode);
   // Server-rendered HTML so crawlers see full page content without running JS.
   primeBlog(blog);
   const html = useMemo(() => renderStatic(loc.pathname, loc.searchStr).html as string, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -41,6 +42,7 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
     w["__npaEvent"] = (d: { name: string; email: string; phone?: string }) =>
       event({ data: { name: d.name, email: d.email, phone: d.phone } });
     w["__npaLead"] = (d: unknown) => lead({ data: d as never });
+    w["__npaRefCheck"] = (d: { code: string }) => refCheck({ data: d });
     w["__npaNav"] = (href: string) => {
       const target = new URL(href, location.origin);
       const current = new URLSearchParams(location.search);
