@@ -6,7 +6,7 @@ import { getPublicCourseConfig } from "@/lib/course-config.functions";
 
 export const Route = createFileRoute("/")({
   loader: async () => ({ blog: await getBlogData({ data: { path: "/" } }), config: await getPublicCourseConfig() }),
-  head: () => headFor("/"),
+  head: ({ loaderData }) => headFor("/", loaderData?.blog, loaderData?.config),
   component: HomePage,
 });
 

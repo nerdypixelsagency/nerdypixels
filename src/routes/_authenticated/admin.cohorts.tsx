@@ -5,7 +5,17 @@ import { useMemo, useState } from "react";
 import { listCourseCms, saveCohortCms, saveCourse } from "@/lib/course-config.functions";
 import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
-export const Route = createFileRoute("/_authenticated/admin/cohorts")({ component: Cohorts });
+export const Route = createFileRoute("/_authenticated/admin/cohorts")({
+  head: () => ({ meta: [
+    { title: "Courses and Cohorts | Nerdy Pixels Academy Admin" },
+    { name: "description", content: "Manage courses, cohorts, public offers, pricing, and countdowns." },
+    { property: "og:title", content: "Courses and Cohorts | Nerdy Pixels Academy Admin" },
+    { property: "og:description", content: "Manage courses, cohorts, public offers, pricing, and countdowns." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: Cohorts,
+});
 
 function Cohorts() {
   const listFn=useServerFn(listCourseCms), saveC=useServerFn(saveCourse), saveH=useServerFn(saveCohortCms), qc=useQueryClient();

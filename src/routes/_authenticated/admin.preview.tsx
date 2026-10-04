@@ -7,7 +7,17 @@ import { getEnrolments } from "@/lib/admin.functions";
 import { previewStudent } from "@/lib/course-config.functions";
 import { naira } from "@/components/admin/data";
 
-export const Route = createFileRoute("/_authenticated/admin/preview")({ component: Preview });
+export const Route = createFileRoute("/_authenticated/admin/preview")({
+  head: () => ({ meta: [
+    { title: "View As | Nerdy Pixels Academy Admin" },
+    { name: "description", content: "Preview the Nerdy Pixels Academy guest and student experience safely." },
+    { property: "og:title", content: "View As | Nerdy Pixels Academy Admin" },
+    { property: "og:description", content: "Preview the Nerdy Pixels Academy guest and student experience safely." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: Preview,
+});
 
 function Preview() {
   const listFn = useServerFn(getEnrolments), previewFn = useServerFn(previewStudent);

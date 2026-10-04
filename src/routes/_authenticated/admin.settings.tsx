@@ -4,7 +4,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { CreditCard, ExternalLink, ShieldCheck } from "lucide-react";
 import { getMyRole, getPaymentModeFn, setPaymentMode } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/settings")({ component: Settings });
+export const Route = createFileRoute("/_authenticated/admin/settings")({
+  head: () => ({ meta: [
+    { title: "Settings | Nerdy Pixels Academy Admin" },
+    { name: "description", content: "Manage Nerdy Pixels Academy payment and site settings." },
+    { property: "og:title", content: "Settings | Nerdy Pixels Academy Admin" },
+    { property: "og:description", content: "Manage Nerdy Pixels Academy payment and site settings." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: Settings,
+});
 
 function Settings() {
   const modeFn = useServerFn(getPaymentModeFn), setModeFn = useServerFn(setPaymentMode), roleFn = useServerFn(getMyRole);
