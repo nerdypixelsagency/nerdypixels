@@ -307,7 +307,7 @@ P.eventDone = () => { const r = lastOf("events"); const open = earlyOpen();
 </div></div></section>`};};
 
 /* ---------- Checkout ---------- */
-function coState(){ return sget("npa-co") || { step:1, country:"NG", plan:null, method:null, name:"", email:"", phone:"", persona:"", source:"", ref:"", agree:false }; }
+function coState(){ const c = sget("npa-co") || { step:1, country:"NG", plan:null, method:null, name:"", email:"", phone:"", persona:"", source:"", ref:"", agree:false }; if (!c.ref){ try{ const r = localStorage.getItem("npa-ref"); if (r){ c.ref = r; sset("npa-co", c); } }catch(e){} } return c; }
 function coSave(c){ sset("npa-co", c); }
 function coPlan(c){ let p = c.plan || (earlyOpen()?"early":"monthly"); if (p==="early" && !earlyOpen()) p = "monthly"; return p; }
 P.checkout = (q) => { const c = coState(); if (q.plan==="early"||q.plan==="monthly"){ c.plan=q.plan; } if (!c.step || c.step>3) c.step=1; coSave(c);
@@ -333,7 +333,7 @@ function coRender(){
 <label class="f">WhatsApp number${tel(ct.dial, c.phone)}</label>
 <label class="f">Which best describes you?${personaSelect(c.persona)}</label>
 <label class="f">How did you hear about us?<select name="source"><option value="">Select one</option>${[["blog","Our blog"],["landing","Our website"],["partner","A partner organisation"],["email","Email from us"],["whatsapp","WhatsApp"],["friend","A friend or graduate"],["event","The free event"],["other","Somewhere else"]].map(o=>`<option value="${o[0]}"${o[0]===c.source?" selected":""}>${o[1]}</option>`).join("")}</select></label>
-<label class="f">Referral code (optional)<input name="ref" value="${esc(c.ref)}" placeholder="For example AMB-TOLU"></label></div>
+<label class="f">Referral code (optional)<input name="ref" value="${esc(c.ref)}" placeholder="For example RUTH-FH9W" data-refcheck><small class="ref-note" aria-live="polite"></small></label></div>
 <label class="check" style="cursor:pointer"><input type="checkbox" name="agree" ${c.agree?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span class="small">I accept the <a href="/terms" target="_blank">terms of enrolment</a> and <a href="/payment-policy" target="_blank">payment policy</a>, and I'm happy to receive class updates on WhatsApp and email.</span></label>
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="1">Back</button><button class="btn" type="submit" style="flex:1">Continue to payment</button></div></form>`;
   if (c.step===3) body = `<h1 style="font-size:clamp(26px,3vw,34px)">How would you like to pay?</h1><p class="muted" style="margin-top:-12px">Options for ${esc(ct.name)}. <button type="button" class="linkish" data-act="co-step" data-v="1" style="border:0;background:none;padding:0;color:var(--purple-ink);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer">Change country</button></p>
