@@ -58,7 +58,7 @@ export async function sendReminderEmail(s: { name: string; email: string }, mont
 <div style="border:1px solid #E4DEEE;border-top:0;padding:28px;border-radius:0 0 16px 16px">
 <p>${lead}</p>
 <p><a href="${PAY_URL}" style="display:inline-block;background:#22C55E;color:#06301A;font-weight:700;text-decoration:none;padding:12px 26px;border-radius:999px">Pay now</a></p>
-<p style="color:#574E68;font-size:14px">Already paid? Please ignore this email. Questions? Reply or write to info@npdacademy.com.</p>
+<p style="color:#574E68;font-size:14px">Already paid? Please ignore this email. Questions? Reply or write to info@hello.npdacademy.com.</p>
 <p style="color:#574E68">Nerdy Pixels Academy</p></div></div>`;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",

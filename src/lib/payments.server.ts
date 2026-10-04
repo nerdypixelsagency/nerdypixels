@@ -125,7 +125,7 @@ ${isInst ? "" : `<p><b>Your next steps</b></p><ol>
 <li><a href="${whatsapp}">Join your cohort's WhatsApp group</a></li>
 <li><a href="${PROFILE_FORM}">Complete your student profile</a></li>
 <li>Attend orientation. We'll share the link in the WhatsApp group.</li></ol>`}
-<p>Questions? Reply to this email or write to info@npdacademy.com.</p>
+<p>Questions? Reply to this email or write to info@hello.npdacademy.com.</p>
 <p style="color:#574E68">Nerdy Pixels Academy</p></div></div>`;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
