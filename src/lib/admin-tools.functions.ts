@@ -81,6 +81,7 @@ export const addManualStudent = createServerFn({ method: "POST" })
     await requireAdmin(context);
     const mode = await modeOf(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: cohort } = await supabaseAdmin.from("cohorts").select("id").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
     const row = {
       kind: "enrolment",
       name: data.name,
@@ -97,6 +98,7 @@ export const addManualStudent = createServerFn({ method: "POST" })
       tx_ref: `MANUAL-${Date.now()}-${Math.floor(Math.random() * 1e4)}`,
       source_type: "manual",
       mode,
+      cohort_id: cohort?.id ?? null,
     };
     const { data: ins, error } = await supabaseAdmin.from("enrolments").insert(row as never).select("*").single();
     if (error) throw new Error(error.message);

@@ -138,7 +138,11 @@ export const saveCohort = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await requireAdmin(context);
-    const row = { name: data.name, course: data.course, start_date: data.startDate || null, end_date: data.endDate || null, whatsapp_link: data.whatsappLink || null, status: data.status };
+    const { data: course } = await context.supabase.from("courses").select("id").eq("title", data.course).limit(1).maybeSingle();
+    const { data: firstCourse } = course ? { data: null } : await context.supabase.from("courses").select("id").order("created_at").limit(1).maybeSingle();
+    const courseId = course?.id ?? firstCourse?.id;
+    if (!courseId) throw new Error("Create a course before adding a cohort.");
+    const row = { name: data.name, course: data.course, course_id: courseId, start_date: data.startDate || null, end_date: data.endDate || null, whatsapp_link: data.whatsappLink || null, status: data.status };
     const q = data.id ? context.supabase.from("cohorts").update(row).eq("id", data.id) : context.supabase.from("cohorts").insert(row);
     const { error } = await q;
     if (error) throw new Error(error.message);

@@ -101,13 +101,14 @@ export async function sendReceiptEmail(row: Row) {
   if (!key) return;
   const first = esc(row.name.trim().split(" ")[0]);
   // Pull the open cohort so the welcome email always carries current dates and WhatsApp link.
-  let cohortStart = COHORT_START, whatsapp = WHATSAPP_GROUP;
+  let cohortStart = COHORT_START, whatsapp = WHATSAPP_GROUP, monthlyAmount = PRICE_MONTH;
   try {
     const db = await admin();
-    const { data: c } = await db.from("cohorts" as never).select("start_date, whatsapp_link").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
-    const co = c as { start_date?: string; whatsapp_link?: string } | null;
+    const { data: c } = await db.from("cohorts").select("start_date, whatsapp_link, instalment_amount").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const co = c as { start_date?: string; whatsapp_link?: string; instalment_amount?: number } | null;
     if (co?.start_date) cohortStart = co.start_date;
     if (co?.whatsapp_link) whatsapp = co.whatsapp_link;
+    if (co?.instalment_amount) monthlyAmount = co.instalment_amount;
   } catch { /* fall back to defaults */ }
   const isInst = row.kind === "instalment";
   const subject = isInst ? `Receipt: ${row.instalment_month} instalment received` : "Welcome to the Nerdy Pixels Academy bootcamp";
@@ -115,7 +116,7 @@ export async function sendReceiptEmail(row: Row) {
     ? `${esc(row.instalment_month)} instalment`
     : row.plan === "early"
       ? "Early bird, paid in full"
-      : "Monthly plan (₦40,000 on the 1st of December and January)";
+      : `Monthly plan (${naira(monthlyAmount)} on the 1st of December and January)`;
   const html = `<div style="font-family:Poppins,Arial,sans-serif;max-width:560px;margin:auto;color:#1A1128">
 <div style="background:#2E0B63;color:#fff;padding:28px;border-radius:16px 16px 0 0"><h1 style="margin:0;font-size:24px">${isInst ? "Thank you" : "You're in"}, ${first}.</h1></div>
 <div style="border:1px solid #E4DEEE;border-top:0;padding:28px;border-radius:0 0 16px 16px">

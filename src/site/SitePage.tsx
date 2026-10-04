@@ -5,13 +5,14 @@ import { startPayment, registerEvent, submitLead } from "@/lib/payments.function
 import { validateReferralCode } from "@/lib/referrals.functions";
 const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
-import { renderStatic, boot, renderNow, primeBlog } from "./app.js";
+import { renderStatic, boot, renderNow, primeBlog, primeCourseConfig } from "./app.js";
 import type { BlogData } from "@/lib/blog.functions";
+import type { CourseConfig } from "@/lib/course-config.functions";
 import "./site.css";
 import "./brand.css";
 import "./premium.css";
 
-export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
+export function SitePage({ blog = null, config }: { blog?: BlogData | null; config?: CourseConfig } = {}) {
   const router = useRouter();
   const loc = useRouterState({ select: (s) => s.location });
   const pay = useServerFn(startPayment);
@@ -20,6 +21,7 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
   const refCheck = useServerFn(validateReferralCode);
   // Server-rendered HTML so crawlers see full page content without running JS.
   primeBlog(blog);
+  primeCourseConfig(config);
   const html = useMemo(() => renderStatic(loc.pathname, loc.searchStr).html as string, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -60,8 +62,9 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
 
   useEffect(() => {
     primeBlog(blog);
+    primeCourseConfig(config);
     renderNow();
-  }, [loc.href, blog]);
+  }, [loc.href, blog, config]);
 
   return <div id="app" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />;
 }

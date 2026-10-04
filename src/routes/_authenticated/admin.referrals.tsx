@@ -5,6 +5,7 @@ import { Fragment, useMemo, useState } from "react";
 import { getEnrolments } from "@/lib/admin.functions";
 import { listAmbassadors, saveAmbassador } from "@/lib/referrals.functions";
 import { download, enrolmentsQuery, naira, toCsv } from "@/components/admin/data";
+import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/referrals")({ component: Referrals });
 
@@ -24,6 +25,7 @@ function Referrals() {
   const [edit, setEdit] = useState<Ambassador | null>(null);
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState("");
+  const [search, setSearch] = useState("");
 
   const groups = useMemo(() => {
     const m: Record<string, { code: string; rows: NonNullable<typeof data>["rows"]; paid: number; revenue: number; students: Set<string> }> = {};
@@ -73,13 +75,14 @@ function Referrals() {
           <button className="adm-btn green">{edit ? "Save changes" : "Add ambassador"}</button>
         </form>
       )}
+      <FilterToolbar search={search} onSearch={setSearch} placeholder="Search ambassador name, email, or code" active={!!search} onReset={() => setSearch("")} />
       <div className="adm-card" style={{ marginBottom: 16 }}>
         <h2 style={{ fontSize: 16, marginTop: 0 }}>Ambassadors</h2>
         <p style={{ margin: "0 0 12px", color: "#6b6280", fontSize: 13 }}>Everyone with a referral code. Shareable link: <b>bootcamp.npdacademy.com/?ref=CODE</b> — the code is remembered and pre-filled at checkout.</p>
         {ambLoading ? <p className="adm-empty">Loading…</p> : ambassadors.length === 0 ? <p className="adm-empty">No ambassadors yet</p> : (
           <div className="adm-scroll"><table className="adm-table">
             <thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Link</th><th>Source</th><th>Status</th><th></th></tr></thead>
-            <tbody>{(ambassadors as Ambassador[]).map((a) => (
+            <tbody>{(ambassadors as Ambassador[]).filter((a) => !search || [a.name,a.email,a.code].some((v) => v?.toLowerCase().includes(search.toLowerCase()))).map((a) => (
               <tr key={a.id}>
                 <td><b>{a.name}</b></td><td>{a.email ?? "—"}</td><td><b>{a.code}</b></td>
                 <td><button className="adm-btn ghost" style={{ padding: "4px 10px" }} onClick={() => copy(a.code)}>{copied === a.code ? "Copied!" : "Copy link"}</button></td>

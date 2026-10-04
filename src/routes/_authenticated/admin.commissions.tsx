@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { getCommissions, recordPayout, setCommissionRates } from "@/lib/admin-tools.functions";
 import { naira } from "@/components/admin/data";
+import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/commissions")({ component: Commissions });
 
@@ -16,6 +17,7 @@ function Commissions() {
   const [outRate, setOutRate] = useState("");
   const [instRate, setInstRate] = useState("");
   const [msg, setMsg] = useState("");
+  const [search, setSearch] = useState("");
 
   async function payOut(code: string, owed: number) {
     const v = prompt(`Amount paid out to ${code} (₦)`, String(owed));
@@ -53,11 +55,12 @@ function Commissions() {
         <b>{data.outrightPct}%</b> of each outright payment · <b>{data.instalmentPct}%</b> of each confirmed monthly payment · <b>Total owed: {naira(totalOwed)}</b>
         <p style={{ margin: "6px 0 0", fontSize: 13, color: "#6b6280" }}>Commission counts on confirmed payments only — pending, failed or refunded payments earn nothing.</p>
       </div>
+      <FilterToolbar search={search} onSearch={setSearch} placeholder="Search ambassador or referral code" active={!!search} onReset={() => setSearch("")} />
       <div className="adm-card">
-        {data.list.length === 0 ? <p className="adm-empty">No paid sales with a referral code yet</p> : (
+        {data.list.filter((x) => !search || [x.name,x.code].some((v) => v.toLowerCase().includes(search.toLowerCase()))).length === 0 ? <p className="adm-empty">No paid sales with a referral code yet</p> : (
           <div className="adm-scroll"><table className="adm-table">
             <thead><tr><th>Ambassador</th><th>Code</th><th className="num">Paid sales</th><th className="num">Revenue</th><th className="num">Earned</th><th className="num">Paid out</th><th className="num">Owed</th><th></th></tr></thead>
-            <tbody>{data.list.map((x) => (
+            <tbody>{data.list.filter((x) => !search || [x.name,x.code].some((v) => v.toLowerCase().includes(search.toLowerCase()))).map((x) => (
               <tr key={x.code}><td>{x.name || "—"}</td><td><b>{x.code}</b></td><td className="num">{x.sales}</td><td className="num money">{naira(x.revenue)}</td><td className="num">{naira(x.earned)}</td><td className="num">{naira(x.paidOut)}</td>
                 <td className="num money"><b>{naira(x.owed)}</b></td>
                 <td><button className="adm-btn green" style={{ padding: "6px 12px" }} disabled={x.owed <= 0} onClick={() => payOut(x.code, x.owed)}>Mark paid out</button></td></tr>

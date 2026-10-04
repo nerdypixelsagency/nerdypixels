@@ -15,3 +15,4 @@
 - [x] Cohorts & courses admin page; enrolments tagged to cohort; welcome email uses cohort data; November 2026 cohort seeded
 - [ ] Import existing students from Excel (waiting on user's student file)
 - [x] Premium redesign of all admin screens
+- [x] Admin Settings, course/cohort CMS, read-only previews, footer logo, and unified filter toolbars

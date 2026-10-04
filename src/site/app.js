@@ -4,10 +4,13 @@ const logoLightA = { url: "/brand/logo-light.png" };
 
 /* ============ Config ============ */
 const SITE = { phone:"2349136713644", phoneLabel:"+234 913 671 3644", email:"info@npdacademy.com" };
-const EARLY_END = new Date("2026-10-10T23:59:59+01:00");
-const PRICE_EARLY = 60000, PRICE_MONTH = 40000;
+let COURSE_CONFIG = null;
+const cfg = () => COURSE_CONFIG || { courseTitle:"Digital Marketing Bootcamp", cohortName:"November 2026", headline:"Become a job-ready digital marketer. Certified, with a portfolio to prove it.", offerLabel:"Early bird", startDate:"Thursday 5 November 2026", earlyBirdEnabled:true, earlyBirdPrice:60000, earlyBirdDeadline:"2026-10-10T23:59:59+01:00", outrightPrice:90000, instalmentAmount:40000, instalmentCount:3, outrightCopy:"Pay once and secure your seat.", instalmentCopy:"Pay monthly in equal instalments." };
+export function primeCourseConfig(value){ COURSE_CONFIG = value || COURSE_CONFIG; }
+const EARLY_END = () => new Date(cfg().earlyBirdDeadline || 0);
+const PRICE_EARLY = () => cfg().earlyBirdPrice, PRICE_MONTH = () => cfg().instalmentAmount;
 const EVENT = { title:"Creating Your First Marketing Strategy", dateLabel:"Saturday 10 October 2026", timeLabel:"11:00 AM WAT", startUTC:"20261010T100000Z", endUTC:"20261010T110000Z" };
-const COHORT_START = "Thursday 5 November 2026";
+const COHORT_START = () => cfg().startDate;
 const wa = t => "https://wa.me/" + SITE.phone + "?text=" + encodeURIComponent(t);
 const naira = n => "₦" + Number(n).toLocaleString("en-NG");
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -17,7 +20,7 @@ function earlyOpen(){
   let p = null; try{ p = sessionStorage.getItem("npa-preview"); }catch(e){}
   if (p === "closed") return false;
   if (p === "open") return true;
-  return Date.now() <= EARLY_END.getTime();
+  return cfg().earlyBirdEnabled && !!cfg().earlyBirdDeadline && Date.now() <= EARLY_END().getTime();
 }
 
 /* ============ Storage ============ */
@@ -78,7 +81,7 @@ const FAQS = [
  ["The bootcamp",[
   ["Who is the bootcamp for?","Beginners and early-career marketers: career switchers, graduates, people already handling marketing at work, and business owners. Module 1 assumes no prior knowledge."],
   ["How much time does it take each week?","Plan for self-paced certification work from Monday to Wednesday and live online classes from Thursday to Sunday. Each module ends with a portfolio piece you build with feedback."],
-  ["When does the next cohort start?","Classes start on " + COHORT_START + ". Orientation details are sent by email and WhatsApp once you enrol."],
+  ["When does the next cohort start?","Classes start on " + COHORT_START() + ". Orientation details are sent by email and WhatsApp once you enrol."],
   ["Which certifications will I earn?","Five industry-recognised certifications, earned module by module as you go, plus our certificate of completion when you finish the bootcamp."],
   ["What equipment do I need?","A laptop or smartphone with a stable internet connection and a Google account. A laptop makes the practical work easier."]
  ]],
@@ -99,8 +102,8 @@ const MOD_CERT = '<span class="pill green" style="margin-top:6px">Certification 
 function header(path){
   const on = p => (p === "/" ? path === "/" : path.startsWith(p)) ? ' class="on" aria-current="page"' : "";
   const bar = earlyOpen()
-    ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October. <span class="cd" data-countdown="2026-10-10T23:59:59+01:00" data-label="left"></span><a href="/checkout?plan=early" data-ga-enrol="announcement_bar">Claim your seat</a></div>`
-    : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months. <span class="cd" data-countdown="2026-11-05T09:00:00+01:00" data-label="until classes start"></span><a href="/checkout" data-ga-enrol="announcement_bar">Enrol now</a></div>`;
+    ? `<div class="bar"><b>${esc(cfg().offerLabel)} is open:</b> ${naira(PRICE_EARLY())} paid once. <span class="cd" data-countdown="${esc(cfg().earlyBirdDeadline)}" data-label="left"></span><a href="/checkout?plan=early" data-ga-enrol="announcement_bar">Claim your seat</a></div>`
+    : `<div class="bar"><b>Enrolment for ${esc(cfg().cohortName)} is open:</b> ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months. <a href="/checkout" data-ga-enrol="announcement_bar">Enrol now</a></div>`;
   return `<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
 <a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" width="76" height="50" style="height:50px;width:auto"></a>
 <nav class="menu" aria-label="Main"><a href="/"${on("/")}>Home</a><a href="/courses"${on("/courses")}>Courses</a><a href="/blog"${on("/blog")}>Blog</a><a href="/faq"${on("/faq")}>FAQ</a><a href="/contact"${on("/contact")}>Contact Us</a></nav>
@@ -118,7 +121,7 @@ function footer(){
 <button class="btn deep" type="submit">Subscribe</button></form></div></section>
 <footer><div class="wrap stack" style="gap:36px">
 <div class="grid g4">
-<div class="stack" style="gap:10px"><a class="logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" width="140" height="95" loading="lazy" style="width:140px;height:auto"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
+<div class="stack footer-brand" style="gap:10px"><a class="logo footer-logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" loading="lazy"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
 <div class="stack" style="gap:10px"><h3>Learn</h3><a href="/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="/curriculum">Curriculum</a><a href="/courses">All courses</a><a href="/events/first-marketing-strategy" data-ga-free-event>Free event</a><a href="/blog">Blog</a></div>
 <div class="stack" style="gap:10px"><h3>Students</h3><a href="/student">Student login</a><a href="/onboarding">Student onboarding</a><a href="/pay-instalment">Pay an instalment</a><a href="/faq">FAQ</a><a href="/terms">Terms of enrolment</a><a href="/payment-policy">Payment policy</a><a href="/privacy">Privacy policy</a></div>
 <div class="stack" style="gap:10px"><h3>Contact</h3><a href="mailto:${SITE.email}">${SITE.email}</a><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a><a href="${wa("Hello Nerdy Pixels Academy, I have a question.")}" target="_blank" rel="noopener">Chat on WhatsApp</a><a href="/contact">Contact form</a></div>
@@ -132,8 +135,8 @@ function footer(){
 function leadCard(){
   const open = earlyOpen();
   return `<aside class="price-card" aria-label="Price">
-${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
-       : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
+${open ? `<span class="pill green">${esc(cfg().offerLabel)}</span><div class="price">${naira(PRICE_EARLY())}<small>paid once</small></div><p>${esc(cfg().outrightCopy)}</p>`
+       : `<span class="pill">Monthly plan</span><div class="price">${naira(PRICE_MONTH())}<small>a month</small></div><p>${esc(cfg().instalmentCopy)}</p>`}
 <div class="lead-slot">
 <form class="stack" data-form="lead" novalidate style="gap:10px">
 <div class="grid g2" style="gap:10px"><label class="f">First name<input name="first" autocomplete="given-name" maxlength="60" required></label><label class="f">Last name<input name="last" autocomplete="family-name" maxlength="60" required></label></div>
@@ -147,8 +150,8 @@ ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><d
 function priceCard(){
   const open = earlyOpen();
   return `<aside class="price-card course-price-card" aria-label="Price">
-${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
-       : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
+${open ? `<span class="pill green">${esc(cfg().offerLabel)}</span><div class="price">${naira(PRICE_EARLY())}<small>paid once</small></div><p>${esc(cfg().outrightCopy)}</p>`
+       : `<span class="pill">Monthly plan</span><div class="price">${naira(PRICE_MONTH())}<small>a month</small></div><p>${esc(cfg().instalmentCopy)}</p>`}
 <ul class="list" style="border-top:1px solid var(--line);padding-top:16px">${check("8 modules, 8 portfolio pieces")}${check("5 industry certifications")}${check("Capstone hackathon on real brand briefs")}${check("Mobile money, card and bank transfer worldwide")}</ul>
 <a class="btn deep block" href="/checkout${open?"?plan=early":"?plan=monthly"}" data-ga-enrol="hero">Continue to checkout</a>
 <p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} Secure payment. Takes about two minutes.</p></aside>`;
@@ -179,7 +182,7 @@ function formError(form, msg){
 }
 const TOPICS = ["SEO","Social media marketing","Google Ads","Meta ads","Web analytics","Content strategy","Email marketing","AI marketing tools","Brand projects","Career launch"];
 function marquee(){ const t = TOPICS.map(x=>`<span>${x}</span>`).join(""); return `<section class="marquee" aria-label="What you'll learn"><div class="marquee-track" aria-hidden="false">${t}</div><div class="marquee-track" aria-hidden="true">${t}</div></section>`; }
-function stickyEnrol(){ return `<div class="sticky-enrol"><div><b>${naira(PRICE_EARLY)}</b><span class="small"> early bird or ${naira(PRICE_MONTH)}/month</span></div><a class="btn green sm" href="/checkout" data-ga-enrol="sticky_mobile">Enrol now</a></div>`; }
+function stickyEnrol(){ return `<div class="sticky-enrol"><div><b>${naira(earlyOpen()?PRICE_EARLY():PRICE_MONTH())}</b><span class="small"> ${earlyOpen()?esc(cfg().offerLabel):"monthly"}</span></div><a class="btn green sm" href="/checkout" data-ga-enrol="sticky_mobile">Enrol now</a></div>`; }
 /* ============ Pages ============ */
 const P = {};
 
@@ -192,7 +195,7 @@ P.home = () => ({ title:"Nerdy Pixels Academy | Digital skills for Africa's emer
 ${leadCard()}
 </div></section>${marquee()}
 <section class="section"><div class="wrap stack" style="gap:28px">
-<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>Enrolling now: Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications and live classes. The next cohort starts ${COHORT_START}.</p></div><a href="/courses/digital-marketing" style="font-weight:600">View the bootcamp</a></div>
+<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="stack" style="gap:8px"><h2>Enrolling now: ${esc(cfg().courseTitle)}</h2><p class="lead">Eight modules, five certifications and live classes. The next cohort starts ${esc(COHORT_START())}.</p></div><a href="/courses/digital-marketing" style="font-weight:600">View the bootcamp</a></div>
 <div class="grid g4">${[["8","practical modules"],["5","industry certifications"],["Thu to Sun","live online classes"],["1","live brand project"]].map(s=>`<div class="card"><div style="font-size:28px;font-weight:800;color:var(--ink)">${s[0]}</div><div class="muted">${s[1]}</div></div>`).join("")}</div>
 </div></section>
 <section class="section tint"><div class="wrap stack" style="gap:28px"><h2>Built for four kinds of people</h2>
@@ -208,9 +211,9 @@ P.courses = () => ({ title:"Courses | Nerdy Pixels Academy", html:`
 <section class="hero"><div class="wrap stack" style="gap:16px"><h1>Courses</h1><p class="lead">Start with the flagship bootcamp, or join the waitlist for a specialist programme.</p></div></section>
 <section class="section"><div class="wrap stack" style="gap:28px">
 <article class="card" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:32px;padding:32px;border:2px solid var(--purple)">
-<div class="stack" style="gap:12px"><span class="pill green">Enrolling now</span><h2>Professional Digital Marketing Bootcamp</h2><p class="lead">Eight modules, five certifications, live classes Thursday to Sunday and a capstone hackathon. The next cohort starts ${COHORT_START}.</p>
+<div class="stack" style="gap:12px"><span class="pill green">Enrolling now</span><h2>${esc(cfg().courseTitle)}</h2><p class="lead">Eight modules, five certifications, live classes Thursday to Sunday and a capstone hackathon. The next cohort starts ${esc(COHORT_START())}.</p>
 <div class="row"><a class="btn" href="/courses/digital-marketing">View the bootcamp</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
-<div class="stack" style="gap:8px;justify-content:center"><div class="price">${earlyOpen()?"₦60,000":"₦40,000"}<small>${earlyOpen()?"paid once, until 10 Oct":"a month for 3 months"}</small></div><p class="muted">${earlyOpen()?"Or ₦40,000 a month for November, December and January.":"November, December and January."}</p></div>
+<div class="stack" style="gap:8px;justify-content:center"><div class="price">${naira(earlyOpen()?PRICE_EARLY():PRICE_MONTH())}<small>${earlyOpen()?"paid once":`a month for ${cfg().instalmentCount} months`}</small></div><p class="muted">${earlyOpen()?esc(cfg().outrightCopy):esc(cfg().instalmentCopy)}</p></div>
 </article>
 <h2 style="margin-top:12px">Specialist programmes</h2>
 <div class="grid g3">${COURSES.map(c=>`<div class="card stack" style="gap:10px"><span class="pill">${c.weeks}</span><h3>${c.name}</h3><p class="muted">${c.text}</p><a class="btn ghost sm" style="margin-top:auto;align-self:flex-start" href="/waitlist/${c.slug}">Join the waitlist</a></div>`).join("")}</div>
@@ -219,8 +222,8 @@ P.courses = () => ({ title:"Courses | Nerdy Pixels Academy", html:`
 P.bootcamp = () => { const open = earlyOpen(); return { title:"Digital Marketing Bootcamp, next cohort | Nerdy Pixels Academy", html:`
 <nav class="subnav" aria-label="On this page"><div class="wrap"><b>Digital Marketing Bootcamp</b>${[["overview","Overview"],["curriculum","Curriculum"],["certifications","Certifications"],["pricing","Pricing"],["event","Free event"],["faq","FAQ"]].map(a=>`<a href="/courses/digital-marketing?s=${a[0]}">${a[1]}</a>`).join("")}</div></nav>
 <section class="hero" id="overview"><div class="wrap hero-grid">
-<div class="stack" style="gap:22px"><span class="eyebrow">Professional Digital Marketing Bootcamp. The next cohort starts ${COHORT_START}</span>
-<h1>Become a job-ready digital marketer. <span class="accent">Certified, with a portfolio to prove it.</span></h1>
+<div class="stack" style="gap:22px"><span class="eyebrow">${esc(cfg().courseTitle)}. The next cohort starts ${esc(COHORT_START())}</span>
+<h1>${esc(cfg().headline)}</h1>
 <p class="lead">Eight practical modules taught live by working marketers. Every module ends with a portfolio piece, and you finish with a live project for a real brand.</p>
 <div class="row"><a class="btn green" href="/checkout${open?"?plan=early":""}" data-ga-enrol="hero">Enrol in the next cohort →</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div>
 <ul class="list row" style="flex-direction:row;gap:20px">${check("Live classes Thursday to Sunday")}${check("Pay from anywhere in the world")}${check("Monthly plan available")}</ul></div>
@@ -234,10 +237,10 @@ ${priceCard()}</div></section>
 <div class="stack" style="gap:12px;max-width:760px"><h2>Five certifications in one programme</h2><p style="font-size:17px">Earn industry-recognised certifications module by module, plus our certificate of completion when you finish.</p></div>
 <div class="grid g3">${[["Earned as you go","Certification work is built into the modules, Monday to Wednesday."],["Recognised by employers","Proof of skill that hiring managers and clients already know."],["Ready for your CV","Add each one to your CV and LinkedIn as soon as you pass."]].map(c=>`<div class="card stack" style="gap:8px">${I.check("#25D366",24)}<h3 style="font-size:17px">${c[0]}</h3><p class="small">${c[1]}</p></div>`).join("")}</div></div></section>
 <section class="section" id="pricing"><div class="wrap stack" style="gap:28px">
-<div class="stack" style="gap:8px"><h2>Choose how you pay</h2><p class="lead">Same bootcamp, same certifications. Pay once at the early-bird price, or spread it over three months.</p></div>
+<div class="stack" style="gap:8px"><h2>Choose how you pay</h2><p class="lead">Same bootcamp, same certifications. Pay once or spread it over ${cfg().instalmentCount} months.</p></div>
 <div class="grid g2">
-<div class="plan ${open?"on":"off"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Early bird</h3><span class="pill green">${open?"Ends Sat 10 Oct":"Closed"}</span></div><div class="price">₦60,000<small>paid once</small></div><p class="muted">Available Monday 28 September to Saturday 10 October 2026. You save ₦60,000 compared with the monthly plan.</p>${open?`<a class="btn block" href="/checkout?plan=early" data-ga-enrol="pricing">Pay ₦60,000 now</a>`:`<span class="btn ghost block" aria-disabled="true" style="cursor:default">Early bird has closed</span>`}</div>
-<div class="plan ${open?"":"on"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Monthly plan</h3><span class="pill">3 payments</span></div><div class="price">₦40,000<small>a month</small></div><div class="months"><div>November<b>On enrolment</b></div><div>December<b>By 1 Dec</b></div><div>January<b>By 1 Jan</b></div></div><a class="btn deep block" href="/checkout?plan=monthly" data-ga-enrol="pricing">Start with ₦40,000</a></div>
+${cfg().earlyBirdEnabled?`<div class="plan ${open?"on":"off"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">${esc(cfg().offerLabel)}</h3><span class="pill green">${open?"Available now":"Closed"}</span></div><div class="price">${naira(PRICE_EARLY())}<small>paid once</small></div><p class="muted">${esc(cfg().outrightCopy)}</p>${open?`<a class="btn block" href="/checkout?plan=early" data-ga-enrol="pricing">Pay ${naira(PRICE_EARLY())} now</a>`:`<span class="btn ghost block" aria-disabled="true" style="cursor:default">${esc(cfg().offerLabel)} has closed</span>`}</div>`:""}
+<div class="plan ${open?"":"on"}"><div class="row" style="justify-content:space-between"><h3 style="font-size:22px">Monthly plan</h3><span class="pill">${cfg().instalmentCount} payments</span></div><div class="price">${naira(PRICE_MONTH())}<small>a month</small></div><p class="muted">${esc(cfg().instalmentCopy)}</p><a class="btn deep block" href="/checkout?plan=monthly" data-ga-enrol="pricing">Start with ${naira(PRICE_MONTH())}</a></div>
 </div>
 <div class="card row" style="flex-wrap:nowrap;align-items:flex-start;background:var(--soft-2)">${I.globe()}<p><b>Paying from outside Nigeria?</b> Choose your country at checkout and pay in local currency: M-Pesa in Kenya and Tanzania, mobile money in Ghana, Uganda, Rwanda, Zambia and francophone West and Central Africa, Instant EFT in South Africa, or card anywhere.</p></div>
 </div></section>
@@ -246,7 +249,7 @@ ${priceCard()}</div></section>
 <section class="section" id="faq"><div class="wrap grid" style="grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:40px">
 <div class="stack" style="gap:14px"><h2>Questions, answered</h2><p class="muted">Still unsure? Talk to an advisor on WhatsApp and get an answer the same day.</p><a class="btn green" style="align-self:flex-start" href="${wa("Hello, I have a question about the Digital Marketing Bootcamp.")}" target="_blank" rel="noopener">${I.wa()} Chat with an advisor</a><a href="/faq" style="font-weight:600">See all FAQs</a></div>
 <div class="stack" style="gap:12px">${faqBlock(FAQS[0][1].slice(0,3).concat(FAQS[1][1].slice(0,3)), true)}</div></div></section>
-<section class="section dark"><div class="wrap row" style="justify-content:space-between;gap:24px"><div class="stack" style="gap:8px"><h2>The next cohort starts ${COHORT_START.replace(" 2026","")}.</h2><p style="font-size:17px">${open?"Early bird ends Saturday 10 October: ₦60,000 paid once.":"₦40,000 a month for November, December and January."}</p></div><a class="btn" href="/checkout${open?"?plan=early":""}" data-ga-enrol="section_cta">Enrol now</a></div></section>
+<section class="section dark"><div class="wrap row" style="justify-content:space-between;gap:24px"><div class="stack" style="gap:8px"><h2>The next cohort starts ${esc(COHORT_START())}.</h2><p style="font-size:17px">${open?`${esc(cfg().offerLabel)}: ${naira(PRICE_EARLY())} paid once.`:`${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`}</p></div><a class="btn" href="/checkout${open?"?plan=early":""}" data-ga-enrol="section_cta">Enrol now</a></div></section>
 <style>@media (max-width:820px){#faq .wrap{grid-template-columns:1fr!important}}</style>`};};
 
 P.curriculum = () => ({ title:"Curriculum | Digital Marketing Bootcamp | Nerdy Pixels Academy", html:`
@@ -260,7 +263,7 @@ P.curriculum = () => ({ title:"Curriculum | Digital Marketing Bootcamp | Nerdy P
 P.onboarding = () => { const o = lastOf("orders"); return { title:"Student onboarding | Nerdy Pixels Academy", html:`
 <section class="section dark"><div class="wrap hero-grid">
 <div class="stack" style="gap:16px"><span style="font-weight:600;color:#D2BCFF">Student onboarding</span><h1 style="color:#fff">${o?`Welcome, ${esc(o.first)}.`:"Welcome to the Digital Marketing Bootcamp."}</h1><p style="font-size:18px">Everything you need before your first class: your checklist, the weekly rhythm, the curriculum and your payment dates.</p></div>
-<div class="card stack" style="gap:12px">${[["Orientation","Details sent by email and WhatsApp"],["First live class",COHORT_START.replace(" 2026","")],["December instalment","Due 1 December"],["January instalment","Due 1 January"]].map(r=>`<div class="sumrow" style="border-bottom:1px solid var(--deep-line);padding-bottom:10px"><span style="color:var(--on-dark-2)">${r[0]}</span><b style="color:#fff">${r[1]}</b></div>`).join("")}</div></div></section>
+<div class="card stack" style="gap:12px">${[["Orientation","Details sent by email and WhatsApp"],["First live class",COHORT_START().replace(" 2026","")],["December instalment","Due 1 December"],["January instalment","Due 1 January"]].map(r=>`<div class="sumrow" style="border-bottom:1px solid var(--deep-line);padding-bottom:10px"><span style="color:var(--on-dark-2)">${r[0]}</span><b style="color:#fff">${r[1]}</b></div>`).join("")}</div></div></section>
 <section class="section tint" id="checklist"><div class="wrap grid" style="grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:40px">
 <div class="stack" style="gap:10px"><h2>Before your first class</h2><p class="muted">Six steps, about 30 minutes in total. Finish them before orientation.</p></div>
 <ol class="list" style="gap:12px">${[["Join your cohort's WhatsApp group","Class links, reminders and announcements go here first.",`<a class="btn green sm" href="${wa("Hello, I've enrolled in the bootcamp. Please add me to my cohort's WhatsApp group.")}" target="_blank" rel="noopener">${I.wa("#06301A",18)} Request my group link</a>`],["Complete your student profile","Name for your certificate, country, and your goal for the bootcamp.",`<a class="btn ghost sm" href="https://forms.gle/9Yt5Pa5kT5F19MYN8" target="_blank" rel="noopener">Complete my profile</a>`],["Create your learning accounts","Set up the free certification platform accounts listed in your welcome email.",""],["Set up your tools","A laptop or smartphone with a stable internet connection and a Google account.",""],["Attend orientation","Meet your instructors and cohort, and get the week-by-week calendar.",""],["Save your payment dates","Monthly plan: December and January instalments are due on the 1st.",`<a class="btn ghost sm" href="/pay-instalment">Pay an instalment</a>`]].map((c,i)=>`<li class="card row" style="flex-wrap:nowrap;align-items:flex-start"><span class="avatar" style="width:36px;height:36px;font-size:15px">${i+1}</span><div class="stack" style="gap:8px"><b style="color:var(--ink)">${c[0]}</b><span class="muted">${c[1]}</span>${c[2]?`<div>${c[2]}</div>`:""}</div></li>`).join("")}</ol></div></section>
@@ -302,7 +305,7 @@ P.eventDone = () => { const r = lastOf("events"); const open = earlyOpen();
 <h1 style="font-size:clamp(30px,4vw,44px)">You're registered${r?", "+esc(r.first):""}.</h1>
 <p class="lead">Your joining link for ${EVENT.title} is on its way${r?" to "+esc(r.email):""}. It's on ${EVENT.dateLabel} at ${EVENT.timeLabel}. Two quick things so you don't miss it:</p>
 <div class="grid g2"><a class="btn deep" href="${gcal}" target="_blank" rel="noopener">Add to Google Calendar</a><a class="btn green" href="${wa("Hi, I registered for " + EVENT.title + ". Please send me reminders on WhatsApp.")}" target="_blank" rel="noopener">${I.wa()} Get reminders on WhatsApp</a></div>
-<div class="card stack" style="gap:10px;margin-top:10px"><h2 style="font-size:22px">Ready for the full programme?</h2><p class="muted">${open?"Early bird is ₦60,000 paid once, until Saturday 10 October.":"The next cohort starts " + COHORT_START + ". Join from ₦40,000 a month for three months."}</p><div class="row"><a class="btn" href="/checkout${open?"?plan=early":""}" data-ga-enrol="section_cta">See plans for the next cohort</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
+<div class="card stack" style="gap:10px;margin-top:10px"><h2 style="font-size:22px">Ready for the full programme?</h2><p class="muted">${open?"Early bird is ₦60,000 paid once, until Saturday 10 October.":"The next cohort starts " + COHORT_START() + ". Join from ₦40,000 a month for three months."}</p><div class="row"><a class="btn" href="/checkout${open?"?plan=early":""}" data-ga-enrol="section_cta">See plans for the next cohort</a><a class="btn ghost" href="/curriculum">See the curriculum</a></div></div>
 <a href="/blog" style="font-weight:600">Read our beginner guides while you wait</a>
 </div></div></section>`};};
 
@@ -315,15 +318,15 @@ P.checkout = (q) => { const c = coState(); if (q.plan==="early"||q.plan==="month
 function coRender(){
   const c = coState(), plan = coPlan(c), ct = country(c.country), open = earlyOpen();
   const method = ct.methods.find(m=>m[0]===c.method) ? c.method : ct.methods[0][0];
-  const amount = plan==="early" ? PRICE_EARLY : PRICE_MONTH, local = ct.code!=="NG";
+  const amount = plan==="early" ? PRICE_EARLY() : PRICE_MONTH(), local = ct.code!=="NG";
   const localNote = `<p class="small" style="background:var(--soft);padding:12px 14px;border-radius:10px">Charged in ${ct.curName} (${ct.cur}). You'll see the exact ${ct.cur} amount on the secure payment screen before you confirm.</p>`;
   const steps = `<ol class="steps" aria-label="Checkout steps">${["Plan","Your details","Payment"].map((s,i)=>`<li class="${c.step===i+1?"on":c.step>i+1?"done":""}"${c.step===i+1?' aria-current="step"':""}><i>${c.step>i+1?"✓":i+1}</i>${s}</li>`).join("")}</ol>`;
   let body = "";
   if (c.step===1) body = `<h1 style="font-size:clamp(26px,3vw,34px)">Choose your plan</h1>
 <label class="f">Where will you pay from?<select id="co-country">${countryOptions(ct.code)}</select></label>${local?localNote:""}
 <div class="stack" style="gap:14px" role="radiogroup" aria-label="Plan">
-<button type="button" role="radio" aria-checked="${plan==="early"}" class="choice ${plan==="early"?"on":""}" data-act="co-plan" data-v="early"${open?"":" disabled"}><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">Early bird, paid once</b><b style="font-size:20px;color:var(--ink)">₦60,000</b></span><span class="small">Monday 28 September to Saturday 10 October only. Saves ₦60,000.</span><span class="small" style="font-weight:700;color:var(--green-ink)">${open?"Ends Saturday 10 October":"Early bird has closed"}</span></span></button>
-<button type="button" role="radio" aria-checked="${plan==="monthly"}" class="choice ${plan==="monthly"?"on":""}" data-act="co-plan" data-v="monthly"><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">Monthly plan</b><b style="font-size:20px;color:var(--ink)">₦40,000 <span class="small muted" style="font-weight:500">a month</span></b></span><span class="small">Three payments: November (today), 1 December and 1 January. ₦120,000 in total.</span></span></button>
+${cfg().earlyBirdEnabled?`<button type="button" role="radio" aria-checked="${plan==="early"}" class="choice ${plan==="early"?"on":""}" data-act="co-plan" data-v="early"${open?"":" disabled"}><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">${esc(cfg().offerLabel)}, paid once</b><b style="font-size:20px;color:var(--ink)">${naira(PRICE_EARLY())}</b></span><span class="small">${esc(cfg().outrightCopy)}</span><span class="small" style="font-weight:700;color:var(--green-ink)">${open?"Available now":"Offer has closed"}</span></span></button>`:""}
+<button type="button" role="radio" aria-checked="${plan==="monthly"}" class="choice ${plan==="monthly"?"on":""}" data-act="co-plan" data-v="monthly"><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">Monthly plan</b><b style="font-size:20px;color:var(--ink)">${naira(PRICE_MONTH())} <span class="small muted" style="font-weight:500">a month</span></b></span><span class="small">${esc(cfg().instalmentCopy)} ${naira(PRICE_MONTH()*cfg().instalmentCount)} in total.</span></span></button>
 </div>
 <button class="btn block" type="button" data-act="co-step" data-v="2">Continue</button>`;
   if (c.step===2) body = `<h1 style="font-size:clamp(26px,3vw,34px)">Your details</h1><p class="muted" style="margin-top:-12px">We use these for your receipt, your certificate and your cohort's WhatsApp group.</p>
@@ -342,9 +345,9 @@ ${local?localNote:""}
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="2">Back</button><button class="btn green" type="button" data-act="co-pay" style="flex:1">${I.lock("#06301A")} Pay ${naira(amount)}${local?" in "+ct.cur:""}</button></div>
 <p class="small muted">Payments are processed securely by our licensed payment partner. We never see or store your card details or wallet PIN.</p>`;
   document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${steps}<div class="mobile-due"><span class="small">${plan==="early"?"Early bird, paid once":"Monthly plan, due today"}</span><b style="font-size:20px;color:var(--ink)">${naira(amount)}</b></div>${body}`;
-  document.getElementById("co-sum").innerHTML = `<h2 style="font-size:18px">Order summary</h2><div><b style="color:var(--ink)">Professional Digital Marketing Bootcamp</b><div class="small muted">Next cohort, classes start ${COHORT_START.replace(" 2026","")}</div></div>
-<div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px"><span>Plan</span><b style="color:var(--ink)">${plan==="early"?"Early bird, paid once":"Monthly plan, 3 payments"}</b></div>
-${plan==="monthly"?`<div class="sumrow"><span>Total over 3 months</span><span>₦120,000</span></div>`:""}
+  document.getElementById("co-sum").innerHTML = `<h2 style="font-size:18px">Order summary</h2><div><b style="color:var(--ink)">${esc(cfg().courseTitle)}</b><div class="small muted">Next cohort, classes start ${esc(COHORT_START())}</div></div>
+<div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px"><span>Plan</span><b style="color:var(--ink)">${plan==="early"?`${esc(cfg().offerLabel)}, paid once`:`Monthly plan, ${cfg().instalmentCount} payments`}</b></div>
+${plan==="monthly"?`<div class="sumrow"><span>Total over ${cfg().instalmentCount} months</span><span>${naira(PRICE_MONTH()*cfg().instalmentCount)}</span></div>`:""}
 <div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px;align-items:baseline"><b>${plan==="early"?"Total to pay":"Due today (November)"}</b><b style="font-size:26px;color:var(--ink)">${naira(amount)}</b></div>
 ${local?`<span class="small muted">Paying in ${ct.cur} from ${esc(ct.name)}</span>`:""}
 <ul class="list small" style="border-top:1px solid var(--line);padding-top:12px">${check("8 modules and 8 portfolio pieces")}${check("5 industry certifications")}${check("Live classes Thursday to Sunday")}${check("Capstone hackathon")}</ul>
@@ -561,7 +564,7 @@ document.addEventListener("click", e => {
   if (act === "co-step"){ c.step = Number(v); coSave(c); coRender(); window.scrollTo({top:0,behavior:"smooth"}); }
   if (act === "co-method"){ c.method = v; coSave(c); coRender(); }
   if (act === "co-pay"){
-    const ct = country(c.country), plan = coPlan(c), m = ct.methods.find(x=>x[0]===c.method) || ct.methods[0], amount = plan==="early"?PRICE_EARLY:PRICE_MONTH;
+    const ct = country(c.country), plan = coPlan(c), m = ct.methods.find(x=>x[0]===c.method) || ct.methods[0], amount = plan==="early"?PRICE_EARLY():PRICE_MONTH();
     const btn = a; btn.disabled = true; const old = btn.innerHTML; btn.innerHTML = "Opening secure payment…";
     const order = { plan, amount, cur: ct.cur, country: ct.code, methodLabel: m[1], method: m[0], name: c.name, first: c.name.trim().split(" ")[0], email: c.email.trim(), phone: c.phone, persona: c.persona, source: c.source, referral: c.ref };
     save("orders", order);

@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_preview_audit: {
+        Row: {
+          admin_user_id: string
+          created_at: string
+          enrolment_id: string | null
+          id: string
+          preview_type: string
+        }
+        Insert: {
+          admin_user_id: string
+          created_at?: string
+          enrolment_id?: string | null
+          id?: string
+          preview_type: string
+        }
+        Update: {
+          admin_user_id?: string
+          created_at?: string
+          enrolment_id?: string | null
+          id?: string
+          preview_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_preview_audit_enrolment_id_fkey"
+            columns: ["enrolment_id"]
+            isOneToOne: false
+            referencedRelation: "enrolments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ambassadors: {
         Row: {
           active: boolean
@@ -68,10 +100,22 @@ export type Database = {
       cohorts: {
         Row: {
           course: string
+          course_id: string
           created_at: string
+          early_bird_deadline: string | null
+          early_bird_enabled: boolean
+          early_bird_price: number
           end_date: string | null
+          headline: string | null
           id: string
+          instalment_amount: number
+          instalment_copy: string | null
+          instalment_count: number
+          is_published: boolean
           name: string
+          offer_label: string | null
+          outright_copy: string | null
+          outright_price: number
           start_date: string | null
           status: string
           updated_at: string
@@ -79,10 +123,22 @@ export type Database = {
         }
         Insert: {
           course?: string
+          course_id: string
           created_at?: string
+          early_bird_deadline?: string | null
+          early_bird_enabled?: boolean
+          early_bird_price?: number
           end_date?: string | null
+          headline?: string | null
           id?: string
+          instalment_amount?: number
+          instalment_copy?: string | null
+          instalment_count?: number
+          is_published?: boolean
           name: string
+          offer_label?: string | null
+          outright_copy?: string | null
+          outright_price?: number
           start_date?: string | null
           status?: string
           updated_at?: string
@@ -90,16 +146,36 @@ export type Database = {
         }
         Update: {
           course?: string
+          course_id?: string
           created_at?: string
+          early_bird_deadline?: string | null
+          early_bird_enabled?: boolean
+          early_bird_price?: number
           end_date?: string | null
+          headline?: string | null
           id?: string
+          instalment_amount?: number
+          instalment_copy?: string | null
+          instalment_count?: number
+          is_published?: boolean
           name?: string
+          offer_label?: string | null
+          outright_copy?: string | null
+          outright_price?: number
           start_date?: string | null
           status?: string
           updated_at?: string
           whatsapp_link?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cohorts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       commission_payouts: {
         Row: {
@@ -128,6 +204,39 @@ export type Database = {
           note?: string | null
           paid_by?: string | null
           referral_code?: string
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_published: boolean
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

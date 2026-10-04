@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { addAdmin, getMyRole, listAdmins, removeAdmin } from "@/lib/admin.functions";
+import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/team")({ component: Team });
 
@@ -16,6 +17,7 @@ function Team() {
   const { data: admins = [], isLoading } = useQuery({ queryKey: ["admin-team"], queryFn: () => listFn() });
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
+  const [search, setSearch] = useState("");
   const isSuper = role?.role === "super_admin";
 
   async function add(e: React.FormEvent) {
@@ -42,10 +44,11 @@ function Team() {
           <p style={{ width: "100%", margin: 0, fontSize: 12, color: "#6b6280" }}>No account needed first — we'll email them a link to set their password.</p>
         </form>
       )}
+      <FilterToolbar search={search} onSearch={setSearch} placeholder="Search admin email or role" active={!!search} onReset={() => setSearch("")} />
       <div className="adm-card">
         {isLoading ? <p className="adm-empty">Loading…</p> : (
           <div className="adm-scroll"><table className="adm-table"><thead><tr><th>Email</th><th>Role</th><th>Since</th><th></th></tr></thead>
-            <tbody>{admins.map((a) => (
+            <tbody>{admins.filter((a) => !search || [a.email,a.role].some((v) => v?.toLowerCase().includes(search.toLowerCase()))).map((a) => (
               <tr key={a.user_id + a.role}><td>{a.email}</td><td><span className={`adm-pill ${a.role === "super_admin" ? "" : "registered"}`}>{a.role === "super_admin" ? "Super admin" : "Admin"}</span></td>
                 <td>{new Date(a.created_at).toLocaleDateString("en-GB")}</td>
                 <td className="num">{isSuper && a.role === "admin" && (

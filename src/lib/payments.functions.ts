@@ -30,14 +30,15 @@ export const startPayment = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { PRICE_EARLY, PRICE_MONTH, EARLY_END, flwCreatePayment, getPaymentMode } = await import("./payments.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const plan = data.kind === "enrolment" ? (data.plan === "early" && Date.now() <= EARLY_END.getTime() ? "early" : "monthly") : "monthly";
-    const amount = data.kind === "enrolment" && plan === "early" ? PRICE_EARLY : PRICE_MONTH;
+    const { data: cohort } = await supabaseAdmin.from("cohorts").select("id,early_bird_enabled,early_bird_price,early_bird_deadline,instalment_amount").eq("status", "open").eq("is_published", true).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const earlyAllowed = cohort ? cohort.early_bird_enabled && !!cohort.early_bird_deadline && Date.now() <= new Date(cohort.early_bird_deadline).getTime() : Date.now() <= EARLY_END.getTime();
+    if (data.kind === "enrolment" && data.plan === "early" && !earlyAllowed) throw new Error("Early-bird enrolment is no longer available. Choose the monthly plan.");
+    const plan = data.kind === "enrolment" ? (data.plan === "early" ? "early" : "monthly") : "monthly";
+    const amount = data.kind === "enrolment" && plan === "early" ? (cohort?.early_bird_price ?? PRICE_EARLY) : (cohort?.instalment_amount ?? PRICE_MONTH);
     const txRef = "NPA-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
     const mode = await getPaymentMode();
     const referral = data.referral ? data.referral.toUpperCase() : null;
     // Tag the enrolment to the currently open cohort, if one exists.
-    const { data: cohort } = await supabaseAdmin.from("cohorts" as never).select("id").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
-
     const { error } = await supabaseAdmin.from("enrolments").insert({
       kind: data.kind,
       name: data.name,
@@ -53,7 +54,7 @@ export const startPayment = createServerFn({ method: "POST" })
       payment_method: data.method ?? null,
       tx_ref: txRef,
       mode,
-      cohort_id: cohort ? (cohort as { id: string }).id : null,
+      cohort_id: cohort?.id ?? null,
     } as never);
     if (error) {
       console.error("[startPayment:db_insert]", error.code, error.message);
