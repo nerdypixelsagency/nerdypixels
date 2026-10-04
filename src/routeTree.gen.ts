@@ -25,7 +25,9 @@ import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_authenticated/admin.enrolments'
 import { Route as AuthenticatedAdminInstalmentsRouteImport } from './routes/_authenticated/admin.instalments'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
+import { Route as AuthenticatedAdminPreviewRouteImport } from './routes/_authenticated/admin.preview'
 import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin.referrals'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
 import { Route as ApiPublicAuthEmailHookRouteImport } from './routes/api/public/auth-email-hook'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
@@ -117,10 +119,22 @@ const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminPreviewRoute =
+  AuthenticatedAdminPreviewRouteImport.update({
+    id: '/preview',
+    path: '/preview',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminReferralsRoute =
   AuthenticatedAdminReferralsRouteImport.update({
     id: '/referrals',
     path: '/referrals',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminTeamRoute = AuthenticatedAdminTeamRouteImport.update({
@@ -173,7 +187,9 @@ export interface FileRoutesByFullPath {
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/preview': typeof AuthenticatedAdminPreviewRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
@@ -196,7 +212,9 @@ export interface FileRoutesByTo {
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/preview': typeof AuthenticatedAdminPreviewRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
@@ -222,7 +240,9 @@ export interface FileRoutesById {
   '/_authenticated/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/_authenticated/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/_authenticated/admin/preview': typeof AuthenticatedAdminPreviewRoute
   '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
@@ -248,7 +268,9 @@ export interface FileRouteTypes {
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/leads'
+    | '/admin/preview'
     | '/admin/referrals'
+    | '/admin/settings'
     | '/admin/team'
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
@@ -271,7 +293,9 @@ export interface FileRouteTypes {
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/leads'
+    | '/admin/preview'
     | '/admin/referrals'
+    | '/admin/settings'
     | '/admin/team'
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
@@ -296,7 +320,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/enrolments'
     | '/_authenticated/admin/instalments'
     | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/preview'
     | '/_authenticated/admin/referrals'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/team'
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
@@ -435,11 +461,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/preview': {
+      id: '/_authenticated/admin/preview'
+      path: '/preview'
+      fullPath: '/admin/preview'
+      preLoaderRoute: typeof AuthenticatedAdminPreviewRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/referrals': {
       id: '/_authenticated/admin/referrals'
       path: '/referrals'
       fullPath: '/admin/referrals'
       preLoaderRoute: typeof AuthenticatedAdminReferralsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/team': {
@@ -494,7 +534,9 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminEnrolmentsRoute: typeof AuthenticatedAdminEnrolmentsRoute
   AuthenticatedAdminInstalmentsRoute: typeof AuthenticatedAdminInstalmentsRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
+  AuthenticatedAdminPreviewRoute: typeof AuthenticatedAdminPreviewRoute
   AuthenticatedAdminReferralsRoute: typeof AuthenticatedAdminReferralsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminEnrolmentIdRoute: typeof AuthenticatedAdminEnrolmentIdRoute
@@ -507,7 +549,9 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminEnrolmentsRoute: AuthenticatedAdminEnrolmentsRoute,
   AuthenticatedAdminInstalmentsRoute: AuthenticatedAdminInstalmentsRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+  AuthenticatedAdminPreviewRoute: AuthenticatedAdminPreviewRoute,
   AuthenticatedAdminReferralsRoute: AuthenticatedAdminReferralsRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminEnrolmentIdRoute: AuthenticatedAdminEnrolmentIdRoute,

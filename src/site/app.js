@@ -4,10 +4,13 @@ const logoLightA = { url: "/brand/logo-light.png" };
 
 /* ============ Config ============ */
 const SITE = { phone:"2349136713644", phoneLabel:"+234 913 671 3644", email:"info@npdacademy.com" };
-const EARLY_END = new Date("2026-10-10T23:59:59+01:00");
-const PRICE_EARLY = 60000, PRICE_MONTH = 40000;
+let COURSE_CONFIG = null;
+const cfg = () => COURSE_CONFIG || { courseTitle:"Digital Marketing Bootcamp", cohortName:"November 2026", headline:"Become a job-ready digital marketer. Certified, with a portfolio to prove it.", offerLabel:"Early bird", startDate:"Thursday 5 November 2026", earlyBirdEnabled:true, earlyBirdPrice:60000, earlyBirdDeadline:"2026-10-10T23:59:59+01:00", outrightPrice:90000, instalmentAmount:40000, instalmentCount:3, outrightCopy:"Pay once and secure your seat.", instalmentCopy:"Pay monthly in equal instalments." };
+export function primeCourseConfig(value){ COURSE_CONFIG = value || COURSE_CONFIG; }
+const EARLY_END = () => new Date(cfg().earlyBirdDeadline || 0);
+const PRICE_EARLY = () => cfg().earlyBirdPrice, PRICE_MONTH = () => cfg().instalmentAmount;
 const EVENT = { title:"Creating Your First Marketing Strategy", dateLabel:"Saturday 10 October 2026", timeLabel:"11:00 AM WAT", startUTC:"20261010T100000Z", endUTC:"20261010T110000Z" };
-const COHORT_START = "Thursday 5 November 2026";
+const COHORT_START = () => cfg().startDate;
 const wa = t => "https://wa.me/" + SITE.phone + "?text=" + encodeURIComponent(t);
 const naira = n => "₦" + Number(n).toLocaleString("en-NG");
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -17,7 +20,7 @@ function earlyOpen(){
   let p = null; try{ p = sessionStorage.getItem("npa-preview"); }catch(e){}
   if (p === "closed") return false;
   if (p === "open") return true;
-  return Date.now() <= EARLY_END.getTime();
+  return cfg().earlyBirdEnabled && !!cfg().earlyBirdDeadline && Date.now() <= EARLY_END().getTime();
 }
 
 /* ============ Storage ============ */
@@ -78,7 +81,7 @@ const FAQS = [
  ["The bootcamp",[
   ["Who is the bootcamp for?","Beginners and early-career marketers: career switchers, graduates, people already handling marketing at work, and business owners. Module 1 assumes no prior knowledge."],
   ["How much time does it take each week?","Plan for self-paced certification work from Monday to Wednesday and live online classes from Thursday to Sunday. Each module ends with a portfolio piece you build with feedback."],
-  ["When does the next cohort start?","Classes start on " + COHORT_START + ". Orientation details are sent by email and WhatsApp once you enrol."],
+  ["When does the next cohort start?","Classes start on " + COHORT_START() + ". Orientation details are sent by email and WhatsApp once you enrol."],
   ["Which certifications will I earn?","Five industry-recognised certifications, earned module by module as you go, plus our certificate of completion when you finish the bootcamp."],
   ["What equipment do I need?","A laptop or smartphone with a stable internet connection and a Google account. A laptop makes the practical work easier."]
  ]],
@@ -99,8 +102,8 @@ const MOD_CERT = '<span class="pill green" style="margin-top:6px">Certification 
 function header(path){
   const on = p => (p === "/" ? path === "/" : path.startsWith(p)) ? ' class="on" aria-current="page"' : "";
   const bar = earlyOpen()
-    ? `<div class="bar"><b>Early bird is open:</b> ₦60,000 paid once, until Saturday 10 October. <span class="cd" data-countdown="2026-10-10T23:59:59+01:00" data-label="left"></span><a href="/checkout?plan=early" data-ga-enrol="announcement_bar">Claim your seat</a></div>`
-    : `<div class="bar"><b>Enrolment for the next cohort is open:</b> ₦40,000 a month for three months. <span class="cd" data-countdown="2026-11-05T09:00:00+01:00" data-label="until classes start"></span><a href="/checkout" data-ga-enrol="announcement_bar">Enrol now</a></div>`;
+    ? `<div class="bar"><b>${esc(cfg().offerLabel)} is open:</b> ${naira(PRICE_EARLY())} paid once. <span class="cd" data-countdown="${esc(cfg().earlyBirdDeadline)}" data-label="left"></span><a href="/checkout?plan=early" data-ga-enrol="announcement_bar">Claim your seat</a></div>`
+    : `<div class="bar"><b>Enrolment for ${esc(cfg().cohortName)} is open:</b> ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months. <a href="/checkout" data-ga-enrol="announcement_bar">Enrol now</a></div>`;
   return `<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
 <a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" width="76" height="50" style="height:50px;width:auto"></a>
 <nav class="menu" aria-label="Main"><a href="/"${on("/")}>Home</a><a href="/courses"${on("/courses")}>Courses</a><a href="/blog"${on("/blog")}>Blog</a><a href="/faq"${on("/faq")}>FAQ</a><a href="/contact"${on("/contact")}>Contact Us</a></nav>
@@ -118,7 +121,7 @@ function footer(){
 <button class="btn deep" type="submit">Subscribe</button></form></div></section>
 <footer><div class="wrap stack" style="gap:36px">
 <div class="grid g4">
-<div class="stack" style="gap:10px"><a class="logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" width="140" height="95" loading="lazy" style="width:140px;height:auto"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
+<div class="stack footer-brand" style="gap:10px"><a class="logo footer-logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" loading="lazy"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
 <div class="stack" style="gap:10px"><h3>Learn</h3><a href="/courses/digital-marketing">Digital Marketing Bootcamp</a><a href="/curriculum">Curriculum</a><a href="/courses">All courses</a><a href="/events/first-marketing-strategy" data-ga-free-event>Free event</a><a href="/blog">Blog</a></div>
 <div class="stack" style="gap:10px"><h3>Students</h3><a href="/student">Student login</a><a href="/onboarding">Student onboarding</a><a href="/pay-instalment">Pay an instalment</a><a href="/faq">FAQ</a><a href="/terms">Terms of enrolment</a><a href="/payment-policy">Payment policy</a><a href="/privacy">Privacy policy</a></div>
 <div class="stack" style="gap:10px"><h3>Contact</h3><a href="mailto:${SITE.email}">${SITE.email}</a><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a><a href="${wa("Hello Nerdy Pixels Academy, I have a question.")}" target="_blank" rel="noopener">Chat on WhatsApp</a><a href="/contact">Contact form</a></div>
@@ -132,8 +135,8 @@ function footer(){
 function leadCard(){
   const open = earlyOpen();
   return `<aside class="price-card" aria-label="Price">
-${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
-       : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
+${open ? `<span class="pill green">${esc(cfg().offerLabel)}</span><div class="price">${naira(PRICE_EARLY())}<small>paid once</small></div><p>${esc(cfg().outrightCopy)}</p>`
+       : `<span class="pill">Monthly plan</span><div class="price">${naira(PRICE_MONTH())}<small>a month</small></div><p>${esc(cfg().instalmentCopy)}</p>`}
 <div class="lead-slot">
 <form class="stack" data-form="lead" novalidate style="gap:10px">
 <div class="grid g2" style="gap:10px"><label class="f">First name<input name="first" autocomplete="given-name" maxlength="60" required></label><label class="f">Last name<input name="last" autocomplete="family-name" maxlength="60" required></label></div>
@@ -147,8 +150,8 @@ ${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><d
 function priceCard(){
   const open = earlyOpen();
   return `<aside class="price-card course-price-card" aria-label="Price">
-${open ? `<span class="pill green">Early bird: Mon 28 Sep to Sat 10 Oct</span><div class="price">₦60,000<small>paid once</small></div><p>Save 50% ₦60,000 when you pay once before 10th October, 2026.</p>`
-       : `<span class="pill">Monthly plan</span><div class="price">₦40,000<small>a month</small></div><p>Three payments: November, December and January. Pay the first one when you enrol.</p>`}
+${open ? `<span class="pill green">${esc(cfg().offerLabel)}</span><div class="price">${naira(PRICE_EARLY())}<small>paid once</small></div><p>${esc(cfg().outrightCopy)}</p>`
+       : `<span class="pill">Monthly plan</span><div class="price">${naira(PRICE_MONTH())}<small>a month</small></div><p>${esc(cfg().instalmentCopy)}</p>`}
 <ul class="list" style="border-top:1px solid var(--line);padding-top:16px">${check("8 modules, 8 portfolio pieces")}${check("5 industry certifications")}${check("Capstone hackathon on real brand briefs")}${check("Mobile money, card and bank transfer worldwide")}</ul>
 <a class="btn deep block" href="/checkout${open?"?plan=early":"?plan=monthly"}" data-ga-enrol="hero">Continue to checkout</a>
 <p class="small muted row" style="justify-content:center;gap:8px">${I.lock()} Secure payment. Takes about two minutes.</p></aside>`;
@@ -179,7 +182,7 @@ function formError(form, msg){
 }
 const TOPICS = ["SEO","Social media marketing","Google Ads","Meta ads","Web analytics","Content strategy","Email marketing","AI marketing tools","Brand projects","Career launch"];
 function marquee(){ const t = TOPICS.map(x=>`<span>${x}</span>`).join(""); return `<section class="marquee" aria-label="What you'll learn"><div class="marquee-track" aria-hidden="false">${t}</div><div class="marquee-track" aria-hidden="true">${t}</div></section>`; }
-function stickyEnrol(){ return `<div class="sticky-enrol"><div><b>${naira(PRICE_EARLY)}</b><span class="small"> early bird or ${naira(PRICE_MONTH)}/month</span></div><a class="btn green sm" href="/checkout" data-ga-enrol="sticky_mobile">Enrol now</a></div>`; }
+function stickyEnrol(){ return `<div class="sticky-enrol"><div><b>${naira(earlyOpen()?PRICE_EARLY():PRICE_MONTH())}</b><span class="small"> ${earlyOpen()?esc(cfg().offerLabel):"monthly"}</span></div><a class="btn green sm" href="/checkout" data-ga-enrol="sticky_mobile">Enrol now</a></div>`; }
 /* ============ Pages ============ */
 const P = {};
 

@@ -1,6 +1,7 @@
 export const SITE_URL = "https://bootcamp.npdacademy.com";
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
+import type { CourseConfig } from "@/lib/course-config.functions";
 type Meta = { title: string; description: string; noindex?: boolean; type?: string };
 
 const M: Record<string, Meta> = {
@@ -59,7 +60,7 @@ const FAQ = [
   ["Can I use a referral code?", "Yes. Enter your ambassador's referral code at checkout and it is attached to your payment and receipt."],
 ];
 
-export function jsonLdFor(path: string) {
+export function jsonLdFor(path: string, config?: CourseConfig) {
   const p = path.replace(/\/+$/, "") || "/";
   const org = {
     "@context": "https://schema.org",
@@ -77,14 +78,14 @@ export function jsonLdFor(path: string) {
     out.push({
       "@context": "https://schema.org",
       "@type": "Course",
-      name: "Professional Digital Marketing Bootcamp",
+      name: config?.courseTitle ?? "Professional Digital Marketing Bootcamp",
       description: M["/courses/digital-marketing"]!.description,
       provider: { "@type": "Organization", name: "Nerdy Pixels Academy", sameAs: SITE_URL },
       offers: [
-        { "@type": "Offer", price: 60000, priceCurrency: "NGN", category: "Early bird, pay once" },
-        { "@type": "Offer", price: 40000, priceCurrency: "NGN", category: "Monthly instalment" },
+        ...(config?.earlyBirdEnabled ? [{ "@type": "Offer", price: config.earlyBirdPrice, priceCurrency: "NGN", category: config.offerLabel }] : []),
+        { "@type": "Offer", price: config?.instalmentAmount ?? 40000, priceCurrency: "NGN", category: "Monthly instalment" },
       ],
-      hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", startDate: "2026-11-05" },
+      hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", startDate: config?.startDate ?? "2026-11-05" },
     });
   if (p === "/faq" || p === "/courses/digital-marketing")
     out.push({
@@ -121,7 +122,7 @@ export function jsonLdFor(path: string) {
 
 type BlogHeadData = { kind: string; post?: { title: string; excerpt: string; image: string | null; author: string; dateIso: string; modifiedIso: string } | null } | null | undefined;
 
-export function headFor(path: string, blog?: BlogHeadData) {
+export function headFor(path: string, blog?: BlogHeadData, config?: CourseConfig) {
   const post = blog && blog.kind === "post" ? blog.post : undefined;
   if (post === null) return { meta: [{ title: "Article not found | Nerdy Pixels Academy" }, { name: "robots", content: "noindex" }] };
   const base = metaFor(path);
@@ -146,6 +147,6 @@ export function headFor(path: string, blog?: BlogHeadData) {
   return {
     meta,
     links: m.noindex ? [] : [{ rel: "canonical", href: url }],
-    scripts: jsonLdFor(p).map((j) => (post && (j as { "@type"?: string })["@type"] === "Article" ? { ...j, headline: post.title, image: post.image ?? undefined, datePublished: post.dateIso, dateModified: post.modifiedIso, author: { "@type": "Person", name: post.author } } : j)).map((j) => ({ type: "application/ld+json", children: JSON.stringify(j) })),
+    scripts: jsonLdFor(p, config).map((j) => (post && (j as { "@type"?: string })["@type"] === "Article" ? { ...j, headline: post.title, image: post.image ?? undefined, datePublished: post.dateIso, dateModified: post.modifiedIso, author: { "@type": "Person", name: post.author } } : j)).map((j) => ({ type: "application/ld+json", children: JSON.stringify(j) })),
   };
 }

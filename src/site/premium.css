@@ -25,6 +25,9 @@ h3{letter-spacing:-.02em}
 .top{background:color-mix(in srgb,var(--canvas) 86%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
 .nav{height:68px}
 .logo img{height:42px!important}
+.footer-logo{display:inline-flex;align-items:center;width:140px;min-height:0}
+.footer-logo img{display:block!important;width:140px!important;height:auto!important;max-height:72px;object-fit:contain;object-position:left center}
+.footer-brand{align-items:flex-start}
 .menu{gap:6px}
 .menu a{padding:8px 14px;border-radius:999px;border:0;transition:background .2s var(--ease),color .2s var(--ease)}
 .menu a:hover{background:#fff;color:var(--ink)}
@@ -99,6 +102,7 @@ label.f{font-weight:600;color:var(--ink)}
   .hero .price-card .btn{min-height:50px}
   .nav{height:62px}
   .logo img{height:36px!important}
+  .footer-logo img{width:124px!important;height:auto!important;max-height:64px}
   .subnav{top:62px}
   .bar{font-size:12.5px}
 }
