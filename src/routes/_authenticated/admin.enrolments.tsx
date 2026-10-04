@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { getEnrolments, updateEnrolmentStatus } from "@/lib/admin.functions";
 import { download, enrolmentsQuery, naira, PERSONAS, toCsv } from "@/components/admin/data";
+import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/enrolments")({ component: Enrolments });
 
@@ -39,15 +40,12 @@ function Enrolments() {
   return (
     <>
       <div className="adm-head"><h1>Enrolments</h1><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Link to="/admin/add-student" className="adm-btn">Add student manually</Link><button className="adm-btn green" onClick={() => download("enrolments.csv", toCsv(rows))}>Export CSV ({rows.length})</button></div></div>
-      <div className="adm-card">
-        <div className="adm-filters">
-          <input className="adm-input" placeholder="Search name, email, phone, code, reference" value={q} onChange={(e) => setQ(e.target.value)} />
+      <FilterToolbar search={q} onSearch={setQ} placeholder="Search name, email, phone, code, reference" from={from} to={to} onFrom={setFrom} onTo={setTo} active={!!(q || from || to || kind !== "all" || status !== "all" || plan !== "all")} onReset={() => { setQ(""); setKind("all"); setStatus("all"); setPlan("all"); setFrom(""); setTo(""); }}>
           <select className="adm-select" value={kind} onChange={(e) => setKind(e.target.value)}><option value="all">All types</option><option value="enrolment">Enrolments</option><option value="instalment">Instalments</option><option value="event">Free event</option></select>
           <select className="adm-select" value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">Any status</option><option value="paid">Paid</option><option value="pending">Pending</option><option value="failed">Failed</option><option value="refunded">Refunded</option><option value="registered">Registered</option></select>
           <select className="adm-select" value={plan} onChange={(e) => setPlan(e.target.value)}><option value="all">Any plan</option><option value="early">Early bird</option><option value="monthly">Monthly</option></select>
-          <input className="adm-select" type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
-          <input className="adm-select" type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
-        </div>
+      </FilterToolbar>
+      <div className="adm-card">
         {isLoading ? <p className="adm-empty">Loading…</p> : rows.length === 0 ? <p className="adm-empty">No matching records</p> : (
           <div className="adm-scroll"><table className="adm-table">
             <thead><tr><th>Date</th><th>Name</th><th>Contact</th><th>Type</th><th>Persona</th><th>Referral</th><th className="num">Amount</th><th>Status</th><th>Reference</th></tr></thead>
