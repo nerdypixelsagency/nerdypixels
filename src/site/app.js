@@ -307,7 +307,7 @@ P.eventDone = () => { const r = lastOf("events"); const open = earlyOpen();
 </div></div></section>`};};
 
 /* ---------- Checkout ---------- */
-function coState(){ return sget("npa-co") || { step:1, country:"NG", plan:null, method:null, name:"", email:"", phone:"", persona:"", source:"", ref:"", agree:false }; }
+function coState(){ const c = sget("npa-co") || { step:1, country:"NG", plan:null, method:null, name:"", email:"", phone:"", persona:"", source:"", ref:"", agree:false }; if (!c.ref){ try{ const r = localStorage.getItem("npa-ref"); if (r){ c.ref = r; sset("npa-co", c); } }catch(e){} } return c; }
 function coSave(c){ sset("npa-co", c); }
 function coPlan(c){ let p = c.plan || (earlyOpen()?"early":"monthly"); if (p==="early" && !earlyOpen()) p = "monthly"; return p; }
 P.checkout = (q) => { const c = coState(); if (q.plan==="early"||q.plan==="monthly"){ c.plan=q.plan; } if (!c.step || c.step>3) c.step=1; coSave(c);
@@ -333,7 +333,7 @@ function coRender(){
 <label class="f">WhatsApp number${tel(ct.dial, c.phone)}</label>
 <label class="f">Which best describes you?${personaSelect(c.persona)}</label>
 <label class="f">How did you hear about us?<select name="source"><option value="">Select one</option>${[["blog","Our blog"],["landing","Our website"],["partner","A partner organisation"],["email","Email from us"],["whatsapp","WhatsApp"],["friend","A friend or graduate"],["event","The free event"],["other","Somewhere else"]].map(o=>`<option value="${o[0]}"${o[0]===c.source?" selected":""}>${o[1]}</option>`).join("")}</select></label>
-<label class="f">Referral code (optional)<input name="ref" value="${esc(c.ref)}" placeholder="For example AMB-TOLU"></label></div>
+<label class="f">Referral code (optional)<input name="ref" value="${esc(c.ref)}" placeholder="For example RUTH-FH9W" data-refcheck><small class="ref-note" aria-live="polite"></small></label></div>
 <label class="check" style="cursor:pointer"><input type="checkbox" name="agree" ${c.agree?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span class="small">I accept the <a href="/terms" target="_blank">terms of enrolment</a> and <a href="/payment-policy" target="_blank">payment policy</a>, and I'm happy to receive class updates on WhatsApp and email.</span></label>
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="1">Back</button><button class="btn" type="submit" style="flex:1">Continue to payment</button></div></form>`;
   if (c.step===3) body = `<h1 style="font-size:clamp(26px,3vw,34px)">How would you like to pay?</h1><p class="muted" style="margin-top:-12px">Options for ${esc(ct.name)}. <button type="button" class="linkish" data-act="co-step" data-v="1" style="border:0;background:none;padding:0;color:var(--purple-ink);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer">Change country</button></p>
@@ -543,6 +543,8 @@ function scrollToId(id){ const el = document.getElementById(id); if (el) el.scro
 let booted = false;
 export function boot(){
 if (booted) return; booted = true;
+// Remember a referral link (?ref=CODE) so checkout can prefill the code.
+try{ const rc = new URLSearchParams(location.search).get("ref"); if (rc) localStorage.setItem("npa-ref", rc.trim().toUpperCase()); }catch(e){}
 const track = (name, params) => { if (typeof window.gtag === "function") window.gtag("event", name, params); };
 const tick = () => document.querySelectorAll("[data-countdown]").forEach(el => { const ms = new Date(el.dataset.countdown) - Date.now(); if (ms <= 0){ el.textContent = ""; return; } const d = Math.floor(ms/864e5), h = Math.floor(ms%864e5/36e5), m = Math.floor(ms%36e5/6e4); el.textContent = `${d}d ${h}h ${m}m ${el.dataset.label}`; });
 tick(); setInterval(tick, 30000); window.__npaTick = tick;
@@ -576,6 +578,23 @@ document.addEventListener("change", e => {
 document.addEventListener("input", e => {
   const f = e.target.closest('form[data-form="co-details"]'); if (!f) return;
   const c = coState(); const t = e.target; c[t.name] = t.type === "checkbox" ? t.checked : t.value; coSave(c);
+});
+// Live referral code check at checkout.
+let refTimer = null;
+document.addEventListener("input", e => {
+  const t = e.target.closest("[data-refcheck]"); if (!t) return;
+  const note = t.parentElement.querySelector(".ref-note"); if (!note) return;
+  clearTimeout(refTimer);
+  const code = t.value.trim().toUpperCase();
+  if (!code){ note.textContent = ""; note.className = "ref-note"; return; }
+  if (!window.__npaRefCheck) return;
+  refTimer = setTimeout(() => {
+    window.__npaRefCheck({ code }).then(r => {
+      if (t.value.trim().toUpperCase() !== code) return;
+      if (r && r.ok){ note.textContent = `Code applied — referred by ${r.name}.`; note.className = "ref-note ok"; }
+      else { note.textContent = "Code not recognised."; note.className = "ref-note bad"; }
+    }).catch(() => {});
+  }, 400);
 });
 document.addEventListener("submit", e => {
   const f = e.target.closest("form[data-form]"); if (!f) return; e.preventDefault();

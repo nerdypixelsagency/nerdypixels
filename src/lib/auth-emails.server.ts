@@ -7,7 +7,7 @@ type Copy = { subject: string; heading: string; body: string; cta: string };
 
 const COPY: Record<string, Copy> = {
   signup: { subject: "Confirm your Nerdy Pixels account", heading: "Confirm your email", body: "Welcome to Nerdy Pixels Academy! Please confirm your email address to activate your account.", cta: "Confirm email" },
-  invite: { subject: "You've been invited to Nerdy Pixels Academy", heading: "You're invited", body: "You've been invited to join Nerdy Pixels Academy. Click below to accept and set up your account.", cta: "Accept invite" },
+  invite: { subject: "You're now an admin at Nerdy Pixels Academy", heading: "You're invited", body: "You've been given admin access to the Nerdy Pixels Academy dashboard. Click below to set your password, then sign in at bootcamp.npdacademy.com/admin.", cta: "Set your password" },
   magiclink: { subject: "Your Nerdy Pixels sign-in link", heading: "Sign in", body: "Click the button below to sign in. This link expires shortly and can only be used once.", cta: "Sign in" },
   recovery: { subject: "Reset your Nerdy Pixels password", heading: "Reset your password", body: "We received a request to reset your password. Click below to choose a new one. If you didn't ask for this, you can ignore this email.", cta: "Reset password" },
   email_change: { subject: "Confirm your new email address", heading: "Confirm email change", body: "Please confirm this change of email address for your Nerdy Pixels account.", cta: "Confirm change" },

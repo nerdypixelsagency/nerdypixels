@@ -50,9 +50,12 @@ export const updateEnrolmentStatus = createServerFn({ method: "POST" })
 export const listAdmins = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    if (!(await roleOf(context))) throw new Error("Forbidden");
+    const role = await roleOf(context);
+    if (!role) throw new Error("Forbidden");
     const { data } = await context.supabase.from("user_roles").select("user_id, email, role, created_at").order("created_at");
-    return data ?? [];
+    const rows = data ?? [];
+    // Only the super admin can see the super admin row.
+    return role === "super_admin" ? rows : rows.filter((r) => r.role !== "super_admin");
   });
 
 export const addAdmin = createServerFn({ method: "POST" })
@@ -69,10 +72,27 @@ export const addAdmin = createServerFn({ method: "POST" })
       if (u) userId = u.id;
       if (!list || list.users.length < 200) break;
     }
-    if (!userId) throw new Error("No account with that email yet. Ask them to create one on the admin sign-in page first.");
+    let invited = false;
+    if (!userId) {
+      // Create the account and email them a "set your password" link via Resend.
+      const { data: created, error: ce } = await supabaseAdmin.auth.admin.createUser({ email, email_confirm: true });
+      if (ce || !created.user) throw new Error(ce?.message ?? "Could not create the account.");
+      userId = created.user.id;
+      invited = true;
+    }
     const { error } = await supabaseAdmin.from("user_roles").upsert({ user_id: userId, email, role: "admin" }, { onConflict: "user_id,role" });
     if (error) throw new Error(error.message);
-    return { ok: true };
+    // Always send a fresh set-password link so new and existing admins can get in.
+    const { data: linkData, error: le } = await supabaseAdmin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: { redirectTo: "https://bootcamp.npdacademy.com/reset-password" },
+    });
+    if (le || !linkData?.properties?.action_link) throw new Error(le?.message ?? "Could not create the sign-in link.");
+    const { renderAuthEmail, sendViaResend } = await import("./auth-emails.server");
+    const mail = renderAuthEmail("invite", linkData.properties.action_link, linkData.properties.email_otp ?? "");
+    await sendViaResend(email, mail.subject, mail.html);
+    return { ok: true, invited };
   });
 
 export const removeAdmin = createServerFn({ method: "POST" })

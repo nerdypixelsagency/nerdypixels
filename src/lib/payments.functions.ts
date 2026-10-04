@@ -35,6 +35,8 @@ export const startPayment = createServerFn({ method: "POST" })
     const txRef = "NPA-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
     const mode = await getPaymentMode();
     const referral = data.referral ? data.referral.toUpperCase() : null;
+    // Tag the enrolment to the currently open cohort, if one exists.
+    const { data: cohort } = await supabaseAdmin.from("cohorts" as never).select("id").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
 
     const { error } = await supabaseAdmin.from("enrolments").insert({
       kind: data.kind,
@@ -51,7 +53,8 @@ export const startPayment = createServerFn({ method: "POST" })
       payment_method: data.method ?? null,
       tx_ref: txRef,
       mode,
-    });
+      cohort_id: cohort ? (cohort as { id: string }).id : null,
+    } as never);
     if (error) {
       console.error("[startPayment:db_insert]", error.code, error.message);
       throw new Error("We couldn't start the payment. Please try again.");

@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyStudentRecords, requestStudentLink } from "@/lib/student.functions";
+import { myReferralCode } from "@/lib/referrals.functions";
 import "@/site/site.css";
 import "@/site/brand.css";
 import "@/site/premium.css";
@@ -73,6 +74,23 @@ function SignIn() {
   );
 }
 
+function ReferralCard() {
+  const fn = useServerFn(myReferralCode);
+  const { data } = useQuery({ queryKey: ["my-ref"], queryFn: () => fn(), retry: 1 });
+  const [copied, setCopied] = useState(false);
+  if (!data?.link) return null;
+  return (
+    <div className="card stack" style={{ gap: 10 }}>
+      <h2 style={{ fontSize: 20, margin: 0 }}>Your referral link</h2>
+      <p className="muted" style={{ margin: 0 }}>Share this link with friends. When someone enrols through it, you earn a commission on every confirmed payment.</p>
+      <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+        <code style={{ background: "var(--canvas, #f5f2fb)", padding: "10px 14px", borderRadius: 10, fontSize: 14, wordBreak: "break-all" }}>{data.link}</code>
+        <button className="btn ghost sm" type="button" onClick={() => { navigator.clipboard?.writeText(data.link!).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }).catch(() => {}); }}>{copied ? "Copied!" : "Copy link"}</button>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard() {
   const fn = useServerFn(getMyStudentRecords);
   const { data, isLoading, error } = useQuery({ queryKey: ["student"], queryFn: () => fn(), retry: 1 });
@@ -91,6 +109,7 @@ function Dashboard() {
       ) : (
         <div className="card"><b>You're all paid up.</b> <span className="muted">Classes start Thursday 5 November 2026.</span></div>
       )}
+      <ReferralCard />
       <div className="card"><h2 style={{ fontSize: 20, marginBottom: 12 }}>Payment history</h2>
         {rows.length === 0 ? <p className="muted">No payments yet.</p> : (
           <div className="tw"><table className="table"><thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th><th>Receipt ref</th></tr></thead><tbody>
