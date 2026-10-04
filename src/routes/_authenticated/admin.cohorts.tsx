@@ -1,81 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { listCohorts, saveCohort } from "@/lib/referrals.functions";
+import { useMemo, useState } from "react";
+import { listCourseCms, saveCohortCms, saveCourse } from "@/lib/course-config.functions";
+import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/cohorts")({ component: Cohorts });
 
-type Cohort = { id: string; name: string; course: string; start_date: string | null; end_date: string | null; whatsapp_link: string | null; status: string; students: number };
-
 function Cohorts() {
-  const listFn = useServerFn(listCohorts);
-  const saveFn = useServerFn(saveCohort);
-  const qc = useQueryClient();
-  const { data: cohorts = [], isLoading } = useQuery({ queryKey: ["cohorts"], queryFn: () => listFn() });
-  const [showForm, setShowForm] = useState(false);
-  const [edit, setEdit] = useState<Cohort | null>(null);
-  const [msg, setMsg] = useState("");
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    try {
-      await saveFn({
-        data: {
-          id: edit?.id,
-          name: String(fd.get("name") || ""),
-          course: String(fd.get("course") || ""),
-          startDate: String(fd.get("startDate") || ""),
-          endDate: String(fd.get("endDate") || ""),
-          whatsappLink: String(fd.get("whatsappLink") || ""),
-          status: fd.get("status") === "closed" ? "closed" : "open",
-        },
-      });
-      setShowForm(false); setEdit(null); setMsg("Cohort saved.");
-      qc.invalidateQueries({ queryKey: ["cohorts"] });
-    } catch (err) { setMsg((err as Error).message); }
-  }
-
-  return (
-    <>
-      <div className="adm-head"><h1>Cohorts</h1>
-        <button className="adm-btn" onClick={() => { setEdit(null); setShowForm(!showForm); }}>{showForm ? "Close" : "New cohort"}</button>
-      </div>
-      {msg && <div className="adm-card" style={{ marginBottom: 16, fontSize: 14 }} role="status">{msg}</div>}
-      <div className="adm-card" style={{ marginBottom: 16, fontSize: 13, color: "#6b6280" }}>
-        New enrolments are tagged to the <b>open</b> cohort automatically, and the welcome email uses its start date and WhatsApp link. Keep only one cohort open at a time.
-      </div>
-      {showForm && (
-        <form className="adm-card" onSubmit={submit} style={{ marginBottom: 16, display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-          <input className="adm-input" name="name" required placeholder="Cohort name, e.g. November 2026" defaultValue={edit?.name ?? ""} />
-          <input className="adm-input" name="course" required placeholder="Course" defaultValue={edit?.course ?? "Digital Marketing Bootcamp"} />
-          <input className="adm-input" name="startDate" placeholder="Start date, e.g. Thursday 5 November 2026" defaultValue={edit?.start_date ?? ""} />
-          <input className="adm-input" name="endDate" placeholder="End date (optional)" defaultValue={edit?.end_date ?? ""} />
-          <input className="adm-input" name="whatsappLink" placeholder="WhatsApp group link" defaultValue={edit?.whatsapp_link ?? ""} style={{ gridColumn: "1 / -1" }} />
-          <label style={{ fontSize: 13, display: "flex", gap: 6, alignItems: "center" }}>
-            <select className="adm-input" name="status" defaultValue={edit?.status ?? "open"} style={{ width: "auto" }}>
-              <option value="open">Open</option><option value="closed">Closed</option>
-            </select>
-          </label>
-          <button className="adm-btn green" style={{ justifySelf: "start" }}>{edit ? "Save changes" : "Create cohort"}</button>
-        </form>
-      )}
-      <div className="adm-card">
-        {isLoading ? <p className="adm-empty">Loading…</p> : cohorts.length === 0 ? <p className="adm-empty">No cohorts yet — create the first one.</p> : (
-          <div className="adm-scroll"><table className="adm-table">
-            <thead><tr><th>Cohort</th><th>Course</th><th>Starts</th><th>Ends</th><th className="num">Students</th><th>Status</th><th></th></tr></thead>
-            <tbody>{(cohorts as Cohort[]).map((c) => (
-              <tr key={c.id}>
-                <td><b>{c.name}</b></td><td>{c.course}</td><td>{c.start_date ?? "—"}</td><td>{c.end_date ?? "—"}</td>
-                <td className="num">{c.students}</td>
-                <td><span className={`adm-pill ${c.status === "open" ? "paid" : ""}`}>{c.status}</span></td>
-                <td className="num"><button className="adm-btn ghost" style={{ padding: "4px 10px" }} onClick={() => { setEdit(c); setShowForm(true); }}>Edit</button></td>
-              </tr>
-            ))}</tbody>
-          </table></div>
-        )}
-      </div>
-    </>
-  );
+  const listFn=useServerFn(listCourseCms), saveC=useServerFn(saveCourse), saveH=useServerFn(saveCohortCms), qc=useQueryClient();
+  const { data,isLoading }=useQuery({queryKey:["course-cms"],queryFn:()=>listFn()});
+  const [q,setQ]=useState(""),[form,setForm]=useState<"course"|"cohort"|null>(null),[edit,setEdit]=useState<any>(null),[msg,setMsg]=useState("");
+  const cohorts=useMemo(()=> (data?.cohorts??[]).filter((c:any)=>!q||[c.name,c.course,c.headline].some((v)=>String(v??"").toLowerCase().includes(q.toLowerCase()))),[data,q]);
+  async function submitCourse(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);try{await saveC({data:{id:edit?.id,title:String(f.get("title")),slug:String(f.get("slug")),description:String(f.get("description")||""),status:f.get("status")==="inactive"?"inactive":"active",published:f.get("published")==="on"}});done("Course saved.");}catch(x){setMsg((x as Error).message)}}
+  async function submitCohort(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const f=new FormData(e.currentTarget);try{await saveH({data:{id:edit?.id,courseId:String(f.get("courseId")),name:String(f.get("name")),startDate:String(f.get("startDate")||""),endDate:String(f.get("endDate")||""),whatsappLink:String(f.get("whatsappLink")||""),status:f.get("status")==="closed"?"closed":"open",published:f.get("published")==="on",headline:String(f.get("headline")),offerLabel:String(f.get("offerLabel")),earlyBirdEnabled:f.get("earlyBirdEnabled")==="on",earlyBirdPrice:Number(f.get("earlyBirdPrice")),earlyBirdDeadline:String(f.get("earlyBirdDeadline")||"")||null,outrightPrice:Number(f.get("outrightPrice")),instalmentAmount:Number(f.get("instalmentAmount")),instalmentCount:Number(f.get("instalmentCount")),outrightCopy:String(f.get("outrightCopy")||""),instalmentCopy:String(f.get("instalmentCopy")||"")}});done("Cohort and offer saved.");}catch(x){setMsg((x as Error).message)}}
+  function done(text:string){setForm(null);setEdit(null);setMsg(text);qc.invalidateQueries({queryKey:["course-cms"]})}
+  return <><div className="adm-head"><h1>Courses & cohorts</h1><div style={{display:"flex",gap:8}}><button className="adm-btn ghost" onClick={()=>{setEdit(null);setForm("course")}}>New course</button><button className="adm-btn" onClick={()=>{setEdit(null);setForm("cohort")}}>New cohort</button></div></div>
+    {msg&&<div className="adm-card" style={{marginBottom:16}} role="status">{msg}</div>}
+    {form==="course"&&<CourseForm edit={edit} onSubmit={submitCourse} onClose={()=>setForm(null)}/>} {form==="cohort"&&<CohortForm edit={edit} courses={data?.courses??[]} onSubmit={submitCohort} onClose={()=>setForm(null)}/>} 
+    <FilterToolbar search={q} onSearch={setQ} placeholder="Search cohort, course, or headline" active={!!q} onReset={()=>setQ("")}/>
+    <div className="adm-card">{isLoading?<p className="adm-empty">Loading…</p>:cohorts.length===0?<p className="adm-empty">No matching cohorts</p>:<div className="adm-scroll"><table className="adm-table"><thead><tr><th>Cohort</th><th>Course</th><th>Starts</th><th>Early bird</th><th>Monthly</th><th>Status</th><th></th></tr></thead><tbody>{cohorts.map((c:any)=><tr key={c.id}><td><b>{c.name}</b><br/><span className="sub">{c.headline}</span></td><td>{c.course}</td><td>{c.start_date??"—"}</td><td>{c.early_bird_enabled?`₦${Number(c.early_bird_price).toLocaleString()}`:"Off"}</td><td>₦{Number(c.instalment_amount).toLocaleString()} × {c.instalment_count}</td><td><span className={`adm-pill ${c.status==="open"?"":"registered"}`}>{c.status}</span></td><td><button className="adm-btn ghost" onClick={()=>{setEdit(c);setForm("cohort")}}>Edit</button></td></tr>)}</tbody></table></div>}</div>
+  </>;
 }
+function CourseForm({edit,onSubmit,onClose}:{edit:any;onSubmit:(e:React.FormEvent<HTMLFormElement>)=>void;onClose:()=>void}){return <form className="adm-card adm-form-grid" style={{marginBottom:16}} onSubmit={onSubmit}><h2 className="adm-section-title full">{edit?"Edit course":"New course"}</h2><label>Course title<input className="adm-input" name="title" required defaultValue={edit?.title??""}/></label><label>URL slug<input className="adm-input" name="slug" required pattern="[a-z0-9-]+" defaultValue={edit?.slug??""}/></label><label className="full">Description<textarea className="adm-input" name="description" rows={3} defaultValue={edit?.description??""}/></label><label>Status<select className="adm-select" name="status" defaultValue={edit?.status??"active"}><option value="active">Active</option><option value="inactive">Inactive</option></select></label><label style={{flexDirection:"row",alignItems:"center"}}><input type="checkbox" name="published" defaultChecked={edit?.is_published??true}/> Published publicly</label><div className="full" style={{display:"flex",gap:8}}><button className="adm-btn green">Save course</button><button className="adm-btn ghost" type="button" onClick={onClose}>Cancel</button></div></form>}
+function CohortForm({edit,courses,onSubmit,onClose}:{edit:any;courses:any[];onSubmit:(e:React.FormEvent<HTMLFormElement>)=>void;onClose:()=>void}){const deadline=edit?.early_bird_deadline?String(edit.early_bird_deadline).slice(0,16):"";return <form className="adm-card adm-form-grid" style={{marginBottom:16}} onSubmit={onSubmit}><h2 className="adm-section-title full">{edit?"Edit cohort, offer & countdown":"New cohort"}</h2><label>Course<select className="adm-select" name="courseId" required defaultValue={edit?.course_id??courses[0]?.id}>{courses.map(c=><option key={c.id} value={c.id}>{c.title}</option>)}</select></label><label>Cohort name<input className="adm-input" name="name" required defaultValue={edit?.name??""}/></label><label className="full">Public headline<input className="adm-input" name="headline" required defaultValue={edit?.headline??"Build a digital marketing career that gets results."}/></label><label>Start date<input className="adm-input" name="startDate" defaultValue={edit?.start_date??""}/></label><label>End date<input className="adm-input" name="endDate" defaultValue={edit?.end_date??""}/></label><label className="full">WhatsApp group link<input className="adm-input" name="whatsappLink" type="url" defaultValue={edit?.whatsapp_link??""}/></label><label>Offer label<input className="adm-input" name="offerLabel" required defaultValue={edit?.offer_label??"Early bird"}/></label><label>Early-bird deadline<input className="adm-input" name="earlyBirdDeadline" type="datetime-local" defaultValue={deadline}/></label><label>Early-bird price (₦)<input className="adm-input" name="earlyBirdPrice" type="number" min="0" required defaultValue={edit?.early_bird_price??60000}/></label><label>Standard outright price (₦)<input className="adm-input" name="outrightPrice" type="number" min="0" required defaultValue={edit?.outright_price??90000}/></label><label>Instalment amount (₦)<input className="adm-input" name="instalmentAmount" type="number" min="0" required defaultValue={edit?.instalment_amount??40000}/></label><label>Number of instalments<input className="adm-input" name="instalmentCount" type="number" min="1" max="12" required defaultValue={edit?.instalment_count??3}/></label><label>Outright payment copy<textarea className="adm-input" name="outrightCopy" rows={2} defaultValue={edit?.outright_copy??"Pay once and secure your seat."}/></label><label>Instalment payment copy<textarea className="adm-input" name="instalmentCopy" rows={2} defaultValue={edit?.instalment_copy??"Pay monthly in equal instalments."}/></label><label>Status<select className="adm-select" name="status" defaultValue={edit?.status??"open"}><option value="open">Open</option><option value="closed">Closed</option></select></label><div style={{display:"flex",gap:18,alignItems:"center"}}><label style={{flexDirection:"row",alignItems:"center"}}><input type="checkbox" name="published" defaultChecked={edit?.is_published??true}/> Published</label><label style={{flexDirection:"row",alignItems:"center"}}><input type="checkbox" name="earlyBirdEnabled" defaultChecked={edit?.early_bird_enabled??true}/> Show early bird</label></div><div className="full" style={{display:"flex",gap:8}}><button className="adm-btn green">Save cohort and offer</button><button className="adm-btn ghost" type="button" onClick={onClose}>Cancel</button></div></form>}

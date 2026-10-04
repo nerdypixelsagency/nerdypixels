@@ -1,9 +1,9 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap } from "lucide-react";
+import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { getMyRole, getPaymentModeFn, setPaymentMode } from "@/lib/admin.functions";
+import { getMyRole, getPaymentModeFn } from "@/lib/admin.functions";
 const logoDark = { url: "/brand/logo-dark.png" };
 import "@/components/admin/admin.css";
 
@@ -39,15 +39,8 @@ function AdminLayout() {
   });
   const qc = useQueryClient();
   const modeFn = useServerFn(getPaymentModeFn);
-  const setModeFn = useServerFn(setPaymentMode);
   const { data: modeData } = useQuery({ queryKey: ["pay-mode"], queryFn: () => modeFn(), enabled: !!data?.role });
   const mode = modeData?.mode ?? "live";
-  async function toggleMode() {
-    const next = mode === "live" ? "test" : "live";
-    if (!confirm(next === "test" ? "Switch to TEST mode? Buyers won't be charged real money." : "Switch to LIVE mode? Buyers will be charged real money.")) return;
-    await setModeFn({ data: { mode: next } });
-    qc.invalidateQueries();
-  }
   const navigate = useNavigate();
 
   async function signOut() {
@@ -90,7 +83,9 @@ function AdminLayout() {
     { to: "/admin/instalments", label: "Instalments", icon: CalendarClock },
     { to: "/admin/commissions", label: "Commissions", icon: HandCoins },
     { to: "/admin/cohorts", label: "Cohorts", icon: GraduationCap },
+    { to: "/admin/preview", label: "View as", icon: Eye },
     { to: "/admin/team", label: "Admins", icon: ShieldCheck },
+    { to: "/admin/settings", label: "Settings", icon: Settings },
   ] as const;
 
   return (
@@ -111,13 +106,7 @@ function AdminLayout() {
       </aside>
       <main className="adm-main">
         <div className="adm-top">
-          {data.role === "super_admin" ? (
-            <button className="adm-btn ghost" onClick={toggleMode} title="Switch payment mode" style={mode === "test" ? { background: "#fff4d6", borderColor: "#e0a800", color: "#7a5a00" } : undefined}>
-              Payments: <b>{mode === "test" ? "TEST" : "LIVE"}</b> · switch
-            </button>
-          ) : (
-            <span className="adm-chip">Payments: {mode === "test" ? "TEST" : "LIVE"}</span>
-          )}
+          <span className={`adm-chip ${mode === "test" ? "pending" : ""}`}>Payments: {mode === "test" ? "TEST" : "LIVE"}</span>
           <span className="adm-chip">{data.role === "super_admin" ? "Super admin" : "Admin"}</span>
           <button className="adm-btn ghost" onClick={signOut}><LogOut size={14} style={{ verticalAlign: -2 }} /> Sign out</button>
         </div>
