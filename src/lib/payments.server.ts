@@ -120,9 +120,9 @@ export async function sendReceiptEmail(row: Row) {
 <div style="background:#2E0B63;color:#fff;padding:28px;border-radius:16px 16px 0 0"><h1 style="margin:0;font-size:24px">${isInst ? "Thank you" : "You're in"}, ${first}.</h1></div>
 <div style="border:1px solid #E4DEEE;border-top:0;padding:28px;border-radius:0 0 16px 16px">
 <p>We've received your payment of <b>${naira(row.amount)}</b>.</p>
-<p><b>Plan:</b> ${planLine}<br><b>Reference:</b> ${esc(row.tx_ref)}<br><b>Classes start:</b> ${COHORT_START}</p>
+<p><b>Plan:</b> ${planLine}<br><b>Reference:</b> ${esc(row.tx_ref)}<br><b>Classes start:</b> ${esc(cohortStart)}</p>
 ${isInst ? "" : `<p><b>Your next steps</b></p><ol>
-<li><a href="${WHATSAPP_GROUP}">Join your cohort's WhatsApp group</a></li>
+<li><a href="${whatsapp}">Join your cohort's WhatsApp group</a></li>
 <li><a href="${PROFILE_FORM}">Complete your student profile</a></li>
 <li>Attend orientation. We'll share the link in the WhatsApp group.</li></ol>`}
 <p>Questions? Reply to this email or write to info@npdacademy.com.</p>
