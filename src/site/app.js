@@ -579,6 +579,23 @@ document.addEventListener("input", e => {
   const f = e.target.closest('form[data-form="co-details"]'); if (!f) return;
   const c = coState(); const t = e.target; c[t.name] = t.type === "checkbox" ? t.checked : t.value; coSave(c);
 });
+// Live referral code check at checkout.
+let refTimer = null;
+document.addEventListener("input", e => {
+  const t = e.target.closest("[data-refcheck]"); if (!t) return;
+  const note = t.parentElement.querySelector(".ref-note"); if (!note) return;
+  clearTimeout(refTimer);
+  const code = t.value.trim().toUpperCase();
+  if (!code){ note.textContent = ""; note.className = "ref-note"; return; }
+  if (!window.__npaRefCheck) return;
+  refTimer = setTimeout(() => {
+    window.__npaRefCheck({ code }).then(r => {
+      if (t.value.trim().toUpperCase() !== code) return;
+      if (r && r.ok){ note.textContent = `Code applied — referred by ${r.name}.`; note.className = "ref-note ok"; }
+      else { note.textContent = "Code not recognised."; note.className = "ref-note bad"; }
+    }).catch(() => {});
+  }, 400);
+});
 document.addEventListener("submit", e => {
   const f = e.target.closest("form[data-form]"); if (!f) return; e.preventDefault();
   const d = Object.fromEntries(new FormData(f).entries()); const kind = f.dataset.form;

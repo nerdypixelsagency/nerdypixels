@@ -2,6 +2,7 @@ import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo } from "react";
 import { startPayment, registerEvent, submitLead } from "@/lib/payments.functions";
+import { validateReferralCode } from "@/lib/referrals.functions";
 const astronaut = { url: "/brand/astronaut.png" };
 // @ts-expect-error plain JS site bundle
 import { renderStatic, boot, renderNow, primeBlog } from "./app.js";
