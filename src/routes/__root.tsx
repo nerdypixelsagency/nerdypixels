@@ -4,10 +4,12 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -34,7 +36,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -95,10 +97,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const browserWindow = typeof window === "undefined" ? undefined : (window as Window & { __NPA_GA_ID?: string });
+  const measurementId = typeof window === "undefined" ? process.env["GOOGLE_ANALYTICS_MEASUREMENT_ID"] : browserWindow?.__NPA_GA_ID;
+  const analyticsSetup = measurementId
+    ? `window.__NPA_GA_ID=${JSON.stringify(measurementId)};window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=window.gtag||gtag;gtag('js',new Date());gtag('config',${JSON.stringify(measurementId)});`
+    : "";
+
   return (
     <html lang="en" data-theme="light">
       <head>
         <HeadContent />
+        {measurementId ? (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`} />
+            <script dangerouslySetInnerHTML={{ __html: analyticsSetup }} />
+          </>
+        ) : null}
       </head>
       <body>
         {children}
@@ -113,8 +127,34 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AnalyticsPageViews />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
+}
+
+function AnalyticsPageViews() {
+  const href = useRouterState({ select: (state) => state.location.href });
+  const firstView = useRef(true);
+
+  useEffect(() => {
+    if (firstView.current) {
+      firstView.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      const analyticsWindow = window as Window & { gtag?: (...args: unknown[]) => void };
+      if (typeof analyticsWindow.gtag === "function") {
+        analyticsWindow.gtag("event", "page_view", {
+          page_path: location.pathname + location.search,
+          page_location: location.href,
+          page_title: document.title,
+        });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [href]);
+
+  return null;
 }

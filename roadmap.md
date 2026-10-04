@@ -1,4 +1,5 @@
 # Roadmap
+- [x] GA4 tracking on Lovable, Vercel, and bootcamp.npdacademy.com
 - [ ] Phase 1: owner test payment in TEST mode; send WhatsApp group link (waiting on user)
 - [x] Phase 2: instalment reminders, overdue flag, send-reminder button
 - [x] Phase 3: real page addresses, server-rendered content, per-page meta, JSON-LD, sitemap, robots, share image

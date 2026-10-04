@@ -24,15 +24,33 @@ export function SitePage({ blog = null }: { blog?: BlogData | null } = {}) {
     // Old "#/path" links keep working.
     if (location.hash.startsWith("#/")) {
       const target = location.hash.slice(1);
-      history.replaceState(null, "", target);
-      router.navigate({ href: target, replace: true });
+      const targetUrl = new URL(target, location.origin);
+      for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content"]) {
+        if (!targetUrl.searchParams.has(key)) {
+          const value = new URLSearchParams(location.search).get(key);
+          if (value) targetUrl.searchParams.set(key, value);
+        }
+      }
+      const preservedTarget = targetUrl.pathname + targetUrl.search + targetUrl.hash;
+      history.replaceState(null, "", preservedTarget);
+      router.navigate({ href: preservedTarget, replace: true });
     }
     const w = window as unknown as Record<string, unknown>;
     w["__npaPay"] = (d: unknown) => pay({ data: d as never });
     w["__npaEvent"] = (d: { name: string; email: string; phone?: string }) =>
       event({ data: { name: d.name, email: d.email, phone: d.phone } });
     w["__npaLead"] = (d: unknown) => lead({ data: d as never });
-    w["__npaNav"] = (href: string) => router.navigate({ href });
+    w["__npaNav"] = (href: string) => {
+      const target = new URL(href, location.origin);
+      const current = new URLSearchParams(location.search);
+      for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content"]) {
+        if (!target.searchParams.has(key)) {
+          const value = current.get(key);
+          if (value) target.searchParams.set(key, value);
+        }
+      }
+      router.navigate({ href: target.pathname + target.search + target.hash });
+    };
     document.documentElement.style.setProperty("--astro", `url(${astronaut.url})`);
     boot();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
