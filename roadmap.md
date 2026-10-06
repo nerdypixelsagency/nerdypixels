@@ -19,4 +19,6 @@
 - [x] Email Centre: log, view, resend, preview, compose, bulk sends; ambassador code emails
 - [x] Form confirmations + categorised submissions; payment-confirmed email logged
 - [x] Lead payment status and follow-up emails until paid
-- [ ] Send the ambassador announcement from /admin/emails (waiting on user — one click)
+- [x] Ambassador code emails sent to all 38; auto-send on new ambassadors; one-click resend
+- [x] Ambassadors given student records; paying students become ambassadors automatically
+- [ ] Delivery confirmation from Resend (waiting on user: Resend key is "sending only" — needs Full access)
