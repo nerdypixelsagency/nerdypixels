@@ -243,10 +243,12 @@ export type Database = {
       email_log: {
         Row: {
           created_at: string
+          delivery_status: string | null
           error: string | null
           html: string
           id: string
           mode: string
+          provider_id: string | null
           related_id: string | null
           sent_by: string | null
           status: string
@@ -256,10 +258,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          delivery_status?: string | null
           error?: string | null
           html: string
           id?: string
           mode?: string
+          provider_id?: string | null
           related_id?: string | null
           sent_by?: string | null
           status?: string
@@ -269,10 +273,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          delivery_status?: string | null
           error?: string | null
           html?: string
           id?: string
           mode?: string
+          provider_id?: string | null
           related_id?: string | null
           sent_by?: string | null
           status?: string
