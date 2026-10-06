@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAddStudentRouteImport } from './routes/_authenticated/admin.add-student'
 import { Route as AuthenticatedAdminCohortsRouteImport } from './routes/_authenticated/admin.cohorts'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin.commissions'
+import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_authenticated/admin.enrolments'
 import { Route as AuthenticatedAdminInstalmentsRouteImport } from './routes/_authenticated/admin.instalments'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
@@ -100,6 +101,12 @@ const AuthenticatedAdminCommissionsRoute =
   AuthenticatedAdminCommissionsRouteImport.update({
     id: '/commissions',
     path: '/commissions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEmailsRoute =
+  AuthenticatedAdminEmailsRouteImport.update({
+    id: '/emails',
+    path: '/emails',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminEnrolmentsRoute =
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/admin/cohorts': typeof AuthenticatedAdminCohortsRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -209,6 +217,7 @@ export interface FileRoutesByTo {
   '/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/admin/cohorts': typeof AuthenticatedAdminCohortsRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
+  '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -237,6 +246,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/add-student': typeof AuthenticatedAdminAddStudentRoute
   '/_authenticated/admin/cohorts': typeof AuthenticatedAdminCohortsRoute
   '/_authenticated/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
+  '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
   '/_authenticated/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/admin/add-student'
     | '/admin/cohorts'
     | '/admin/commissions'
+    | '/admin/emails'
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/leads'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/admin/add-student'
     | '/admin/cohorts'
     | '/admin/commissions'
+    | '/admin/emails'
     | '/admin/enrolments'
     | '/admin/instalments'
     | '/admin/leads'
@@ -317,6 +329,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/add-student'
     | '/_authenticated/admin/cohorts'
     | '/_authenticated/admin/commissions'
+    | '/_authenticated/admin/emails'
     | '/_authenticated/admin/enrolments'
     | '/_authenticated/admin/instalments'
     | '/_authenticated/admin/leads'
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCommissionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/emails': {
+      id: '/_authenticated/admin/emails'
+      path: '/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AuthenticatedAdminEmailsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/enrolments': {
       id: '/_authenticated/admin/enrolments'
       path: '/enrolments'
@@ -531,6 +551,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAddStudentRoute: typeof AuthenticatedAdminAddStudentRoute
   AuthenticatedAdminCohortsRoute: typeof AuthenticatedAdminCohortsRoute
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
+  AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminEnrolmentsRoute: typeof AuthenticatedAdminEnrolmentsRoute
   AuthenticatedAdminInstalmentsRoute: typeof AuthenticatedAdminInstalmentsRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
@@ -546,6 +567,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAddStudentRoute: AuthenticatedAdminAddStudentRoute,
   AuthenticatedAdminCohortsRoute: AuthenticatedAdminCohortsRoute,
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
+  AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminEnrolmentsRoute: AuthenticatedAdminEnrolmentsRoute,
   AuthenticatedAdminInstalmentsRoute: AuthenticatedAdminInstalmentsRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,

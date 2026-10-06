@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye } from "lucide-react";
+import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn } from "@/lib/admin.functions";
 const logoDark = { url: "/brand/logo-dark.png" };
@@ -79,6 +79,7 @@ function AdminLayout() {
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/enrolments", label: "Enrolments", icon: Users },
     { to: "/admin/leads", label: "Leads", icon: Inbox },
+    { to: "/admin/emails", label: "Emails", icon: Mail },
     { to: "/admin/referrals", label: "Referrals", icon: Ticket },
     { to: "/admin/instalments", label: "Instalments", icon: CalendarClock },
     { to: "/admin/commissions", label: "Commissions", icon: HandCoins },

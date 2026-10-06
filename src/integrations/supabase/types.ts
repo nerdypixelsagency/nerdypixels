@@ -240,6 +240,48 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          created_at: string
+          error: string | null
+          html: string
+          id: string
+          mode: string
+          related_id: string | null
+          sent_by: string | null
+          status: string
+          subject: string
+          to_email: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          html: string
+          id?: string
+          mode?: string
+          related_id?: string | null
+          sent_by?: string | null
+          status?: string
+          subject: string
+          to_email: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          html?: string
+          id?: string
+          mode?: string
+          related_id?: string | null
+          sent_by?: string | null
+          status?: string
+          subject?: string
+          to_email?: string
+          type?: string
+        }
+        Relationships: []
+      }
       enrolments: {
         Row: {
           admin_notes: string | null
@@ -367,33 +409,42 @@ export type Database = {
       }
       leads: {
         Row: {
+          category: string
           country: string | null
           created_at: string
           email: string
           first_name: string
+          followup_count: number
           id: string
+          last_followup_at: string | null
           last_name: string
           mode: string
           phone: string
           source: string | null
         }
         Insert: {
+          category?: string
           country?: string | null
           created_at?: string
           email: string
           first_name: string
+          followup_count?: number
           id?: string
+          last_followup_at?: string | null
           last_name: string
           mode?: string
           phone: string
           source?: string | null
         }
         Update: {
+          category?: string
           country?: string | null
           created_at?: string
           email?: string
           first_name?: string
+          followup_count?: number
           id?: string
+          last_followup_at?: string | null
           last_name?: string
           mode?: string
           phone?: string

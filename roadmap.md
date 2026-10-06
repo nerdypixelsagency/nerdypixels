@@ -16,3 +16,7 @@
 - [ ] Import existing students from Excel (waiting on user's student file)
 - [x] Premium redesign of all admin screens
 - [x] Admin Settings, course/cohort CMS, read-only previews, footer logo, and unified filter toolbars
+- [x] Email Centre: log, view, resend, preview, compose, bulk sends; ambassador code emails
+- [x] Form confirmations + categorised submissions; payment-confirmed email logged
+- [x] Lead payment status and follow-up emails until paid
+- [ ] Send the ambassador announcement from /admin/emails (waiting on user — one click)
