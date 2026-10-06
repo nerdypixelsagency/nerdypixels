@@ -94,7 +94,7 @@ export async function refreshDelivery(ids?: string[]) {
 }
 
 /** Sends the code/link email to one ambassador. */
-export async function sendAmbassadorEmail(a: { id?: string; name: string; email: string | null; code: string }, sentBy?: string | null) {
+export async function sendAmbassadorEmail(a: { id?: string | undefined; name: string; email: string | null; code: string }, sentBy?: string | null) {
   if (!a.email) return { ok: false, error: "No email" };
   const m = ambassadorEmail(a.name, a.code, await commissionRates());
   return sendLogged(a.email, m.subject, m.html, { type: "ambassador", relatedId: a.id ?? a.code, sentBy, mode: "live" });
