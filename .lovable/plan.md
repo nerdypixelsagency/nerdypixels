@@ -7,7 +7,7 @@ Every ambassador in the system (the 33 imported from your spreadsheet, plus any 
 - From: Nerdy Pixels Academy <info@hello.npdacademy.com> (the verified sending address).
 - Branded email matching the site: purple header with logo, green button, clean white layout.
 - Personalised with their name, their code (e.g. `SARAH-X7K2`), and their link: `bootcamp.npdacademy.com/?ref=THEIR-CODE`.
-- A short explanation: share the link, the code is pre-filled at checkout, and they earn a percentage of every confirmed payment (current rates: 10% outright / 10% instalment, pulled from your settings so the email always shows the real numbers).
+- A short explanation: share the link, the code is pre-filled at checkout, and they earn a percentage of every confirmed payment (current rates: 15% of outright payments / 10% of each confirmed monthly payment, pulled live from your Commissions settings so the email always shows the real numbers).
 
 ## How it will be sent
 1. A one-time send, run by me from the server side using your existing Resend key — no new screens or buttons needed unless you want to re-send later.
