@@ -87,7 +87,13 @@ export async function confirmPayment(transactionId: string, txRef: string) {
     .neq("status", "paid")
     .select("*")
     .maybeSingle();
-  if (updated) await sendReceiptEmail(updated).catch((e) => console.error("Email failed", e));
+  if (updated) {
+    await sendReceiptEmail(updated).catch((e) => console.error("Email failed", e));
+    if (updated.mode !== "test") {
+      const { ensureAmbassador } = await import("./email-log.server");
+      await ensureAmbassador(updated.email, updated.name).catch((e) => console.error("Ambassador create failed", e));
+    }
+  }
   return { ok: true as const, row: updated ?? row };
 }
 

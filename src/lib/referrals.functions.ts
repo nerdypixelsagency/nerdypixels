@@ -57,11 +57,53 @@ export const saveAmbassador = createServerFn({ method: "POST" })
     if (!CODE_RE.test(code)) throw new Error("Codes can only use letters, numbers and dashes.");
     const row = { name: data.name, email: data.email ? data.email.toLowerCase() : null, code, active: data.active };
     const q = data.id
-      ? context.supabase.from("ambassadors").update(row).eq("id", data.id)
-      : context.supabase.from("ambassadors").insert({ ...row, source: "imported" });
-    const { error } = await q;
+      ? context.supabase.from("ambassadors").update(row).eq("id", data.id).select("id").maybeSingle()
+      : context.supabase.from("ambassadors").insert({ ...row, source: "imported" }).select("id").maybeSingle();
+    const { data: saved, error } = await q;
     if (error) throw new Error(error.message.includes("duplicate") ? "That code is already taken." : error.message);
+    if (!data.id && row.email) {
+      const { ensureStudentRecord, sendAmbassadorEmail } = await import("./email-log.server");
+      await ensureStudentRecord(row.email, row.name);
+      if (row.active) await sendAmbassadorEmail({ id: saved?.id, ...row }, context.userId);
+    }
     return { ok: true };
+  });
+
+export const emailAmbassadors = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid().optional() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { sendAmbassadorEmail, pause } = await import("./email-log.server");
+    let q = supabaseAdmin.from("ambassadors").select("id, name, email, code").eq("active", true).not("email", "is", null).limit(1000);
+    if (data.id) q = q.eq("id", data.id);
+    const { data: list } = await q;
+    let sent = 0; const failed: string[] = [];
+    for (const a of list ?? []) {
+      const r = await sendAmbassadorEmail(a, context.userId);
+      if (r.ok) sent++; else failed.push(a.email!);
+      if ((list ?? []).length > 1) await pause(550);
+    }
+    return { sent, failed, total: (list ?? []).length };
+  });
+
+export const ambassadorEmailStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ refresh: z.boolean().default(false) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.refresh) {
+      const { data: rows } = await supabaseAdmin.from("email_log" as never).select("id").eq("type", "ambassador").order("created_at", { ascending: false }).limit(200);
+      const { refreshDelivery } = await import("./email-log.server");
+      await refreshDelivery(((rows ?? []) as { id: string }[]).map((r) => r.id));
+    }
+    const { data: rows } = await supabaseAdmin.from("email_log" as never).select("to_email, status, delivery_status, created_at").eq("type", "ambassador").order("created_at", { ascending: false }).limit(2000);
+    const m: Record<string, { status: string; at: string }> = {};
+    for (const r of (rows ?? []) as { to_email: string; status: string; delivery_status: string | null; created_at: string }[])
+      if (!m[r.to_email]) m[r.to_email] = { status: r.delivery_status ?? r.status, at: r.created_at };
+    return m;
   });
 
 export const getCommissionSettings = createServerFn({ method: "GET" })
@@ -99,13 +141,10 @@ export const myReferralCode = createServerFn({ method: "GET" })
     // Only enrolled students (a record with their email) get a code.
     const { data: rec } = await supabaseAdmin.from("enrolments").select("name").eq("email", email).limit(1).maybeSingle();
     if (!rec) return { code: null, link: null };
-    for (let i = 0; i < 5; i++) {
-      const code = makeCode((rec as { name: string }).name || email);
-      const { error } = await supabaseAdmin.from("ambassadors" as never).insert({ name: (rec as { name: string }).name, email, code, source: "student" } as never);
-      if (!error) return { code, link: `https://bootcamp.npdacademy.com/?ref=${code}` };
-      if (!error.message.includes("duplicate")) throw new Error(error.message);
-    }
-    throw new Error("Could not create your referral code. Please try again.");
+    const { ensureAmbassador } = await import("./email-log.server");
+    const code = await ensureAmbassador(email, (rec as { name: string }).name || email);
+    if (!code) throw new Error("Could not create your referral code. Please try again.");
+    return { code, link: `https://bootcamp.npdacademy.com/?ref=${code}` };
   });
 
 // ---- Cohorts ----
