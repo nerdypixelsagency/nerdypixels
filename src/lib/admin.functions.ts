@@ -36,7 +36,7 @@ export const getEnrolments = createServerFn({ method: "GET" })
 
 export const updateEnrolmentStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), status: z.enum(["pending", "paid", "failed", "refunded", "registered"]) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), status: z.enum(["pending", "paid", "failed", "refunded", "registered", "existing"]) }).parse(d))
   .handler(async ({ data, context }) => {
     if (!(await roleOf(context))) throw new Error("Forbidden");
     const { error } = await context.supabase

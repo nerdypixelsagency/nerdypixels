@@ -43,7 +43,7 @@ async function leadsWithStatus(mode: string) {
   const st = new Map<string, string>();
   for (const e of enr ?? []) {
     const k = e.email.toLowerCase();
-    if (e.status === "paid") st.set(k, "paid");
+    if (e.status === "paid" || e.status === "existing") st.set(k, "paid");
     else if (!st.has(k)) st.set(k, "checkout_started");
   }
   return (leads ?? []).map((l) => ({ ...l, pay_status: st.get(l.email.toLowerCase()) ?? "not_paid" }));

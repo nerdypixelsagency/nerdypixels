@@ -1,0 +1,1 @@
+ALTER TABLE public.email_log ADD COLUMN provider_id text, ADD COLUMN delivery_status text;

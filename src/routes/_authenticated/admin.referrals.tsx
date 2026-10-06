@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useMemo, useState } from "react";
 import { getEnrolments } from "@/lib/admin.functions";
-import { listAmbassadors, saveAmbassador } from "@/lib/referrals.functions";
+import { ambassadorEmailStatus, emailAmbassadors, listAmbassadors, saveAmbassador } from "@/lib/referrals.functions";
 import { download, enrolmentsQuery, naira, toCsv } from "@/components/admin/data";
 import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
@@ -26,6 +26,22 @@ function Referrals() {
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState("");
   const [search, setSearch] = useState("");
+  const mailFn = useServerFn(emailAmbassadors);
+  const statusFn = useServerFn(ambassadorEmailStatus);
+  const { data: mail = {}, refetch: refetchMail } = useQuery({ queryKey: ["amb-mail"], queryFn: () => statusFn({ data: { refresh: false } }) });
+  const [sending, setSending] = useState("");
+  async function emailOne(id?: string) {
+    if (!id && !confirm("Send every active ambassador their code and link email now?")) return;
+    setSending(id ?? "all"); setMsg("");
+    try { const r = await mailFn({ data: { id } }); setMsg(`Sent ${r.sent} of ${r.total}.${r.failed.length ? ` Failed: ${r.failed.join(", ")}` : ""}`); refetchMail(); }
+    catch (e) { setMsg((e as Error).message); }
+    setSending("");
+  }
+  async function refreshStatus() {
+    setSending("refresh");
+    try { await statusFn({ data: { refresh: true } }); await refetchMail(); setMsg("Delivery status updated."); } catch (e) { setMsg((e as Error).message); }
+    setSending("");
+  }
 
   const groups = useMemo(() => {
     const m: Record<string, { code: string; rows: NonNullable<typeof data>["rows"]; paid: number; revenue: number; students: Set<string> }> = {};
@@ -63,7 +79,10 @@ function Referrals() {
   return (
     <>
       <div className="adm-head"><h1>Referrals</h1>
-        <button className="adm-btn" onClick={() => { setEdit(null); setShowForm(!showForm); }}>{showForm ? "Close" : "Add ambassador"}</button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button className="adm-btn ghost" disabled={!!sending} onClick={refreshStatus}>{sending === "refresh" ? "Checking…" : "Refresh delivery status"}</button>
+        <button className="adm-btn green" disabled={!!sending} onClick={() => emailOne()}>{sending === "all" ? "Sending… keep page open" : "Email all ambassadors"}</button>
+        <button className="adm-btn" onClick={() => { setEdit(null); setShowForm(!showForm); }}>{showForm ? "Close" : "Add ambassador"}</button></div>
       </div>
       {msg && <div className="adm-card" style={{ marginBottom: 16, fontSize: 14 }} role="status">{msg}</div>}
       {showForm && (
@@ -78,17 +97,18 @@ function Referrals() {
       <FilterToolbar search={search} onSearch={setSearch} placeholder="Search ambassador name, email, or code" active={!!search} onReset={() => setSearch("")} />
       <div className="adm-card" style={{ marginBottom: 16 }}>
         <h2 style={{ fontSize: 16, marginTop: 0 }}>Ambassadors</h2>
-        <p style={{ margin: "0 0 12px", color: "#6b6280", fontSize: 13 }}>Everyone with a referral code. Shareable link: <b>bootcamp.npdacademy.com/?ref=CODE</b> — the code is remembered and pre-filled at checkout.</p>
+        <p style={{ margin: "0 0 12px", color: "#6b6280", fontSize: 13 }}>Ambassadors are students who refer other students. New ambassadors are emailed their code automatically. Shareable link: <b>bootcamp.npdacademy.com/?ref=CODE</b> — the code is remembered and pre-filled at checkout.</p>
         {ambLoading ? <p className="adm-empty">Loading…</p> : ambassadors.length === 0 ? <p className="adm-empty">No ambassadors yet</p> : (
           <div className="adm-scroll"><table className="adm-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Link</th><th>Source</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Link</th><th>Source</th><th>Status</th><th>Code email</th><th></th></tr></thead>
             <tbody>{(ambassadors as Ambassador[]).filter((a) => !search || [a.name,a.email,a.code].some((v) => v?.toLowerCase().includes(search.toLowerCase()))).map((a) => (
               <tr key={a.id}>
                 <td><b>{a.name}</b></td><td>{a.email ?? "—"}</td><td><b>{a.code}</b></td>
                 <td><button className="adm-btn ghost" style={{ padding: "4px 10px" }} onClick={() => copy(a.code)}>{copied === a.code ? "Copied!" : "Copy link"}</button></td>
                 <td>{a.source === "student" ? "Student" : "Imported"}</td>
                 <td><span className={`adm-pill ${a.active ? "paid" : "failed"}`}>{a.active ? "Active" : "Off"}</span></td>
-                <td className="num"><button className="adm-btn ghost" style={{ padding: "4px 10px" }} onClick={() => { setEdit(a); setShowForm(true); }}>Edit</button></td>
+                <td>{(() => { const m = a.email ? (mail as Record<string, { status: string; at: string }>)[a.email.toLowerCase()] : undefined; return m ? <span className={`adm-pill ${["delivered","opened","clicked"].includes(m.status) ? "paid" : ["bounced","failed","complained"].includes(m.status) ? "failed" : "pending"}`} title={new Date(m.at).toLocaleString("en-GB")}>{m.status}</span> : <span style={{ color: "#6b6280" }}>Not sent</span>; })()}</td>
+                <td className="num" style={{ whiteSpace: "nowrap" }}><button className="adm-btn ghost" style={{ padding: "4px 10px" }} disabled={!!sending || !a.email} onClick={() => emailOne(a.id)}>{sending === a.id ? "Sending…" : "Resend"}</button>{" "}<button className="adm-btn ghost" style={{ padding: "4px 10px" }} onClick={() => { setEdit(a); setShowForm(true); }}>Edit</button></td>
               </tr>
             ))}</tbody>
           </table></div>

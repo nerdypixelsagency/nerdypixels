@@ -41,7 +41,7 @@ export type SendOpts = { type: string; relatedId?: string | null | undefined; se
 
 /** Sends and logs. Returns {ok, error}. Never throws. */
 export async function sendLogged(to: string, subject: string, html: string, o: SendOpts) {
-  let status = "sent", error: string | null = null;
+  let status = "sent", error: string | null = null, providerId: string | null = null;
   try {
     const key = process.env["RESEND_API_KEY"];
     if (!key) throw new Error("RESEND_API_KEY is not configured");
@@ -56,6 +56,7 @@ export async function sendLogged(to: string, subject: string, html: string, o: S
       await new Promise((r) => setTimeout(r, 1200));
     }
     if (!res!.ok) throw new Error(`Resend [${res!.status}]: ${(await res!.text()).slice(0, 300)}`);
+    providerId = ((await res!.json().catch(() => ({}))) as { id?: string }).id ?? null;
   } catch (e) {
     status = "failed"; error = (e as Error).message;
     console.error("email send failed", to, error);
@@ -64,12 +65,66 @@ export async function sendLogged(to: string, subject: string, html: string, o: S
     await (await db()).from("email_log" as never).insert({
       to_email: to.toLowerCase(), subject, html, type: o.type, related_id: o.relatedId ?? null,
       status, error, mode: o.mode ?? (await currentMode()), sent_by: o.sentBy ?? null,
+      provider_id: providerId, delivery_status: status === "sent" ? "sent" : "failed",
     } as never);
   } catch (e) { console.error("email_log insert failed", e); }
   return { ok: status === "sent", error };
 }
 
 export const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Ask Resend for the latest delivery event of logged emails. */
+export async function refreshDelivery(ids?: string[]) {
+  const key = process.env["RESEND_API_KEY"];
+  if (!key) return 0;
+  const d = await db();
+  let q = d.from("email_log" as never).select("id, provider_id").not("provider_id", "is", null).order("created_at", { ascending: false }).limit(200);
+  if (ids?.length) q = q.in("id", ids);
+  const { data } = await q;
+  let n = 0;
+  for (const r of (data ?? []) as { id: string; provider_id: string }[]) {
+    const res = await fetch(`https://api.resend.com/emails/${r.provider_id}`, { headers: { Authorization: `Bearer ${key}` } });
+    if (res.ok) {
+      const ev = ((await res.json()) as { last_event?: string }).last_event;
+      if (ev) { await d.from("email_log" as never).update({ delivery_status: ev } as never).eq("id", r.id); n++; }
+    }
+    await pause(520);
+  }
+  return n;
+}
+
+/** Sends the code/link email to one ambassador. */
+export async function sendAmbassadorEmail(a: { id?: string | undefined; name: string; email: string | null; code: string }, sentBy?: string | null) {
+  if (!a.email) return { ok: false, error: "No email" };
+  const m = ambassadorEmail(a.name, a.code, await commissionRates());
+  return sendLogged(a.email, m.subject, m.html, { type: "ambassador", relatedId: a.id ?? a.code, sentBy, mode: "live" });
+}
+
+/** Ambassadors are students: give an ambassador a student record if they have none. */
+export async function ensureStudentRecord(email: string, name: string) {
+  const d = await db();
+  const e = email.toLowerCase();
+  const { data: ex } = await d.from("enrolments").select("id").eq("email", e).neq("kind", "event").limit(1);
+  if (ex?.length) return;
+  const { data: c } = await d.from("cohorts").select("id").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
+  await d.from("enrolments").insert({ kind: "enrolment", name, email: e, amount: 0, status: "existing", source_type: "imported", mode: "live", cohort_id: c?.id ?? null, notes: "Existing student (ambassador)" });
+}
+
+/** Students become ambassadors: create a code if missing, email it on creation. */
+export async function ensureAmbassador(email: string, name: string) {
+  const d = await db();
+  const e = email.toLowerCase();
+  const { data: ex } = await d.from("ambassadors").select("code").eq("email", e).maybeSingle();
+  if (ex) return ex.code;
+  for (let i = 0; i < 5; i++) {
+    const base = name.replace(/[^a-zA-Z]/g, "").slice(0, 6).toUpperCase() || "NPA";
+    const code = `${base}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+    const { data: row, error } = await d.from("ambassadors").insert({ name, email: e, code, source: "student" }).select("id").maybeSingle();
+    if (!error) { await sendAmbassadorEmail({ id: row?.id, name, email: e, code }); return code; }
+    if (!error.message.includes("duplicate")) throw new Error(error.message);
+  }
+  return null;
+}
 
 export function formConfirmation(first: string, what: string) {
   return {
