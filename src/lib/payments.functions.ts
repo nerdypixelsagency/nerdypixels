@@ -89,14 +89,18 @@ export const registerEvent = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("enrolments").insert({
-      kind: "event",
-      name: data.name,
-      email: data.email.toLowerCase(),
-      phone: data.phone ?? null,
-      amount: 0,
-      status: "registered",
-    });
+    const email = data.email.toLowerCase();
+    const since = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+    const { data: recent } = await supabaseAdmin.from("enrolments").select("id").eq("email", email).eq("kind", "event").gte("created_at", since).limit(1);
+    if (recent?.length) return { ok: true };
+    const { data: m } = await supabaseAdmin.from("app_settings").select("value").eq("key", "payment_mode").maybeSingle();
+    const mode = m?.value === "test" ? "test" : "live";
+    await supabaseAdmin.from("enrolments").insert({ kind: "event", name: data.name, email, phone: data.phone ?? null, amount: 0, status: "registered", mode });
+    const [first, ...rest] = data.name.trim().split(/\s+/);
+    await supabaseAdmin.from("leads").insert({ first_name: first || data.name, last_name: rest.join(" ") || "-", email, phone: data.phone || "-", category: "free_event", source: "Free event", mode } as never);
+    const { formConfirmation, sendLogged } = await import("./email-log.server");
+    const c = formConfirmation(first || "there", "free event registration");
+    await sendLogged(email, c.subject, c.html, { type: "form_confirmation", mode });
     return { ok: true };
   });
 
@@ -122,10 +126,14 @@ export const submitLead = createServerFn({ method: "POST" })
     const { data: recent } = await supabaseAdmin.from("leads" as never).select("id").eq("email", email).gte("created_at", since).limit(1);
     if (recent && (recent as unknown[]).length) return { ok: true };
     const { data: m } = await supabaseAdmin.from("app_settings").select("value").eq("key", "payment_mode").maybeSingle();
-    const { error } = await supabaseAdmin.from("leads" as never).insert({
+    const mode = m?.value === "test" ? "test" : "live";
+    const { data: ins, error } = await supabaseAdmin.from("leads" as never).insert({
       first_name: data.firstName, last_name: data.lastName, email, phone: data.phone,
-      country: data.country || null, source: data.source || null, mode: m?.value === "test" ? "test" : "live",
-    } as never);
+      country: data.country || null, source: data.source || null, mode, category: "hero_lead",
+    } as never).select("id").maybeSingle();
     if (error) { console.error("lead insert", error); throw new Error("Could not save your details."); }
+    const { formConfirmation, sendLogged } = await import("./email-log.server");
+    const c = formConfirmation(data.firstName, "details");
+    await sendLogged(email, c.subject, c.html, { type: "form_confirmation", relatedId: (ins as { id?: string } | null)?.id, mode });
     return { ok: true };
   });

@@ -128,15 +128,9 @@ ${isInst ? "" : `<p><b>Your next steps</b></p><ol>
 <li>Attend orientation. We'll share the link in the WhatsApp group.</li></ol>`}
 <p>Questions? Reply to this email or write to info@hello.npdacademy.com.</p>
 <p style="color:#574E68">Nerdy Pixels Academy</p></div></div>`;
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: EMAIL_FROM, to: [row.email], subject, html }),
-  });
-  if (!res.ok) {
-    console.error("Resend failed", res.status, await res.text());
-    return;
-  }
+  const { sendLogged } = await import("./email-log.server");
+  const r = await sendLogged(row.email, subject, html, { type: isInst ? "payment_receipt" : "payment_welcome", relatedId: row.id });
+  if (!r.ok) return;
   const db = await admin();
   await db.from("enrolments").update({ email_sent_at: new Date().toISOString() }).eq("id", row.id);
 }
