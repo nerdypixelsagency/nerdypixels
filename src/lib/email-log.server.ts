@@ -37,7 +37,7 @@ export async function currentMode() {
   return data?.value === "test" ? "test" : "live";
 }
 
-export type SendOpts = { type: string; relatedId?: string | null; sentBy?: string | null; mode?: string };
+export type SendOpts = { type: string; relatedId?: string | null | undefined; sentBy?: string | null | undefined; mode?: string | undefined };
 
 /** Sends and logs. Returns {ok, error}. Never throws. */
 export async function sendLogged(to: string, subject: string, html: string, o: SendOpts) {
