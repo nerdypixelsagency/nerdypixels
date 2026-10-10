@@ -1,0 +1,116 @@
+// The student area. Its own module so the public-site stylesheets load only on /student,
+// not in the shared bundle (which would leak them into the admin).
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { getMyStudentRecords, requestStudentLink } from "@/lib/student.functions";
+import { myReferralCode } from "@/lib/referrals.functions";
+import "@/site/site.css";
+import "@/site/brand.css";
+import "@/site/premium.css";
+
+const naira = (n: number) => "₦" + n.toLocaleString("en-NG");
+
+export function Student() {
+  const [session, setSession] = useState<boolean | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(!!data.session));
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(!!s));
+    return () => data.subscription.unsubscribe();
+  }, []);
+  return (
+    <div style={{ minHeight: "100vh", background: "var(--canvas)" }}>
+      <header className="top"><div className="wrap nav"><a className="logo" href="/"><img src="/brand/logo-dark.png" alt="Nerdy Pixels Academy" width={64} height={42} style={{ height: 42, width: "auto" }} /></a><a className="btn ghost sm" href="/">Back to site</a></div></header>
+      <main id="main" className="section"><div className="wrap" style={{ maxWidth: 760 }}>
+        {session === null ? <p className="muted">Loading…</p> : session ? <Dashboard /> : <SignIn />}
+      </div></main>
+    </div>
+  );
+}
+
+function SignIn() {
+  const fn = useServerFn(requestStudentLink);
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<"idle" | "busy" | "sent">("idle");
+  const [err, setErr] = useState("");
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setErr("");
+    if (!/^\S+@\S+\.\S+$/.test(email)) return setErr("Enter the email you used when you enrolled.");
+    setState("busy");
+    const r = await fn({ data: { email } }).catch(() => ({ ok: false, error: "Something went wrong. Please try again." }));
+    if (!r.ok) { setErr(("error" in r && r.error) || "Please try again."); setState("idle"); return; }
+    setState("sent");
+  }
+  return (
+    <div className="card stack" style={{ gap: 18, padding: 32 }}>
+      <h1 style={{ fontSize: "clamp(28px,5vw,40px)" }}>Student area</h1>
+      {state === "sent" ? (
+        <p className="lead">If <b>{email}</b> is enrolled, a sign-in link is on its way from info@hello.npdacademy.com. Open it on this device.</p>
+      ) : (
+        <form className="stack" style={{ gap: 14 }} onSubmit={submit} noValidate>
+          <p className="muted">Enter the email you used at checkout. We'll email you a one-time sign-in link, no password needed.</p>
+          <label className="f">Email address<input type="email" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required /></label>
+          {err && <p className="err" role="alert">{err}</p>}
+          <button className="btn green" type="submit" disabled={state === "busy"}>{state === "busy" ? "Sending…" : "Email me a sign-in link"}</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+function ReferralCard() {
+  const fn = useServerFn(myReferralCode);
+  const { data } = useQuery({ queryKey: ["my-ref"], queryFn: () => fn(), retry: 1 });
+  const [copied, setCopied] = useState(false);
+  if (!data?.link) return null;
+  return (
+    <div className="card stack" style={{ gap: 10 }}>
+      <h2 style={{ fontSize: 20, margin: 0 }}>Your referral link</h2>
+      <p className="muted" style={{ margin: 0 }}>Share this link with friends. When someone enrolls through it, you earn a commission on every confirmed payment.</p>
+      <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+        <code style={{ background: "var(--canvas, #f5f2fb)", padding: "10px 14px", borderRadius: 10, fontSize: 14, wordBreak: "break-all" }}>{data.link}</code>
+        <button className="btn ghost sm" type="button" onClick={() => { navigator.clipboard?.writeText(data.link!).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }).catch(() => {}); }}>{copied ? "Copied!" : "Copy link"}</button>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard() {
+  const fn = useServerFn(getMyStudentRecords);
+  const { data, isLoading, error } = useQuery({ queryKey: ["student"], queryFn: () => fn(), retry: 1 });
+  if (isLoading) return <p className="muted">Loading your payments…</p>;
+  if (error || !data) return <div className="card stack" style={{ gap: 12 }}><p className="err">{(error as Error)?.message ?? "Could not load your records."}</p><button className="btn ghost" onClick={() => supabase.auth.signOut()}>Sign out</button></div>;
+  const rows = data.rows as Array<{ id: string; kind: string; plan: string | null; instalment_month: string | null; amount: number; status: string; paid_at: string | null; created_at: string; tx_ref: string | null; currency?: string | null; charge_amount?: number | null }>;
+  return (
+    <div className="stack" style={{ gap: 20 }}>
+      <div className="row" style={{ justifyContent: "space-between" }}>
+        <h1 style={{ fontSize: "clamp(28px,5vw,40px)" }}>Hi {data.name.split(" ")[0] || "there"}</h1>
+        <button className="btn ghost sm" onClick={() => supabase.auth.signOut()}>Sign out</button>
+      </div>
+      {data.next ? (
+        <div className="band"><div className="stack" style={{ gap: 6 }}><h2 style={{ fontSize: 24 }}>{data.next.label}: {naira(data.next.amount)}</h2>{data.next.dueText && <p className="muted">Due {data.next.dueText}.</p>}</div>
+          <a className="btn green" href={`/pay-instalment?item=${encodeURIComponent(data.next.key)}`}>Pay now</a></div>
+      ) : (
+        <div className="card"><b>You're all paid up.</b> {data.startDate && <span className="muted">Classes start {data.startDate}.</span>}</div>
+      )}
+      {data.schedule.length > 1 && (
+        <div className="card"><h2 style={{ fontSize: 20, marginBottom: 12 }}>Your payment plan</h2>
+          <div className="tw"><table className="table"><tbody>
+            {data.schedule.map((i) => <tr key={i.key}><td>{i.label}</td><td>{naira(i.amount)}</td><td className="small muted">{i.dueText || "At enrolment"}</td><td><span className={`pill ${i.paid ? "green" : ""}`}>{i.paid ? "paid" : "to pay"}</span></td></tr>)}
+          </tbody></table></div>
+        </div>
+      )}
+      <ReferralCard />
+      <div className="card"><h2 style={{ fontSize: 20, marginBottom: 12 }}>Payment history</h2>
+        {rows.length === 0 ? <p className="muted">No payments yet.</p> : (
+          <div className="tw"><table className="table"><thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th><th>Receipt ref</th></tr></thead><tbody>
+            {rows.map((r) => <tr key={r.id}><td>{new Date(r.paid_at ?? r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
+              <td>{r.kind === "instalment" ? (r.instalment_month === "Balance" ? "Bootcamp balance" : `${r.instalment_month} instalment`) : r.kind === "event" ? "Free class" : r.plan === "early" ? "Bootcamp, early bird" : r.plan?.startsWith("deposit") ? "Seat deposit" : "Bootcamp, first month"}</td>
+              <td>{r.currency && r.currency !== "NGN" && r.charge_amount ? `${r.currency} ${Number(r.charge_amount).toLocaleString("en-US")}` : r.amount ? naira(r.amount) : "—"}</td><td><span className={`pill ${r.status === "paid" ? "green" : ""}`}>{r.status}</span></td><td className="small muted">{r.tx_ref}</td></tr>)}
+          </tbody></table></div>
+        )}
+      </div>
+    </div>
+  );
+}

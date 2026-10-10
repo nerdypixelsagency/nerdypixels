@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import "@/components/admin/admin.css";
+import { PasswordInput } from "@/components/admin/PasswordInput";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -42,18 +43,22 @@ function ResetPage() {
 
   return (
     <div className="adm-auth">
+      <div className="adm-auth-bg" aria-hidden="true"><img src="/brand/photos/hero-neon-1920.webp" srcSet="/brand/photos/hero-neon-960.webp 960w, /brand/photos/hero-neon-1920.webp 1920w" sizes="100vw" alt="" /></div>
+      <div className="adm-auth-wrap">
+      <div className="adm-auth-intro"><span className="adm-auth-kicker">Nerdy Pixels Academy</span><h2>Run the academy from one place.</h2><p>Enrollments, payments, emails, referrals and the website, all in your admin.</p></div>
       <form onSubmit={submit}>
         <h1 style={{ fontSize: 22, margin: 0 }}>Set a new password</h1>
         {!ready ? (
           <p>Open this page from the reset link in your email. If the link expired, request a new one from the sign-in page.</p>
         ) : (
           <>
-            <label>New password<input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" /></label>
+            <label>New password<PasswordInput required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" /></label>
             {err && <p className="err">{err}</p>}
             <button className="adm-btn" style={{ padding: 12 }} disabled={busy}>{busy ? "Saving…" : "Save password"}</button>
           </>
         )}
       </form>
+      </div>
     </div>
   );
 }

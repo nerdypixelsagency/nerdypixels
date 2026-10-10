@@ -3,8 +3,9 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { requestPasswordReset, requestSignup } from "@/lib/auth-actions.functions";
-const logoDark = { url: "/brand/logo-dark.png" };
+const logoDark = { url: "/brand/logo-dark.webp" };
 import "@/components/admin/admin.css";
+import { PasswordInput } from "@/components/admin/PasswordInput";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -77,11 +78,14 @@ function AuthPage() {
 
   return (
     <div className="adm-auth">
+      <div className="adm-auth-bg" aria-hidden="true"><img src="/brand/photos/hero-neon-1920.webp" srcSet="/brand/photos/hero-neon-960.webp 960w, /brand/photos/hero-neon-1920.webp 1920w" sizes="100vw" alt="" /></div>
+      <div className="adm-auth-wrap">
+      <div className="adm-auth-intro"><span className="adm-auth-kicker">Nerdy Pixels Academy</span><h2>Run the academy from one place.</h2><p>Enrollments, payments, emails, referrals and the website, all in your admin.</p></div>
       <form onSubmit={submit}>
         <img src={logoDark.url} alt="Nerdy Pixels Academy" style={{ height: 44, width: "auto", alignSelf: "flex-start" }} />
         <h1 style={{ fontSize: 22, margin: "6px 0 0" }}>{mode === "in" ? "Admin sign in" : "Create admin account"}</h1>
         <label>Email<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
-        <label>Password<input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "in" ? "current-password" : "new-password"} /></label>
+        <label>Password<PasswordInput required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === "in" ? "current-password" : "new-password"} /></label>
         {err && <p className="err">{err}</p>}
         {ok && <p className="ok">{ok}</p>}
         <button className="adm-btn" style={{ padding: 12 }} disabled={busy}>{busy ? "Please wait…" : mode === "in" ? "Sign in" : "Create account"}</button>
@@ -94,6 +98,7 @@ function AuthPage() {
           </button>
         )}
       </form>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard } from "lucide-react";
+import { Menu, X, LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard } from "lucide-react";
 import { can, type Access } from "@/lib/access";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn } from "@/lib/admin.functions";
@@ -43,6 +44,8 @@ function AdminLayout() {
   const { data: modeData } = useQuery({ queryKey: ["pay-mode"], queryFn: () => modeFn(), enabled: !!data?.role });
   const mode = modeData?.mode ?? "live";
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => { document.body.style.overflow = menuOpen ? "hidden" : ""; const k = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); }; addEventListener("keydown", k); return () => { removeEventListener("keydown", k); document.body.style.overflow = ""; }; }, [menuOpen]);
 
   async function signOut() {
     await qc.cancelQueries();
@@ -79,7 +82,7 @@ function AdminLayout() {
   const access = data as Access;
   const nav = ([
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true, perm: "dashboard" },
-    { to: "/admin/enrolments", label: "Enrolments", icon: Users, perm: "enrolments" },
+    { to: "/admin/enrolments", label: "Enrollments", icon: Users, perm: "enrolments" },
     { to: "/admin/leads", label: "Leads", icon: Inbox, perm: "leads" },
     { to: "/admin/emails", label: "Emails", icon: Mail, perm: "emails" },
     { to: "/admin/referrals", label: "Referrals", icon: Ticket, perm: "referrals" },
@@ -95,26 +98,35 @@ function AdminLayout() {
   ] as const).filter((n) => can(access, n.perm) || (n.perm === "settings" && access.role === "admin") || (n.perm === "media" && can(access, "content")));
 
   return (
-    <div className="adm">
-      <aside className="adm-side">
-        <img src={logoDark.url} alt="Nerdy Pixels Academy" />
+    <div className={`adm${menuOpen ? " menu-open" : ""}`}>
+      <aside className="adm-side" id="adm-menu" aria-label="Admin menu">
+        <div className="adm-side-head">
+          <img src={logoDark.url} alt="Nerdy Pixels Academy" />
+          <button type="button" className="adm-menu-close" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={20} /></button>
+        </div>
         <div className="lbl">Pages</div>
-        {nav.map((n) => (
-          <Link key={n.to} to={n.to} className="nav" activeProps={{ className: "nav active" }} activeOptions={{ exact: "exact" in n }}>
-            <n.icon size={16} /> {n.label}
-          </Link>
-        ))}
+        <nav className="adm-nav">
+          {nav.map((n) => (
+            <Link key={n.to} to={n.to} className="nav" activeProps={{ className: "nav active" }} activeOptions={{ exact: "exact" in n }} onClick={() => setMenuOpen(false)}>
+              <n.icon size={16} /> <span>{n.label}</span>
+            </Link>
+          ))}
+        </nav>
         <div className="foot">
           {user.email}
           <br />
           <a href="/" style={{ color: "#6420c9" }}>View site</a>
         </div>
       </aside>
+      <div className="adm-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true" />
       <main className="adm-main">
         <div className="adm-top">
+          <button type="button" className="adm-menu-btn" onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen} aria-controls="adm-menu"><Menu size={20} /></button>
+          <img className="adm-top-logo" src={logoDark.url} alt="Nerdy Pixels Academy" />
+          <span className="adm-top-spacer" />
           <span className={`adm-chip ${mode === "test" ? "pending" : ""}`}>Payments: {mode === "test" ? "TEST" : "LIVE"}</span>
           <span className="adm-chip">{data.role === "super_admin" ? "Super admin" : access.permissions ? "Limited access" : "Admin"}</span>
-          <button className="adm-btn ghost" onClick={signOut}><LogOut size={14} style={{ verticalAlign: -2 }} /> Sign out</button>
+          <button className="adm-btn ghost adm-signout" onClick={signOut} aria-label="Sign out"><LogOut size={14} style={{ verticalAlign: -2 }} /> <span>Sign out</span></button>
         </div>
         {mode === "test" && <div className="adm-card" style={{ background: "#fff4d6", marginBottom: 16, fontSize: 14 }}>Test mode is on. Checkout uses Flutterwave test keys and only test records are shown.</div>}
         <Outlet />
