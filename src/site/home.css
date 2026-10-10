@@ -336,3 +336,30 @@ main.home .hero h1,.hero h1{font-size:clamp(40px,5.4vw,80px);font-weight:800;let
 .seats-left{display:flex;align-items:center;gap:8px;margin:0;font-size:14px;color:var(--muted);font-weight:500}
 .seats-left b{color:var(--ink);font-size:16px}
 .seats-left .livedot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(37,211,102,.6);animation:npa-pulse 2s infinite;flex:none}
+
+/* ---------- Instructors: portrait cards; grid on desktop, swipe rail on phones ---------- */
+.ins-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,1.6vw,22px)}
+.ins-card{position:relative;border-radius:24px;overflow:hidden;background:var(--deep);isolation:isolate;box-shadow:0 24px 48px -32px rgba(46,11,99,.6);transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.ins-photo{aspect-ratio:4/5;overflow:hidden;background:linear-gradient(150deg,var(--deep-2),var(--deeper))}
+.ins-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .8s var(--ease)}
+.ins-initials{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:800;color:#fff;letter-spacing:.02em}
+.ins-card::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,transparent 45%,rgba(20,5,46,.55) 68%,rgba(20,5,46,.94) 100%)}
+.ins-info{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:18px 18px 18px;color:#fff;display:grid;gap:4px}
+.ins-info h3{color:#fff;font-size:clamp(17px,1.4vw,20px);font-weight:700;letter-spacing:-.01em}
+.ins-info p{margin:0;font-size:13.5px;line-height:1.4;color:#e8defb}
+.ins-org{color:#c9a8ff;font-weight:600}
+.ins-li{justify-self:start;margin-top:8px;display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);transition:background .2s,transform .2s}
+.ins-li:hover{background:#0a66c2;border-color:#0a66c2}
+.ins-li:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.ins-card:hover{transform:translateY(-6px);box-shadow:0 34px 60px -30px rgba(46,11,99,.75)}
+.ins-card:hover .ins-photo img{transform:scale(1.06)}
+.ins-hint{display:none}
+@media (max-width:1100px){.ins-rail{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){
+  /* Swipe rail: cards snap into place and the next one peeks in */
+  .ins-rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 calc(-1 * clamp(16px,4vw,32px));padding:4px clamp(16px,4vw,32px) 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  .ins-rail::-webkit-scrollbar{display:none}
+  .ins-card{flex:0 0 76%;scroll-snap-align:center}
+  .ins-hint{display:block;margin:-6px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
+  .ins-card:hover{transform:none}
+}
