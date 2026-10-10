@@ -106,7 +106,7 @@ function Builder() {
         </div>
       </div>
       <div className="cms-mobilebar">
-        {hasUnpublished ? <span className="adm-pill pending">unpublished</span> : <span className="sub" style={{ margin: 0 }}>Up to date</span>}
+        <button className="adm-btn ghost" disabled={busy || !hasUnpublished} onClick={discard}><RotateCcw size={14} style={{ verticalAlign: -2 }} /> Discard</button>
         <button className="adm-btn ghost" disabled={busy || !dirty} onClick={saveDraft}>Save</button>
         <button className="adm-btn green" disabled={busy || !hasUnpublished} onClick={publish}>Publish</button>
       </div>

@@ -331,6 +331,7 @@
   .cms-frame-wrap { height: calc(100dvh - 230px); min-height: 460px; }
   .cms-mobilebar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid #ece6f8; box-shadow: 0 -10px 30px rgba(50,16,99,.08); }
   .cms-mobilebar > :first-child { margin-right: auto; }
+  .cms-mobilebar .adm-btn { padding: 9px 14px; }
   .cms .adm-head > div:last-child { display: none; } /* actions live in the bottom bar */
   .cms-gallery { grid-template-columns: repeat(3, 1fr); }
   .cms-bar { flex-wrap: wrap; }

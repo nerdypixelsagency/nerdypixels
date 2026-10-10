@@ -316,3 +316,9 @@ body.has-sticky .wa-float{bottom:84px}
 .full-note{margin-top:-8px}
 .plan-ctas{display:grid;gap:10px;margin-top:auto}
 .plan-ctas .btn{margin-top:0}
+/* Curriculum module cards: the capstone keeps its dark panel inside tinted sections,
+   and the certification tag stays a small pill instead of stretching across the row. */
+.section.tint .card.module.dark,.card.module.dark{background:linear-gradient(140deg,var(--deep-2),var(--deeper));border-color:transparent;color:var(--on-dark)}
+.card.module.dark h3{color:#fff}
+.card.module.dark p{color:var(--on-dark-2)!important}
+.module .pill{align-self:flex-start;width:auto}
