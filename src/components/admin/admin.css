@@ -336,3 +336,4 @@
   .cms-bar { flex-wrap: wrap; }
 }
 @media (max-width: 980px) { .cms-switch { top: 58px; } }
+@media (max-width: 1100px) { .cms.view-preview { padding-bottom: 76px; } .cms-frame-wrap { height: calc(100dvh - 170px); } }
