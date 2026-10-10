@@ -20,6 +20,7 @@ export const LIVE_TOKENS = ["deposit", "early", "earlyBalance", "monthly", "mont
 const photo = (n: string) => `/brand/photos/${n}-1200.webp`;
 
 export const HOME_DEFAULTS = {
+  offer: { showSeats: true },
   hero: {
     show: true,
     kicker: "Next cohort starts {startDate}",
@@ -175,6 +176,7 @@ const show: Field = { key: "show", label: "Show this section", type: "toggle" };
 const textItem: Field[] = [{ key: "text", label: "Text", type: "text" }];
 
 export const HOME_SCHEMA: Section[] = [
+  { id: "offer", label: "Offer display", help: "Applies across the site: top bar, seat card, stats, checkout and the closing banner. The number of seats is set in Admin > Cohorts.", fields: [{ key: "showSeats", label: "Show how many early-bird seats are left (e.g. \"39 seats left\"). Off shows \"Limited seats\".", type: "toggle" }] },
   { id: "hero", label: "Hero", fields: [show, { key: "kicker", label: "Line above the headline", type: "text" }, { key: "title", label: "Headline", type: "text" }, { key: "accent", label: "Headline, highlighted part", type: "text" }, { key: "lead", label: "Intro paragraph", type: "textarea" }, { key: "secondary", label: "Free class link text", type: "text" }, { key: "trust", label: "Reassurance points", type: "list", itemLabel: "Point", item: textItem }, { key: "image", label: "Background photo", type: "image", help: "Shown faintly behind the hero with a slow zoom." }] },
   { id: "logos", label: "Alumni logos", help: "Logos themselves are managed in Media & syllabus.", fields: [show, { key: "label", label: "Label", type: "text" }] },
   { id: "stats", label: "Statistics", help: "Choose a live number, or type your own value.", fields: [show, { key: "items", label: "Stats", type: "list", itemLabel: "Stat", item: [{ key: "live", label: "Number", type: "select", options: [["", "Typed value"], ["seats_left", "Live: early-bird seats left"], ["days_to_start", "Live: days until classes start"], ["seat_limit", "Live: early-bird seats in total"]] }, { key: "value", label: "Value (when typed)", type: "text" }, { key: "label", label: "Label", type: "text" }] }] },

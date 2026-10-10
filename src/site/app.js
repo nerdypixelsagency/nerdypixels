@@ -21,6 +21,9 @@ const HOME = () => mergeHome(CMS_DRAFT || cfg().content);
 const EARLY_END = () => new Date(cfg().earlyBirdDeadline || 0);
 const PRICE_EARLY = () => cfg().earlyBirdPrice, PRICE_MONTH = () => cfg().instalmentAmount;
 const DEP = () => Number(cfg().depositAmount || 0) > 0;
+const SHOW_SEATS = () => HOME().offer?.showSeats !== false;
+/** Seats left, only when the admin chose to show it. Never shows the total. */
+const SEATS_SHOWN = () => (SHOW_SEATS() ? SEATS_LEFT() : null);
 const SEATS_LEFT = () => cfg().seatLimit ? Math.max(0, cfg().seatLimit - (cfg().seatsTaken || 0)) : null;
 const COHORT_START = () => cfg().startDate;
 const shortDate = iso => longDate(iso, true).replace(/ \d{4}$/, "");
@@ -98,9 +101,11 @@ const chargeCode = code => { const c = curRow(code || CUR_CODE); if (c.code === 
 const P$ = key => `<span data-p="${key}">${money(PV()[key])}</span>`;
 function curSelect(){ return `<select class="cur-sel" aria-label="Show prices in">${curList().map(c => `<option value="${c.code}"${c.code===CUR_CODE?" selected":""}>${esc(c.label)} (${esc(c.symbol.trim())})</option>`).join("")}</select>`; }
 /** Live tokens in CMS text, e.g. "{deposit} today". Values are escaped; tokens become live spans. */
+/** Keeps hyphenated words such as "AI-powered" on one line. */
+const nobreak = html => html.replace(/(^|[\s>])([^\s<>]*\w-\w[^\s<>]*)/g, (m, pre, w) => `${pre}<span class="nowrap">${w}</span>`);
 function T(text){
   const map = { deposit:P$("deposit"), early:P$("early"), earlyBalance:P$("earlyBal"), monthly:P$("monthly"), monthlyFirst:P$("monthlyFirst"), monthlyTotal:P$("monthlyTotal"), save:P$("save"),
-    startDate:esc(COHORT_START()), earlyDeadline:esc(EARLY_DATE()), balanceDue:esc(BAL_DATE()), seatsLeft:`<span class="js-seats-left">${SEATS_LEFT() ?? ""}</span>`, seatLimit:esc(cfg().seatLimit ?? ""), freeClassDate:esc(FREE().day) };
+    startDate:esc(COHORT_START()), earlyDeadline:esc(EARLY_DATE()), balanceDue:esc(BAL_DATE()), seatsLeft:`<span class="js-seats-left">${SEATS_SHOWN() ?? ""}</span>`, seatLimit:esc(cfg().seatLimit ?? ""), freeClassDate:esc(FREE().day) };
   return esc(text).replace(/\{(\w+)\}/g, (m, k) => map[k] ?? m);
 }
 function applyCurrency(){
@@ -180,7 +185,7 @@ const FAQS = () => [
  ]],
  ["Paying",[
   ...(DEP() ? [
-   ["What does it cost?",`Reserve your seat with a ${naira(cfg().depositAmount)} deposit. On the early-bird plan (until ${EARLY_DATE()}${cfg().seatLimit?` or when ${cfg().seatLimit} seats are taken`:""}) the bootcamp is ${naira(PRICE_EARLY())} in total: the deposit, then ${naira(PRICE_EARLY()-cfg().depositAmount)} by ${BAL_DATE()}. On the monthly plan it is ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`],
+   ["What does it cost?",`Reserve your seat with a ${naira(cfg().depositAmount)} deposit. On the early-bird plan (until ${EARLY_DATE()}${cfg().seatLimit?" or until seats run out":""}) the bootcamp is ${naira(PRICE_EARLY())} in total: the deposit, then ${naira(PRICE_EARLY()-cfg().depositAmount)} by ${BAL_DATE()}. On the monthly plan it is ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`],
    ["How does the monthly plan work?",`There's no deposit. You pay ${naira(PRICE_MONTH())} by ${startShort()}, then ${naira(PRICE_MONTH())} on 1 December and 1 January: ${naira(PRICE_MONTH()*cfg().instalmentCount)} in total. We email a reminder before each date.`],
    ["Is the deposit refundable?",`Yes. Ask within 7 days of paying, and no later than ${BAL_DATE()}, for a full refund. After that you can move it once to the following cohort.`],
   ] : [
@@ -236,7 +241,7 @@ function header(path){
   const open = earlyOpen(), s = SEATS_LEFT(), cta = CTA();
   const freeHref = path === "/" ? "#free-class" : "/events/first-marketing-strategy";
   const bar = open
-    ? `<div class="bar" role="note"><b>${esc(cfg().offerLabel)}${s !== null ? " seats" : ""}:</b> ${s !== null ? `<span class="js-seats-left">${s}</span> of ${cfg().seatLimit} left · ` : ""}closes ${esc(EARLY_DATE())} <span class="cd" data-countdown="${esc(cfg().earlyBirdDeadline)}" data-label="left" aria-label="Time left"></span><a href="${cta.href}" data-ga-enrol="announcement_bar">${cta.short}</a></div>`
+    ? `<div class="bar" role="note"><b>${esc(cfg().offerLabel)}:</b> ${SEATS_SHOWN() !== null ? `only <span class="js-seats-left">${SEATS_SHOWN()}</span> seats left · ` : "limited seats · "}closes ${esc(EARLY_DATE())} <span class="cd" data-countdown="${esc(cfg().earlyBirdDeadline)}" data-label="left" aria-label="Time left"></span><a href="${cta.href}" data-ga-enrol="announcement_bar">${cta.short}</a></div>`
     : `<div class="bar" role="note"><b>Enrollment for ${esc(cfg().cohortName)} is open:</b> ${DEP() ? `reserve your seat with ${P$("deposit")}` : `${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months`}. <a href="${cta.href}" data-ga-enrol="announcement_bar">${cta.short}</a></div>`;
   return `${SPRITE}<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
 <a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" width="64" height="42"></a>
@@ -303,7 +308,7 @@ ${open?`<span class="pill green" style="align-self:flex-start">${esc(cfg().offer
 <div class="price">${P$("deposit")}<small>today</small></div>
 ${open?`<p class="then">Then <b>${P$("earlyBal")} by ${esc(BAL_DATE())}</b>. That is <b>${P$("early")}</b> for the full bootcamp.</p><div class="save"><strong>Save ${P$("save")}</strong> compared with the monthly plan (${P$("monthlyTotal")})</div>`
       :`<p class="then"><b>${P$("monthly")} by ${esc(shortDate(COHORT_START()) || COHORT_START())}</b>, then ${P$("monthly")} on 1 December and 1 January.</p>`}
-${open && s !== null ? `<div class="seats"><div class="label"><span>${esc(cfg().offerLabel)} seats</span><span><b class="js-seats-left">${s}</b> of ${lim} left</span></div><div class="meter" role="progressbar" aria-label="Early-bird seats left" aria-valuemin="0" aria-valuemax="${lim}" aria-valuenow="${s}"><i style="width:${Math.round(s/lim*100)}%"></i></div></div>` : ""}
+${open ? `<p class="seats-left">${SEATS_SHOWN() !== null ? `<span class="livedot" aria-hidden="true"></span><b class="js-seats-left">${SEATS_SHOWN()}</b> early-bird seats left` : `<span class="livedot" aria-hidden="true"></span>Limited early-bird seats`}</p>` : ""}
 <a class="btn green block" href="${cta.href}" data-ga-enrol="hero">${cta.label}</a>
 ${FULL() ? `<div class="or"><span>or</span></div>${fullBtn("hero", "btn deep block")}<p class="fine full-note">One payment, nothing more to pay later.</p>` : ""}
 <p class="fine">Prices in ${curSelect()} · <a href="/#pricing">See ${open?"the monthly plan":"all plans"}</a></p>
@@ -313,7 +318,7 @@ function plansBlock(){
   const open = earlyOpen(), H = HOME().pricing;
   const eb = cfg().earlyBirdEnabled;
   const early = DEP()
-    ? `<article class="plan${open?" best":" off"}" aria-labelledby="p-early">${open?`<span class="flag">Save ${P$("save")}</span>`:""}<div class="stack" style="gap:6px"><h3 id="p-early">${esc(cfg().offerLabel)}, paid once</h3><p class="muted small">${open?`Closes ${esc(EARLY_DATE())}${cfg().seatLimit?` or when ${cfg().seatLimit} seats are taken`:""}.`:"This offer has closed."}</p></div>
+    ? `<article class="plan${open?" best":" off"}" aria-labelledby="p-early">${open?`<span class="flag">Save ${P$("save")}</span>`:""}<div class="stack" style="gap:6px"><h3 id="p-early">${esc(cfg().offerLabel)}, paid once</h3><p class="muted small">${open?`Closes ${esc(EARLY_DATE())}${cfg().seatLimit?", or sooner if seats run out":""}.`:"This offer has closed."}</p></div>
 <div class="total">${P$("early")}<small>in total</small></div><ul class="sched"><li class="today"><span>Today, to reserve your seat</span><b>${P$("deposit")}</b></li><li><span>By ${esc(BAL_DATE())}</span><b>${P$("earlyBal")}</b></li></ul>
 ${open?`<div class="plan-ctas"><a class="btn green block" href="/checkout?plan=early" data-ga-enrol="pricing_full"><span>Pay ${P$("early")} in full now</span></a><a class="btn block" href="/checkout?plan=deposit-early" data-ga-enrol="pricing"><span>Or reserve with ${P$("deposit")}</span></a></div>`:`<span class="btn ghost block" aria-disabled="true">${esc(cfg().offerLabel)} has closed</span>`}</article>`
     : `<article class="plan${open?" best":" off"}"><div class="stack" style="gap:6px"><h3>${esc(cfg().offerLabel)}, paid once</h3><p class="muted small">${open?`Until ${esc(EARLY_DATE())}.`:"This offer has closed."}</p></div><div class="total">${P$("early")}<small>paid once</small></div>${open?`<a class="btn green block" href="/checkout?plan=early" data-ga-enrol="pricing"><span>Pay ${P$("early")}</span></a>`:`<span class="btn ghost block" aria-disabled="true">Closed</span>`}</article>`;
@@ -380,10 +385,10 @@ function daysToStart(){ const d = Date.parse(String(COHORT_START()).replace(/^[A
 function statsBlock(){
   const items = (HOME().stats.items || []).map(s => {
     let v = s.value;
-    if (s.live === "seats_left") v = earlyOpen() && SEATS_LEFT() !== null ? String(SEATS_LEFT()) : "";
+    if (s.live === "seats_left") v = earlyOpen() && SEATS_SHOWN() !== null ? String(SEATS_SHOWN()) : "";
     if (s.live === "days_to_start") { const d = daysToStart(); v = d ? String(d) : ""; }
     if (s.live === "seat_limit") v = cfg().seatLimit ? String(cfg().seatLimit) : "";
-    v = String(v || "").replace(/\{seatsLeft\}/, SEATS_LEFT() ?? "");
+    v = String(v || "").replace(/\{seatsLeft\}/, SEATS_SHOWN() ?? "");
     return v ? { v, label: s.label, live: s.live } : null;
   }).filter(Boolean);
   if (!items.length) return "";
@@ -403,7 +408,7 @@ P.home = () => { const H = HOME(), open = earlyOpen(), cta = CTA(), f = FREE();
   return { title:"Nerdy Pixels Academy | Digital Marketing Bootcamp", main:"home", html:`
 ${sec("hero", `<section class="hero" aria-labelledby="hero-title">${H.hero.image?`<div class="hero-bg" aria-hidden="true">${pic(H.hero.image, "", { eager:true, sizes:"100vw", w:1920, h:1280 })}</div>`:""}
 <div class="wrap hero-grid"><div class="stack" style="gap:22px"><p class="kicker-line">${T(H.hero.kicker)}</p>
-<h1 id="hero-title">${T(H.hero.title)} <span class="accent">${T(H.hero.accent)}</span></h1>
+<h1 id="hero-title">${nobreak(T(H.hero.title))} <span class="accent">${nobreak(T(H.hero.accent))}</span></h1>
 <p class="lead">${T(H.hero.lead)}</p>
 <div class="row actions" style="gap:18px"><a class="btn green" href="${cta.href}" data-ga-enrol="hero">${cta.label}</a>${f.at && !f.past?`<a class="secondary" href="#free-class" data-ga-free-event>${T(H.hero.secondary)}</a>`:""}</div>
 <ul class="trust" aria-label="Good to know">${(H.hero.trust||[]).filter(t=>t.text && (DEP() || !/\{deposit\}/.test(t.text))).map(t=>`<li>${svg("check")}<span>${T(t.text)}</span></li>`).join("")}</ul></div>
@@ -439,7 +444,7 @@ ${sec("freeClass", f.at && !f.past ? `<section class="section" id="free-class" a
 ${freeClassForm()}</div></div></section>` : "")}
 ${sec("faq", `<section class="section tint" aria-labelledby="faq-title"><div class="wrap stack" style="gap:28px"><h2 id="faq-title">${T(H.faq.title)}</h2><div class="faq">${(H.faq.items||[]).filter(x => DEP() || !/\{(deposit|earlyBalance|balanceDue)\}/.test(x.q + x.a)).map(x=>`<details><summary><span>${T(x.q)}</span></summary><p>${T(x.a)}</p></details>`).join("")}</div></div></section>`)}
 ${sec("final", `<section class="final" aria-labelledby="final-title">${H.final.image?`<div class="final-bg" aria-hidden="true">${pic(H.final.image, "", { sizes:"100vw", w:1920, h:1280 })}</div>`:""}<div class="wrap inner">
-${open?`${SEATS_LEFT()!==null?`<span class="tag"><span class="js-seats-left">${SEATS_LEFT()}</span> of ${cfg().seatLimit} ${esc(cfg().offerLabel.toLowerCase())} seats left</span>`:""}<h2 id="final-title">${esc(cfg().offerLabel)} closes ${esc(EARLY_DATE())}.</h2>
+${open?`${SEATS_SHOWN()!==null?`<span class="tag">Only <span class="js-seats-left">${SEATS_SHOWN()}</span> ${esc(cfg().offerLabel.toLowerCase())} seats left</span>`:`<span class="tag">Limited ${esc(cfg().offerLabel.toLowerCase())} seats</span>`}<h2 id="final-title">${esc(cfg().offerLabel)} closes ${esc(EARLY_DATE())}.</h2>
 <div class="clock" data-clock="${esc(cfg().earlyBirdDeadline)}" aria-label="Time until the offer closes"><div><b data-u="d">00</b><span>days</span></div><div><b data-u="h">00</b><span>hours</span></div><div><b data-u="m">00</b><span>minutes</span></div></div>`
   :`<h2 id="final-title">The next cohort starts ${esc(COHORT_START())}.</h2>`}
 <a class="btn green" href="${cta.href}" data-ga-enrol="section_cta">${cta.label}</a>
@@ -564,7 +569,7 @@ function coRender(){
   const choice = (id, title, price, lines, disabled, note) => `<button type="button" role="radio" aria-checked="${plan===id}" class="choice ${plan===id?"on":""}" data-act="co-plan" data-v="${id}"${disabled?" disabled":""}><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">${title}</b><b style="font-size:20px;color:var(--ink)">${price}</b></span>${lines}${note?`<span class="small" style="font-weight:700;color:var(--green-ink)">${note}</span>`:""}</span></button>`;
   const plans = DEP()
     ? (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid in full now`, m$(v.early), `<span class="small">One payment today. Nothing more to pay later.</span>`, !open, open ? `Save ${m$(v.save)} · best value, one payment` : "Offer has closed") : "")
-      + (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, reserve with a deposit`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_LEFT()!==null?` · ${SEATS_LEFT()} seats left`:""}` : "Offer has closed") : "")
+      + (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, reserve with a deposit`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_SHOWN()!==null?` · ${SEATS_SHOWN()} seats left`:""}` : "Offer has closed") : "")
       + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.monthly)} today (due by ${esc(startShort())}), then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "")
     : (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid once`, m$(v.early), `<span class="small">${esc(cfg().outrightCopy)}</span>`, !open, open ? "Available now" : "Offer has closed") : "")
       + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${esc(cfg().instalmentCopy)} ${m$(v.monthlyTotal)} in total.</span>`, false, "");
@@ -725,7 +730,7 @@ P.terms = () => legal("Terms of enrolment","September 2026",[
 P.payment = () => { const d = cfg().depositAmount, e = PRICE_EARLY(), m = PRICE_MONTH(), n = cfg().instalmentCount; return legal("Payment policy","October 2026",[
  ["Prices", DEP()
    ? [`Seat deposit: ${naira(d)}, paid when you enroll. It counts toward your fee.`,
-      `${cfg().offerLabel}: ${naira(e)} in total (the deposit, then ${naira(e-d)} by ${BAL_DATE()}), available until ${EARLY_DATE()}${cfg().seatLimit?` or until ${cfg().seatLimit} early-bird seats are taken`:""}.`,
+      `${cfg().offerLabel}: ${naira(e)} in total (the deposit, then ${naira(e-d)} by ${BAL_DATE()}), available until ${EARLY_DATE()}${cfg().seatLimit?" or until early-bird seats run out":""}.`,
       `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total, with no deposit. The first ${naira(m)} is due by ${startShort()}, then ${naira(m)} on 1 December and 1 January.`]
    : [`Early bird: ${naira(e)}, paid once, available until ${EARLY_DATE()}.`, `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total.`]],
  ["Paying from outside Nigeria",["You can pay from anywhere in the world. Prices shown in other currencies are fixed by us, not live exchange rates. Where we can't charge your currency directly, you pay by Visa or Mastercard in US dollars, and the exact amount is shown before you confirm. Your bank may charge its own fees."]],

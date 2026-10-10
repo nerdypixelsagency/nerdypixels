@@ -322,3 +322,16 @@ body.has-sticky .wa-float{bottom:84px}
 .card.module.dark h3{color:#fff}
 .card.module.dark p{color:var(--on-dark-2)!important}
 .module .pill{align-self:flex-start;width:auto}
+/* Headline: bigger, bolder, balanced (3 lines on desktop) */
+.nowrap{white-space:nowrap}
+main.home .hero h1,.hero h1{font-size:clamp(40px,5.4vw,80px);font-weight:800;letter-spacing:-.045em;line-height:1;text-wrap:balance;max-width:15ch}
+.kicker-line,.eyebrow{text-wrap:balance}
+@media (max-width:760px){
+  main.home .hero h1,.hero h1{font-size:clamp(38px,11vw,52px);line-height:1.02;max-width:none}
+  .kicker-line{font-size:14px;line-height:1.4;max-width:30ch}
+  .hero .lead{font-size:16.5px}
+}
+/* Seats left (no total shown) */
+.seats-left{display:flex;align-items:center;gap:8px;margin:0;font-size:14px;color:var(--muted);font-weight:500}
+.seats-left b{color:var(--ink);font-size:16px}
+.seats-left .livedot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(37,211,102,.6);animation:npa-pulse 2s infinite;flex:none}
