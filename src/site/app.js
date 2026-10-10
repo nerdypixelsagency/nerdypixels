@@ -15,7 +15,7 @@ export function primeCourseConfig(value){
   COURSE_CONFIG = value || COURSE_CONFIG;
   // Development only: preview the post-migration offer with ?demo=deposit (removed from production builds).
   if (import.meta.env.DEV && COURSE_CONFIG && typeof location !== "undefined" && /[?&]demo=deposit/.test(location.search))
-    COURSE_CONFIG = { ...COURSE_CONFIG, startDate:"Saturday 14 November 2026", earlyBirdDeadline:"2026-10-31T22:59:59Z", depositAmount:10000, balanceDueDate:"2026-11-07", seatLimit:40, seatsTaken:11, freeClassAt:"2026-10-17T10:00:00Z", currencies: FALLBACK_COURSE_CONFIG.currencies, hasSyllabus:true };
+    COURSE_CONFIG = { ...COURSE_CONFIG, startDate:"Saturday 14 November 2026", earlyBirdDeadline:"2026-10-31T22:59:59Z", depositAmount:10000, balanceDueDate:"2026-10-31", seatLimit:40, seatsTaken:1, freeClassAt:"2026-10-17T10:00:00Z", currencies: FALLBACK_COURSE_CONFIG.currencies, hasSyllabus:true };
 }
 const HOME = () => mergeHome(CMS_DRAFT || cfg().content);
 const EARLY_END = () => new Date(cfg().earlyBirdDeadline || 0);
@@ -24,6 +24,7 @@ const DEP = () => Number(cfg().depositAmount || 0) > 0;
 const SEATS_LEFT = () => cfg().seatLimit ? Math.max(0, cfg().seatLimit - (cfg().seatsTaken || 0)) : null;
 const COHORT_START = () => cfg().startDate;
 const shortDate = iso => longDate(iso, true).replace(/ \d{4}$/, "");
+const startShort = () => String(COHORT_START()).replace(/ \d{4}$/, "");
 const EARLY_DATE = () => cfg().earlyBirdDeadline ? shortDate(cfg().earlyBirdDeadline) : "";
 const BAL_DATE = () => cfg().balanceDueDate ? shortDate(cfg().balanceDueDate) : "";
 const FREE = () => {
@@ -180,7 +181,7 @@ const FAQS = () => [
  ["Paying",[
   ...(DEP() ? [
    ["What does it cost?",`Reserve your seat with a ${naira(cfg().depositAmount)} deposit. On the early-bird plan (until ${EARLY_DATE()}${cfg().seatLimit?` or when ${cfg().seatLimit} seats are taken`:""}) the bootcamp is ${naira(PRICE_EARLY())} in total: the deposit, then ${naira(PRICE_EARLY()-cfg().depositAmount)} by ${BAL_DATE()}. On the monthly plan it is ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`],
-   ["How does the monthly plan work?",`You pay the ${naira(cfg().depositAmount)} deposit today and ${naira(PRICE_MONTH()-cfg().depositAmount)} by ${BAL_DATE()}, which completes the first month. The December and January instalments are ${naira(PRICE_MONTH())} each, due on the 1st. We email a reminder before each date.`],
+   ["How does the monthly plan work?",`There's no deposit. You pay ${naira(PRICE_MONTH())} by ${startShort()}, then ${naira(PRICE_MONTH())} on 1 December and 1 January: ${naira(PRICE_MONTH()*cfg().instalmentCount)} in total. We email a reminder before each date.`],
    ["Is the deposit refundable?",`Yes. Ask within 7 days of paying, and no later than ${BAL_DATE()}, for a full refund. After that you can move it once to the following cohort.`],
   ] : [
    ["What does it cost?",`The early-bird price is ${naira(PRICE_EARLY())} paid once, until ${EARLY_DATE()}. After that, the bootcamp is ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`],
@@ -214,7 +215,8 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 /* ---------- Calls to action follow the live offer ---------- */
 function CTA(){
   const open = earlyOpen();
-  if (DEP()) return { href: open ? "/checkout?plan=deposit-early" : "/checkout?plan=deposit-monthly", label: `<span>Reserve my seat for ${P$("deposit")}</span>`, short: "Reserve my seat" };
+  if (DEP() && open) return { href: "/checkout?plan=deposit-early", label: `<span>Reserve my seat for ${P$("deposit")}</span>`, short: "Reserve my seat" };
+  if (DEP()) return { href: "/checkout?plan=monthly", label: `<span>Start the monthly plan for ${P$("monthly")}</span>`, short: "Enroll now" };
   return { href: open ? "/checkout?plan=early" : "/checkout?plan=monthly", label: open ? `Enroll for ${naira(PRICE_EARLY())}` : "Enroll now", short: "Enroll now" };
 }
 /** Paying in full at the early-bird price, offered next to the deposit while early bird is open. */
@@ -300,7 +302,7 @@ function seatCard(){
 ${open?`<span class="pill green" style="align-self:flex-start">${esc(cfg().offerLabel)} · closes ${esc(EARLY_DATE())}</span>`:`<span class="pill" style="align-self:flex-start">Monthly plan</span>`}
 <div class="price">${P$("deposit")}<small>today</small></div>
 ${open?`<p class="then">Then <b>${P$("earlyBal")} by ${esc(BAL_DATE())}</b>. That is <b>${P$("early")}</b> for the full bootcamp.</p><div class="save"><strong>Save ${P$("save")}</strong> compared with the monthly plan (${P$("monthlyTotal")})</div>`
-      :`<p class="then">Then <b>${P$("monthlyFirst")} by ${esc(BAL_DATE())}</b> and ${P$("monthly")} on 1 December and 1 January.</p>`}
+      :`<p class="then"><b>${P$("monthly")} by ${esc(shortDate(COHORT_START()) || COHORT_START())}</b>, then ${P$("monthly")} on 1 December and 1 January.</p>`}
 ${open && s !== null ? `<div class="seats"><div class="label"><span>${esc(cfg().offerLabel)} seats</span><span><b class="js-seats-left">${s}</b> of ${lim} left</span></div><div class="meter" role="progressbar" aria-label="Early-bird seats left" aria-valuemin="0" aria-valuemax="${lim}" aria-valuenow="${s}"><i style="width:${Math.round(s/lim*100)}%"></i></div></div>` : ""}
 <a class="btn green block" href="${cta.href}" data-ga-enrol="hero">${cta.label}</a>
 ${FULL() ? `<div class="or"><span>or</span></div>${fullBtn("hero", "btn deep block")}<p class="fine full-note">One payment, nothing more to pay later.</p>` : ""}
@@ -317,8 +319,8 @@ ${open?`<div class="plan-ctas"><a class="btn green block" href="/checkout?plan=e
     : `<article class="plan${open?" best":" off"}"><div class="stack" style="gap:6px"><h3>${esc(cfg().offerLabel)}, paid once</h3><p class="muted small">${open?`Until ${esc(EARLY_DATE())}.`:"This offer has closed."}</p></div><div class="total">${P$("early")}<small>paid once</small></div>${open?`<a class="btn green block" href="/checkout?plan=early" data-ga-enrol="pricing"><span>Pay ${P$("early")}</span></a>`:`<span class="btn ghost block" aria-disabled="true">Closed</span>`}</article>`;
   const monthly = DEP()
     ? `<article class="plan${open?"":" best"}" aria-labelledby="p-monthly"><div class="stack" style="gap:6px"><h3 id="p-monthly">Monthly plan</h3><p class="muted small">${P$("monthly")} a month for ${cfg().instalmentCount} months.</p></div>
-<div class="total">${P$("monthlyTotal")}<small>in total</small></div><ul class="sched"><li class="today"><span>Today, to reserve your seat</span><b>${P$("deposit")}</b></li><li><span>By ${esc(BAL_DATE())}</span><b>${P$("monthlyFirst")}</b></li><li><span>1 December</span><b>${P$("monthly")}</b></li><li><span>1 January</span><b>${P$("monthly")}</b></li></ul>
-<a class="btn${open?"":" green"} block" href="/checkout?plan=deposit-monthly" data-ga-enrol="pricing"><span>Reserve my seat for ${P$("deposit")}</span></a></article>`
+<div class="total">${P$("monthlyTotal")}<small>in total</small></div><ul class="sched"><li class="today"><span>By ${esc(startShort())}</span><b>${P$("monthly")}</b></li><li><span>1 December</span><b>${P$("monthly")}</b></li><li><span>1 January</span><b>${P$("monthly")}</b></li></ul>
+<a class="btn${open?"":" green"} block" href="/checkout?plan=monthly" data-ga-enrol="pricing"><span>Start the monthly plan for ${P$("monthly")}</span></a></article>`
     : `<article class="plan${open?"":" best"}"><div class="stack" style="gap:6px"><h3>Monthly plan</h3><p class="muted small">${cfg().instalmentCount} equal payments.</p></div><div class="total">${P$("monthly")}<small>a month</small></div><a class="btn block" href="/checkout?plan=monthly" data-ga-enrol="pricing"><span>Start with ${P$("monthly")}</span></a></article>`;
   return `<div class="cur-row"><span>Showing prices in</span>${curSelect()}<span class="muted" data-cur-note></span></div>
 <div class="plans">${eb?early:""}${monthly}</div>
@@ -509,7 +511,7 @@ P.onboarding = () => { const o = lastOf("orders"); const plan = o && o.plan; ret
 <section class="section"><div class="wrap stack" style="gap:16px"><h2>Your curriculum</h2><p class="lead">Eight modules and a capstone hackathon, one module a week.</p><div><a class="btn" href="/curriculum">Open the full curriculum</a></div></div></section>
 <section class="section tint" id="payments"><div class="wrap grid g2" style="gap:32px;align-items:start">
 <div class="stack" style="gap:12px"><h2>Your payments</h2><p class="lead">We email a reminder before each due date. Pay with the same methods you used at checkout, and see everything in your student area.</p></div>
-<div class="card stack" style="gap:12px">${o?`<div class="sumrow"><span>Your plan</span><b>${esc(planName(plan))}</b></div>`:""}${scheduleRows(plan || (DEP() ? "deposit_monthly" : "monthly")).map(r=>`<div class="sumrow"><span>${r[0]}</span><b>${esc(r[1])}</b></div>`).join("")}<a class="btn block" href="/pay-instalment">Pay my next instalment</a></div></div></section>
+<div class="card stack" style="gap:12px">${o?`<div class="sumrow"><span>Your plan</span><b>${esc(planName(plan))}</b></div>`:""}${scheduleRows(plan || "monthly").map(r=>`<div class="sumrow"><span>${r[0]}</span><b>${esc(r[1])}</b></div>`).join("")}<a class="btn block" href="/pay-instalment">Pay my next instalment</a></div></div></section>
 <section class="section"><div class="wrap band"><div class="stack" style="gap:6px"><h2 style="font-size:26px">Need help getting set up?</h2><p>Message the student support team on WhatsApp or email ${SITE.email}.</p></div><a class="btn green" href="${wa("Hello, I need help with my bootcamp onboarding.")}" target="_blank" rel="noopener">${I.wa()} Message student support</a></div></section>`};};
 
 P.event = () => { const f = FREE(), H = HOME().freeClass; return { title:f.title + " | Free class | Nerdy Pixels Academy", html:`
@@ -541,10 +543,10 @@ function coState(){ const c = sget("npa-co") || { step:1, country:"NG", plan:nul
 function coSave(c){ sset("npa-co", c); }
 function coPlan(c){
   let p = PLAN_PARAM[c.plan] || null;
-  if (DEP() && p === "monthly") p = "deposit_monthly"; // paying in full ("early") stays available with deposits
+  if (p === "deposit_monthly") p = "monthly"; // the monthly plan has no deposit
   if (!DEP() && p === "deposit_early") p = "early"; if (!DEP() && p === "deposit_monthly") p = "monthly";
-  if (!p) p = earlyOpen() ? (DEP() ? "deposit_early" : "early") : (DEP() ? "deposit_monthly" : "monthly");
-  if ((p === "early" || p === "deposit_early") && !earlyOpen()) p = DEP() ? "deposit_monthly" : "monthly";
+  if (!p) p = earlyOpen() ? (DEP() ? "deposit_early" : "early") : "monthly";
+  if ((p === "early" || p === "deposit_early") && !earlyOpen()) p = "monthly";
   return p;
 }
 /** Today's amount for a plan, in a given currency. */
@@ -563,7 +565,7 @@ function coRender(){
   const plans = DEP()
     ? (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid in full now`, m$(v.early), `<span class="small">One payment today. Nothing more to pay later.</span>`, !open, open ? `Save ${m$(v.save)} · best value, one payment` : "Offer has closed") : "")
       + (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, reserve with a deposit`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_LEFT()!==null?` · ${SEATS_LEFT()} seats left`:""}` : "Offer has closed") : "")
-      + choice("deposit_monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.deposit)} today, ${m$(v.monthlyFirst)} by ${esc(BAL_DATE())}, then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "")
+      + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.monthly)} today (due by ${esc(startShort())}), then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "")
     : (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid once`, m$(v.early), `<span class="small">${esc(cfg().outrightCopy)}</span>`, !open, open ? "Available now" : "Offer has closed") : "")
       + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${esc(cfg().instalmentCopy)} ${m$(v.monthlyTotal)} in total.</span>`, false, "");
   let body = "";
@@ -587,11 +589,11 @@ ${DEP()?`<p class="small muted row" style="gap:8px">${svg("shield","ico-inline")
 ${chargeNote}
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="2">Back</button><button class="btn green" type="button" data-act="co-pay" style="flex:1">${I.lock("#06301A")} Pay ${money(todayCharged, charged)}</button></div>
 <p class="small muted">Payments are processed securely by our licensed payment partner, Flutterwave. We never see or store your card details or wallet PIN.</p>`;
-  const sched = DEP() ? (plan === "deposit_early" ? [["Today (deposit)", v.deposit], [`By ${BAL_DATE()}`, v.earlyBal]] : [["Today (deposit)", v.deposit], [`By ${BAL_DATE()}`, v.monthlyFirst], ["1 December", v.monthly], ["1 January", v.monthly]]) : null;
+  const sched = plan === "deposit_early" ? [["Today (deposit)", v.deposit], [`By ${BAL_DATE()}`, v.earlyBal]] : plan === "monthly" ? [[`Today (due by ${startShort()})`, v.monthly], ["1 December", v.monthly], ["1 January", v.monthly]] : null;
   document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${steps}<div class="mobile-due"><span class="small">${esc(planName(plan))}, due today</span><b style="font-size:20px;color:var(--ink)">${m$(today)}</b></div>${body}`;
   document.getElementById("co-sum").innerHTML = `<h2 style="font-size:18px">Order summary</h2><div><b style="color:var(--ink)">${esc(cfg().courseTitle)}</b><div class="small muted">${esc(cfg().cohortName)} cohort, classes start ${esc(COHORT_START())}</div></div>
 <div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px"><span>Plan</span><b style="color:var(--ink)">${esc(planName(plan))}</b></div>
-${sched ? sched.map(r=>`<div class="sumrow"><span>${esc(r[0])}</span><span>${m$(r[1])}</span></div>`).join("") : plan==="monthly"?`<div class="sumrow"><span>Total over ${cfg().instalmentCount} months</span><span>${m$(v.monthlyTotal)}</span></div>`:""}
+${sched ? sched.map(r=>`<div class="sumrow"><span>${esc(r[0])}</span><span>${m$(r[1])}</span></div>`).join("") : ""}
 <div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px;align-items:baseline"><b>Due today</b><b style="font-size:26px;color:var(--ink)">${m$(today)}</b></div>
 ${charged !== shown ? `<span class="small muted">Charged as ${money(todayCharged, charged)}</span>` : ""}
 <ul class="list small" style="border-top:1px solid var(--line);padding-top:12px">${check("8 modules and 8 portfolio pieces")}${check("5 industry certifications")}${check("Live classes Thursday to Sunday")}${check("Capstone hackathon")}</ul>
@@ -619,7 +621,6 @@ function instalmentOptions(){
   const o = [];
   if (DEP()) {
     o.push(["Balance:early", `Early-bird balance (${m$(v.earlyBal)}), due ${BAL_DATE()}`]);
-    o.push(["Balance:monthly", `Monthly plan: rest of the first month (${m$(v.monthlyFirst)}), due ${BAL_DATE()}`]);
   }
   o.push(["December", `December instalment (${m$(v.monthly)}), due 1 Dec`], ["January", `January instalment (${m$(v.monthly)}), due 1 Jan`]);
   return o;
@@ -632,7 +633,7 @@ P.instalment = (q) => { const o = lastOf("orders") || {}; const pre = q.item ===
 <label class="f">WhatsApp number<span class="tel"><span id="in-dial" aria-hidden="true">${country(o.country||"NG").dial}</span><input type="tel" name="phone" autocomplete="tel-national" inputmode="tel" value="${esc(o.phone||"")}"></span></label>
 <label class="f" style="grid-column:1/-1">Which payment?<select name="item">${instalmentOptions().map(x=>`<option value="${x[0]}"${x[0]===pre?" selected":""}>${esc(x[1])}</option>`).join("")}</select></label>
 <label class="f">Show prices in${curSelect()}</label></div>
-${DEP() && earlyOpen() ? `<p class="small note">On the monthly plan? Until ${esc(EARLY_DATE())} you can pay the early-bird balance instead and pay ${P$("early")} in total.</p>` : ""}
+
 <button class="btn green" type="submit">${I.lock("#06301A")} Continue to secure payment</button>
 <p class="small muted">Paid in full already? You have nothing more to pay. Questions: <a href="/contact?topic=payment">contact us</a>.</p></form>
 <aside class="summary"><h2 style="font-size:18px">Payment dates</h2>${DEP()?`<div class="sumrow"><span>Balance</span><b>${esc(BAL_DATE())}</b></div>`:""}<div class="sumrow"><span>December</span><b>1 December</b></div><div class="sumrow"><span>January</span><b>1 January</b></div><p class="small muted">See all your payments in your <a href="/student">student area</a>. Read the <a href="/payment-policy">payment policy</a>.</p></aside>
@@ -725,8 +726,7 @@ P.payment = () => { const d = cfg().depositAmount, e = PRICE_EARLY(), m = PRICE_
  ["Prices", DEP()
    ? [`Seat deposit: ${naira(d)}, paid when you enroll. It counts toward your fee.`,
       `${cfg().offerLabel}: ${naira(e)} in total (the deposit, then ${naira(e-d)} by ${BAL_DATE()}), available until ${EARLY_DATE()}${cfg().seatLimit?` or until ${cfg().seatLimit} early-bird seats are taken`:""}.`,
-      `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total. The deposit and ${naira(m-d)} by ${BAL_DATE()} make up the first month; then ${naira(m)} on 1 December and 1 January.`,
-      `Monthly-plan students can switch to the early-bird price until ${EARLY_DATE()} by paying the ${naira(e-d)} balance instead.`]
+      `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total, with no deposit. The first ${naira(m)} is due by ${startShort()}, then ${naira(m)} on 1 December and 1 January.`]
    : [`Early bird: ${naira(e)}, paid once, available until ${EARLY_DATE()}.`, `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total.`]],
  ["Paying from outside Nigeria",["You can pay from anywhere in the world. Prices shown in other currencies are fixed by us, not live exchange rates. Where we can't charge your currency directly, you pay by Visa or Mastercard in US dollars, and the exact amount is shown before you confirm. Your bank may charge its own fees."]],
  ["Instalments and reminders",[`We email a payment link before each due date${DEP()?`, starting with the balance due ${BAL_DATE()}`:""}. December and January instalments are due on the 1st of the month.`,"If a payment is more than seven days late, we may pause your access to live classes until it is paid. Talk to us early if you are having difficulty paying."]],
