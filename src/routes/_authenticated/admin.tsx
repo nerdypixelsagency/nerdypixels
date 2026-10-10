@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Menu, X, LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard } from "lucide-react";
+import { Menu, X, PanelLeftClose, PanelLeftOpen, LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard } from "lucide-react";
 import { can, type Access } from "@/lib/access";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn } from "@/lib/admin.functions";
@@ -45,6 +45,10 @@ function AdminLayout() {
   const mode = modeData?.mode ?? "live";
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Desktop: collapse the sidebar to an icon rail; remembered on this device.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => { try { setCollapsed(localStorage.getItem("npa-adm-collapsed") === "1"); } catch { /* private mode */ } }, []);
+  const toggleCollapsed = () => setCollapsed((c) => { try { localStorage.setItem("npa-adm-collapsed", c ? "0" : "1"); } catch { /* ignore */ } return !c; });
   useEffect(() => { document.body.style.overflow = menuOpen ? "hidden" : ""; const k = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); }; addEventListener("keydown", k); return () => { removeEventListener("keydown", k); document.body.style.overflow = ""; }; }, [menuOpen]);
 
   async function signOut() {
@@ -98,16 +102,17 @@ function AdminLayout() {
   ] as const).filter((n) => can(access, n.perm) || (n.perm === "settings" && access.role === "admin") || (n.perm === "media" && can(access, "content")));
 
   return (
-    <div className={`adm${menuOpen ? " menu-open" : ""}`}>
+    <div className={`adm${menuOpen ? " menu-open" : ""}${collapsed ? " collapsed" : ""}`}>
       <aside className="adm-side" id="adm-menu" aria-label="Admin menu">
         <div className="adm-side-head">
           <img src={logoDark.url} alt="Nerdy Pixels Academy" />
           <button type="button" className="adm-menu-close" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={20} /></button>
+          <button type="button" className="adm-collapse" onClick={toggleCollapsed} aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!collapsed} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>{collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}</button>
         </div>
         <div className="lbl">Pages</div>
         <nav className="adm-nav">
           {nav.map((n) => (
-            <Link key={n.to} to={n.to} className="nav" activeProps={{ className: "nav active" }} activeOptions={{ exact: "exact" in n }} onClick={() => setMenuOpen(false)}>
+            <Link key={n.to} to={n.to} className="nav" activeProps={{ className: "nav active" }} activeOptions={{ exact: "exact" in n }} onClick={() => setMenuOpen(false)} title={collapsed ? n.label : undefined} aria-label={n.label}>
               <n.icon size={16} /> <span>{n.label}</span>
             </Link>
           ))}
