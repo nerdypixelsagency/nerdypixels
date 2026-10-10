@@ -30,6 +30,7 @@ function Builder() {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [width, setWidth] = useState<keyof typeof WIDTHS>("desktop");
+  const [view, setView] = useState<"edit" | "preview">("edit"); // phones and tablets show one at a time
   const frame = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => { if (data && !draft) { const saved = data.draft && Object.keys(data.draft as object).length ? data.draft : data.published; setDraft(mergeHome(saved) as Json); } }, [data, draft]);
@@ -54,7 +55,7 @@ function Builder() {
   if (error) return <div className="adm-card"><p>{(error as Error).message}</p></div>;
 
   return (
-    <div className="cms">
+    <div className={`cms view-${view}`}>
       <div className="adm-head" style={{ marginBottom: 12 }}>
         <div><h1 style={{ marginBottom: 4 }}>Site content builder</h1><p className="sub" style={{ margin: 0 }}>Editing <b>{page.label}</b>. {publishedAt ? `Last published ${publishedAt}.` : "Not published yet: the site shows the original design."} {hasUnpublished && <span className="adm-pill pending">unpublished changes</span>}</p></div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -64,6 +65,10 @@ function Builder() {
         </div>
       </div>
       {msg && <div className="adm-card" role="status" style={{ marginBottom: 12, fontSize: 14 }}>{msg}</div>}
+      <div className="cms-switch" role="tablist" aria-label="Builder view">
+        <button type="button" role="tab" aria-selected={view === "edit"} className={view === "edit" ? "on" : ""} onClick={() => setView("edit")}>Edit</button>
+        <button type="button" role="tab" aria-selected={view === "preview"} className={view === "preview" ? "on" : ""} onClick={() => { setView("preview"); setTimeout(() => send(draft), 60); }}>Preview</button>
+      </div>
       <div className="cms-grid">
         <aside className="cms-panel">
           <p className="cms-tokens">Live values you can type in any text: {LIVE_TOKENS.map((t) => <code key={t}>{`{${t}}`}</code>)}. They fill in from Cohorts and Currencies, in the visitor's currency.</p>
@@ -99,6 +104,11 @@ function Builder() {
           </div>
           <div className="cms-frame-wrap"><iframe ref={frame} title="Homepage preview" src={`${page.path}?cms=preview`} style={{ width: WIDTHS[width] }} onLoad={() => send(draft)} /></div>
         </div>
+      </div>
+      <div className="cms-mobilebar">
+        {hasUnpublished ? <span className="adm-pill pending">unpublished</span> : <span className="sub" style={{ margin: 0 }}>Up to date</span>}
+        <button className="adm-btn ghost" disabled={busy || !dirty} onClick={saveDraft}>Save</button>
+        <button className="adm-btn green" disabled={busy || !hasUnpublished} onClick={publish}>Publish</button>
       </div>
     </div>
   );

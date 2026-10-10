@@ -316,3 +316,23 @@
   .adm-backdrop { display: block; }
 }
 .adm-auth form h1 { font-family: Outfit, sans-serif; font-weight: 700; font-size: 26px !important; color: #321063; letter-spacing: -.01em; }
+
+/* ---- Site content builder on phones and tablets: one view at a time ---- */
+.cms-switch, .cms-mobilebar { display: none; }
+@media (max-width: 1100px) {
+  .cms-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #ece6f8; padding: 4px; border-radius: 12px; margin-bottom: 12px; position: sticky; top: 64px; z-index: 15; }
+  .cms-switch button { border: 0; background: transparent; padding: 10px; border-radius: 9px; font: 600 14px inherit; color: #3b0f86; cursor: pointer; }
+  .cms-switch button.on { background: #fff; box-shadow: 0 2px 8px rgba(50,16,99,.12); }
+  .cms-grid { grid-template-columns: 1fr; }
+  .cms-preview { order: 0; position: static; }
+  .cms.view-edit .cms-preview { display: none; }
+  .cms.view-preview .cms-panel { display: none; }
+  .cms-panel { max-height: none; overflow: visible; padding-right: 0; padding-bottom: 80px; }
+  .cms-frame-wrap { height: calc(100dvh - 230px); min-height: 460px; }
+  .cms-mobilebar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid #ece6f8; box-shadow: 0 -10px 30px rgba(50,16,99,.08); }
+  .cms-mobilebar > :first-child { margin-right: auto; }
+  .cms .adm-head > div:last-child { display: none; } /* actions live in the bottom bar */
+  .cms-gallery { grid-template-columns: repeat(3, 1fr); }
+  .cms-bar { flex-wrap: wrap; }
+}
+@media (max-width: 980px) { .cms-switch { top: 58px; } }
