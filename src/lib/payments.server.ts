@@ -1,4 +1,4 @@
-// Server-only helpers: Flutterwave + Resend + enrolment records.
+// Server-only helpers: Flutterwave + Resend + enrollment records.
 // Fallbacks only; live values come from the open cohort.
 export const COHORT_START = "Saturday 14 November 2026";
 export const PROFILE_FORM = "https://forms.gle/9Yt5Pa5kT5F19MYN8";

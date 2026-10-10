@@ -42,7 +42,7 @@ const M: Record<string, Meta> = {
   },
   "/payment-policy": { title: "Payment Policy | Nerdy Pixels Academy", description: "How payments, instalments, refunds and early-bird pricing work at Nerdy Pixels Academy." },
   "/privacy": { title: "Privacy Policy | Nerdy Pixels Academy", description: "How Nerdy Pixels Academy collects, uses and protects your personal information." },
-  "/terms": { title: "Terms of Service | Nerdy Pixels Academy", description: "The terms that apply when you use the Nerdy Pixels Academy website and enrol in a programme." },
+  "/terms": { title: "Terms of Service | Nerdy Pixels Academy", description: "The terms that apply when you use the Nerdy Pixels Academy website and enroll in a programme." },
   "/checkout": { title: "Enrol: Checkout | Nerdy Pixels Academy", description: "Secure your seat in the Digital Marketing Bootcamp.", noindex: true },
   "/onboarding": { title: "Student Onboarding | Nerdy Pixels Academy", description: "Your next steps after enrolling.", noindex: true },
   "/pay-instalment": { title: "Pay an Instalment | Nerdy Pixels Academy", description: "Pay your monthly bootcamp instalment securely.", noindex: true },

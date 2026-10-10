@@ -1,6 +1,7 @@
 import { FALLBACK_COURSE_CONFIG } from "@/lib/course-config.functions";
 import { mergeHome } from "@/lib/cms-home";
 import { longDate } from "@/lib/plans";
+import { embedFor } from "@/lib/video";
 
 const logoDarkA = { url: "/brand/logo-dark.webp" };
 const logoLightA = { url: "/brand/logo-light.webp" };
@@ -172,7 +173,7 @@ const FAQS = () => [
  ["The bootcamp",[
   ["Who is the bootcamp for?","Beginners and early-career marketers: career switchers, graduates, people already handling marketing at work, and business owners. Module 1 assumes no prior knowledge."],
   ["How much time does it take each week?","Plan for self-paced certification work from Monday to Wednesday and live online classes from Thursday to Sunday. Each module ends with a portfolio piece you build with feedback."],
-  ["When does the next cohort start?","Classes start on " + COHORT_START() + ". Orientation details are sent by email and WhatsApp once you enrol."],
+  ["When does the next cohort start?","Classes start on " + COHORT_START() + ". Orientation details are sent by email and WhatsApp once you enroll."],
   ["Which certifications will I earn?","Five industry-recognised certifications, earned module by module as you go, plus our certificate of completion when you finish the bootcamp."],
   ["What equipment do I need?","A laptop or smartphone with a stable internet connection and a Google account. A laptop makes the practical work easier."]
  ]],
@@ -183,7 +184,7 @@ const FAQS = () => [
    ["Is the deposit refundable?",`Yes. Ask within 7 days of paying, and no later than ${BAL_DATE()}, for a full refund. After that you can move it once to the following cohort.`],
   ] : [
    ["What does it cost?",`The early-bird price is ${naira(PRICE_EARLY())} paid once, until ${EARLY_DATE()}. After that, the bootcamp is ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`],
-   ["How does the monthly plan work?",`You pay the first instalment of ${naira(PRICE_MONTH())} when you enrol. The December and January instalments are ${naira(PRICE_MONTH())} each, payable on the 1st of the month. We email a reminder before each date.`],
+   ["How does the monthly plan work?",`You pay the first instalment of ${naira(PRICE_MONTH())} when you enroll. The December and January instalments are ${naira(PRICE_MONTH())} each, payable on the 1st of the month. We email a reminder before each date.`],
   ]),
   ["Can I pay from outside Nigeria?","Yes. Prices show in your local currency where we can, and you can pay with any Visa or Mastercard from anywhere in the world. You see the exact amount before you confirm."],
   ["Is my payment secure?","Yes. Payments are processed by our licensed payment partner. We never see or store your card details or wallet PIN."],
@@ -214,7 +215,7 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 function CTA(){
   const open = earlyOpen();
   if (DEP()) return { href: open ? "/checkout?plan=deposit-early" : "/checkout?plan=deposit-monthly", label: `<span>Reserve my seat for ${P$("deposit")}</span>`, short: "Reserve my seat" };
-  return { href: open ? "/checkout?plan=early" : "/checkout?plan=monthly", label: open ? `Enrol for ${naira(PRICE_EARLY())}` : "Enrol now", short: "Enrol now" };
+  return { href: open ? "/checkout?plan=early" : "/checkout?plan=monthly", label: open ? `Enroll for ${naira(PRICE_EARLY())}` : "Enrol now", short: "Enrol now" };
 }
 /* Responsive WebP: /brand/photos/x-1200.webp also has x-640 (and the hero x-1920 / x-960). */
 function pic(src, alt, opts = {}){
@@ -231,7 +232,7 @@ function header(path){
   const freeHref = path === "/" ? "#free-class" : "/events/first-marketing-strategy";
   const bar = open
     ? `<div class="bar" role="note"><b>${esc(cfg().offerLabel)}${s !== null ? " seats" : ""}:</b> ${s !== null ? `<span class="js-seats-left">${s}</span> of ${cfg().seatLimit} left · ` : ""}closes ${esc(EARLY_DATE())} <span class="cd" data-countdown="${esc(cfg().earlyBirdDeadline)}" data-label="left" aria-label="Time left"></span><a href="${cta.href}" data-ga-enrol="announcement_bar">${cta.short}</a></div>`
-    : `<div class="bar" role="note"><b>Enrolment for ${esc(cfg().cohortName)} is open:</b> ${DEP() ? `reserve your seat with ${P$("deposit")}` : `${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months`}. <a href="${cta.href}" data-ga-enrol="announcement_bar">${cta.short}</a></div>`;
+    : `<div class="bar" role="note"><b>Enrollment for ${esc(cfg().cohortName)} is open:</b> ${DEP() ? `reserve your seat with ${P$("deposit")}` : `${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months`}. <a href="${cta.href}" data-ga-enrol="announcement_bar">${cta.short}</a></div>`;
   return `${SPRITE}<a class="skip" href="#main">Skip to content</a>${bar}<header class="top"><div class="wrap nav">
 <a class="logo" href="/" aria-label="Nerdy Pixels Academy home"><img src="${logoDarkA.url}" alt="Nerdy Pixels Academy" width="64" height="42"></a>
 <nav class="menu" aria-label="Main"><a href="/"${on("/")}>Home</a>
@@ -249,7 +250,7 @@ function footer(path){
 <div class="grid g4">
 <div class="stack footer-brand" style="gap:10px"><a class="logo footer-logo" href="/"><img src="${logoLightA.url}" alt="Nerdy Pixels Academy" loading="lazy" width="140" height="95"></a><p class="small" style="color:var(--on-dark-2)">Practical digital marketing training for Africa's emerging workforce.</p></div>
 <div class="stack" style="gap:10px"><h3>Learn</h3><a href="/courses/digital-marketing">${esc(cfg().courseTitle)}</a><a href="/curriculum">Curriculum</a><a href="/courses">All courses</a><a href="/events/first-marketing-strategy" data-ga-free-event>Free class</a><a href="/blog">Blog</a>${cfg().hasSyllabus?`<button type="button" class="linkbtn" data-open="syllabus">Download the syllabus</button>`:""}</div>
-<div class="stack" style="gap:10px"><h3>Students</h3><a href="/student">Student login</a><a href="/onboarding">Student onboarding</a><a href="/pay-instalment">Pay an instalment</a><a href="/faq">FAQ</a><a href="/terms">Terms of enrolment</a><a href="/payment-policy">Payment policy</a><a href="/privacy">Privacy policy</a></div>
+<div class="stack" style="gap:10px"><h3>Students</h3><a href="/student">Student login</a><a href="/onboarding">Student onboarding</a><a href="/pay-instalment">Pay an instalment</a><a href="/faq">FAQ</a><a href="/terms">Terms of enrollment</a><a href="/payment-policy">Payment policy</a><a href="/privacy">Privacy policy</a></div>
 <div class="stack" style="gap:10px"><h3>Contact</h3><a href="mailto:${SITE.email}">${SITE.email}</a><a href="tel:+${SITE.phone}">${SITE.phoneLabel}</a><a href="${wa("Hello Nerdy Pixels Academy, I have a question.")}" target="_blank" rel="noopener" data-ga-whatsapp>Chat on WhatsApp</a><a href="/contact">Contact form</a></div>
 </div>
 <p class="small" style="color:#BBAADC;border-top:1px solid var(--deep-line);padding-top:20px">© ${new Date().getFullYear()} Nerdy Pixels Digital. All rights reserved.</p>
@@ -270,15 +271,6 @@ function syllabusModal(){
 }
 
 /* ---------- Video: plays in a lightbox on our page; the player can't open other sites ---------- */
-function embedFor(url){
-  if (!url) return null;
-  let m;
-  if ((m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/))) return { kind:"iframe", src:`https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3`, thumb:`https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg` };
-  if ((m = url.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([\da-f]+))?/))) return { kind:"iframe", src:`https://player.vimeo.com/video/${m[1]}?autoplay=1&title=0&byline=0&portrait=0&badge=0&dnt=1${m[2]?`&h=${m[2]}`:""}` };
-  if ((m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/))) return { kind:"iframe", src:`https://drive.google.com/file/d/${m[1]}/preview` };
-  if (/^(https:\/\/|\/).+\.(mp4|webm)(\?.*)?$/i.test(url)) return { kind:"video", src:url };
-  return null;
-}
 const DEFAULT_THUMBS = ["/brand/photos/testimonial-1-1200.webp", "/brand/photos/testimonial-2-1200.webp", "/brand/photos/testimonial-3-1200.webp"];
 function vcard(m, i){
   const e = embedFor(m.video_url), thumb = m.image_url || DEFAULT_THUMBS[i % 3] || e?.thumb;
@@ -583,7 +575,7 @@ ${DEP()?`<p class="small muted row" style="gap:8px">${svg("shield","ico-inline")
 <label class="f">Which best describes you?${personaSelect(c.persona)}</label>
 <label class="f">How did you hear about us?<select name="source"><option value="">Select one</option>${[["blog","Our blog"],["landing","Our website"],["partner","A partner organisation"],["email","Email from us"],["whatsapp","WhatsApp"],["friend","A friend or graduate"],["event","The free class"],["other","Somewhere else"]].map(o=>`<option value="${o[0]}"${o[0]===c.source?" selected":""}>${o[1]}</option>`).join("")}</select></label>
 <label class="f">Referral code (optional)<input name="ref" value="${esc(c.ref)}" placeholder="For example RUTH-FH9W" data-refcheck><small class="ref-note" aria-live="polite"></small></label></div>
-<label class="check" style="cursor:pointer"><input type="checkbox" name="agree" ${c.agree?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span class="small">I accept the <a href="/terms" target="_blank">terms of enrolment</a> and <a href="/payment-policy" target="_blank">payment policy</a>, and I'm happy to receive class updates on WhatsApp and email.</span></label>
+<label class="check" style="cursor:pointer"><input type="checkbox" name="agree" ${c.agree?"checked":""} style="width:20px;height:20px;margin-top:3px;flex:none"><span class="small">I accept the <a href="/terms" target="_blank">terms of enrollment</a> and <a href="/payment-policy" target="_blank">payment policy</a>, and I'm happy to receive class updates on WhatsApp and email.</span></label>
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="1">Back</button><button class="btn" type="submit" style="flex:1">Continue to payment</button></div></form>`;
   if (c.step===3) body = `<h1 style="font-size:clamp(26px,3vw,34px)">How would you like to pay?</h1><p class="muted" style="margin-top:-12px">Options for ${esc(ct.name)}. <button type="button" class="linkish" data-act="co-step" data-v="1">Change country or currency</button></p>
 <div class="stack" style="gap:12px" role="radiogroup" aria-label="Payment method">${localMethods.map(m=>`<button type="button" role="radio" aria-checked="${m[0]===method}" class="choice ${m[0]===method?"on":""}" data-act="co-method" data-v="${m[0]}"><span class="radio"></span><span class="stack" style="gap:2px;flex:1"><b style="color:var(--ink)">${m[1]}</b><span class="small muted">${m[2]}</span></span></button>`).join("")}</div>
@@ -697,7 +689,7 @@ ${aside}</div>${related}</div><style>@media (max-width:900px){#post{grid-templat
 P.faq = () => ({ title:"FAQ | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Frequently asked questions</h1><p class="lead">About the bootcamp, paying from anywhere in Africa, and the free event.</p></div></section>
 <section class="section"><div class="wrap stack" style="gap:40px;max-width:900px">${FAQS().map(g=>`<div class="stack" style="gap:12px"><h2 style="font-size:26px">${g[0]}</h2>${faqBlock(g[1],false)}</div>`).join("")}
 <div class="band"><div class="stack" style="gap:6px"><h2 style="font-size:24px">Still have a question?</h2><p>Talk to an advisor on WhatsApp and get an answer the same day.</p></div><div class="stack" style="gap:10px"><a class="btn green" href="${wa("Hello, I have a question about Nerdy Pixels Academy.")}" target="_blank" rel="noopener">${I.wa()} Chat on WhatsApp</a><a class="btn ghost" href="/contact">Send us a message</a></div></div></div></section>`});
-P.contact = (q) => ({ title:"Contact us | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Contact us</h1><p class="lead">Questions about courses, payments or your enrolment? We usually reply the same working day.</p></div></section>
+P.contact = (q) => ({ title:"Contact us | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap stack" style="gap:14px"><h1>Contact us</h1><p class="lead">Questions about courses, payments or your enrollment? We usually reply the same working day.</p></div></section>
 <section class="section"><div class="wrap co">
 <form class="stack" data-form="contact" style="gap:16px" novalidate><div class="grid g2"><label class="f">Full name<input name="name" autocomplete="name"></label><label class="f">Email address<input type="email" name="email" autocomplete="email"></label>
 <label class="f">Country<select name="country" data-dial-target="ct-dial">${countryOptions("NG")}</select></label><label class="f">WhatsApp number (optional)<span class="tel"><span id="ct-dial" aria-hidden="true">+234</span><input type="tel" name="phone" autocomplete="tel-national" inputmode="tel"></span></label></div>
@@ -708,15 +700,15 @@ P.contact = (q) => ({ title:"Contact us | Nerdy Pixels Academy", html:`<section 
 </div></section>`});
 P.contactDone = () => { const m = lastOf("messages"); return { title:"Message sent | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">Thanks${m?", "+esc(m.first):""}. We've got your message.</h1><p class="lead">We'll reply to ${m?esc(m.email):"you"} within one working day. For anything urgent, message us on WhatsApp.</p><div class="row"><a class="btn green" href="${wa("Hello, I just sent a message through your website.")}" target="_blank" rel="noopener">${I.wa()} WhatsApp us</a><a class="btn ghost" href="/">Back to home</a></div></div></div></section>`};};
 P.waitlist = (q, slug) => { const c = COURSES.find(x=>x.slug===slug); if (!c) return P.notFound();
-  return { title:c.name + " waitlist | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap hero-grid" style="align-items:start"><div class="stack" style="gap:18px"><span class="pill" style="align-self:flex-start">${c.weeks}</span><h1>${c.name}</h1><p class="lead">${c.text}</p><p>Dates and pricing for the next intake are not announced yet. Join the waitlist and we'll tell you first, before enrolment opens to everyone.</p><p class="muted">Want to start now? The <a href="/courses/digital-marketing">Professional Digital Marketing Bootcamp</a> covers the foundations of every specialist programme.</p></div>
-<form class="price-card" data-form="waitlist" data-course="${c.slug}" novalidate><h2 style="font-size:22px">Join the waitlist</h2><label class="f">Full name<input name="name" autocomplete="name"></label><label class="f">Email address<input type="email" name="email" autocomplete="email"></label><label class="f">Country<select name="country">${countryOptions("NG")}</select></label><button class="btn block" type="submit">Join the waitlist</button><p class="small muted">No spam. One email when enrolment opens.</p></form></div></section>`};};
+  return { title:c.name + " waitlist | Nerdy Pixels Academy", html:`<section class="hero"><div class="wrap hero-grid" style="align-items:start"><div class="stack" style="gap:18px"><span class="pill" style="align-self:flex-start">${c.weeks}</span><h1>${c.name}</h1><p class="lead">${c.text}</p><p>Dates and pricing for the next intake are not announced yet. Join the waitlist and we'll tell you first, before enrollment opens to everyone.</p><p class="muted">Want to start now? The <a href="/courses/digital-marketing">Professional Digital Marketing Bootcamp</a> covers the foundations of every specialist programme.</p></div>
+<form class="price-card" data-form="waitlist" data-course="${c.slug}" novalidate><h2 style="font-size:22px">Join the waitlist</h2><label class="f">Full name<input name="name" autocomplete="name"></label><label class="f">Email address<input type="email" name="email" autocomplete="email"></label><label class="f">Country<select name="country">${countryOptions("NG")}</select></label><button class="btn block" type="submit">Join the waitlist</button><p class="small muted">No spam. One email when enrollment opens.</p></form></div></section>`};};
 P.waitlistDone = (q, slug) => { const c = COURSES.find(x=>x.slug===slug) || {name:"the programme"};
   return { title:"You're on the waitlist | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap" style="max-width:720px"><div class="stack" style="gap:18px"><div class="ok-icon">${I.check("#0F7A3C",34)}</div><h1 style="font-size:clamp(30px,4vw,44px)">You're on the ${esc(c.name)} waitlist.</h1><p class="lead">We'll email you as soon as dates and pricing are confirmed. In the meantime, the free event is a good place to start.</p><div class="row"><a class="btn" href="/events/first-marketing-strategy" data-ga-free-event>Join the free event</a><a class="btn ghost" href="/courses">Back to courses</a></div></div></div></section>`};};
 
 /* ---------- Policies ---------- */
 const legal = (title, updated, sections) => ({ title:title + " | Nerdy Pixels Academy", html:`<section class="section"><div class="wrap article stack" style="gap:18px"><h1 style="font-size:clamp(30px,4vw,44px)">${title}</h1><p class="muted">Last updated ${updated}</p>${sections.map(s=>`<h2>${s[0]}</h2>${s[1].map(p=>`<p>${p}</p>`).join("")}`).join("")}<p>Questions? Email <a href="mailto:${SITE.email}">${SITE.email}</a> or <a href="/contact">contact us</a>.</p></div></section>`});
 P.terms = () => legal("Terms of enrolment","September 2026",[
- ["About these terms",["These terms apply when you enrol in the Professional Digital Marketing Bootcamp run by Nerdy Pixels Academy, a brand of Nerdy Pixels Digital. By completing checkout, you agree to them."]],
+ ["About these terms",["These terms apply when you enroll in the Professional Digital Marketing Bootcamp run by Nerdy Pixels Academy, a brand of Nerdy Pixels Digital. By completing checkout, you agree to them."]],
  ["Your place in the cohort",["Your seat is confirmed once your first payment is received. Seats are personal and cannot be transferred to someone else without our written agreement."]],
  ["Classes and attendance",["Live classes take place online from Thursday to Sunday, with self-paced work from Monday to Wednesday. Session times are confirmed at orientation. We may occasionally move a session, and we will give you notice when we do."]],
  ["Certifications",["The bootcamp prepares you for five industry certifications and includes our certificate of completion. Third-party certifications are issued by their providers under their own rules, and passing them depends on your own assessment results."]],
@@ -726,7 +718,7 @@ P.terms = () => legal("Terms of enrolment","September 2026",[
 ]);
 P.payment = () => { const d = cfg().depositAmount, e = PRICE_EARLY(), m = PRICE_MONTH(), n = cfg().instalmentCount; return legal("Payment policy","October 2026",[
  ["Prices", DEP()
-   ? [`Seat deposit: ${naira(d)}, paid when you enrol. It counts toward your fee.`,
+   ? [`Seat deposit: ${naira(d)}, paid when you enroll. It counts toward your fee.`,
       `${cfg().offerLabel}: ${naira(e)} in total (the deposit, then ${naira(e-d)} by ${BAL_DATE()}), available until ${EARLY_DATE()}${cfg().seatLimit?` or until ${cfg().seatLimit} early-bird seats are taken`:""}.`,
       `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total. The deposit and ${naira(m-d)} by ${BAL_DATE()} make up the first month; then ${naira(m)} on 1 December and 1 January.`,
       `Monthly-plan students can switch to the early-bird price until ${EARLY_DATE()} by paying the ${naira(e-d)} balance instead.`]
@@ -739,8 +731,8 @@ P.payment = () => { const d = cfg().depositAmount, e = PRICE_EARLY(), m = PRICE_
  ["Security",["Payments are processed by our licensed payment partner. We never see or store your full card details or wallet PIN."]]
 ]);};
 P.privacy = () => legal("Privacy policy","September 2026",[
- ["What we collect",["When you register for an event, enrol, join a waitlist or contact us, we collect the details you give us: your name, email address, WhatsApp number, country and your answers to our short questions. When you pay, our payment partner processes your payment details."]],
- ["How we use it",["We use your details to run your enrolment, send class information, receipts and reminders, answer your questions and improve our courses. With your consent, we send you marketing tips and event invitations, and you can unsubscribe at any time."]],
+ ["What we collect",["When you register for an event, enroll, join a waitlist or contact us, we collect the details you give us: your name, email address, WhatsApp number, country and your answers to our short questions. When you pay, our payment partner processes your payment details."]],
+ ["How we use it",["We use your details to run your enrollment, send class information, receipts and reminders, answer your questions and improve our courses. With your consent, we send you marketing tips and event invitations, and you can unsubscribe at any time."]],
  ["Who we share it with",["We share only what is needed with service providers who help us run the academy, such as our payment partner and email and messaging tools. We do not sell your personal data."]],
  ["How long we keep it",["We keep student records for as long as needed to issue certificates and meet legal and accounting requirements. You can ask us to delete marketing data at any time."]],
  ["Your rights",["You can ask to see, correct or delete the personal data we hold about you, in line with the Nigeria Data Protection Act 2023 and other applicable laws. Email us to make a request."]]
@@ -849,8 +841,8 @@ window.addEventListener("message", e => {
 });
 if (window.parent !== window) { try{ window.parent.postMessage({ type: "npa-cms-ready" }, location.origin); }catch(e){} }
 document.addEventListener("click", e => {
-  const enrol = e.target.closest("[data-ga-enrol]");
-  if (enrol) { track("enrol_click", { button_location: enrol.dataset.gaEnrol }); const h = enrol.getAttribute("href") || ""; if (h.includes("/checkout")) track("begin_checkout", { plan: (h.match(/plan=([\w-]+)/)||[])[1] || "", value: PV().deposit || PV().early }); }
+  const enroll = e.target.closest("[data-ga-enrol]");
+  if (enroll) { track("enrol_click", { button_location: enroll.dataset.gaEnrol }); const h = enroll.getAttribute("href") || ""; if (h.includes("/checkout")) track("begin_checkout", { plan: (h.match(/plan=([\w-]+)/)||[])[1] || "", value: PV().deposit || PV().early }); }
   if (e.target.closest("[data-ga-free-event]")) track("free_event_click");
   if (e.target.closest("[data-ga-whatsapp]")) track("whatsapp_click");
   if (e.target.closest("[data-open=syllabus]")) { e.preventDefault(); openSyllabus(); return; }

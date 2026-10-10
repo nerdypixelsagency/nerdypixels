@@ -5,8 +5,13 @@ import { useMemo } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getEnrolments } from "@/lib/admin.functions";
 import { enrolmentsQuery, initials, naira, PERSONAS } from "@/components/admin/data";
+import { planLabel } from "@/lib/plans";
 
 export const Route = createFileRoute("/_authenticated/admin/")({ component: Dashboard });
+
+const regionNames = typeof Intl !== "undefined" && "DisplayNames" in Intl ? new Intl.DisplayNames(["en"], { type: "region" }) : null;
+const countryName = (c: string) => { if (c === "??") return "Unknown"; if (c === "XX") return "Another country"; try { return regionNames?.of(c) ?? c; } catch { return c; } };
+const flag = (c: string) => (/^[A-Z]{2}$/.test(c) && c !== "XX" ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : "🌍");
 
 const COLORS = ["#7d2ae8", "#25d366", "#b28cf5", "#2e0b63", "#8fe3b0"];
 
@@ -17,7 +22,7 @@ function Dashboard() {
 
   const s = useMemo(() => {
     const paid = rows.filter((r) => r.status === "paid");
-    const enrol = rows.filter((r) => r.kind === "enrolment");
+    const enroll = rows.filter((r) => r.kind === "enrolment");
     const days: Record<string, { day: string; revenue: number; count: number }> = {};
     for (let i = 29; i >= 0; i--) {
       const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10);
@@ -28,7 +33,7 @@ function Dashboard() {
       const b = days[d]; if (b) { b.revenue += r.amount; b.count += 1; }
     });
     const persona: Record<string, number> = {};
-    enrol.forEach((r) => { const k = PERSONAS[r.persona ?? ""] ?? "Not given"; persona[k] = (persona[k] ?? 0) + 1; });
+    enroll.forEach((r) => { const k = PERSONAS[r.persona ?? ""] ?? "Not given"; persona[k] = (persona[k] ?? 0) + 1; });
     const refs: Record<string, { code: string; n: number; paid: number; revenue: number }> = {};
     rows.filter((r) => r.referral_code && r.kind !== "event").forEach((r) => {
       const k = r.referral_code!.toUpperCase();
@@ -36,15 +41,33 @@ function Dashboard() {
       refs[k].n++;
       if (r.status === "paid") { refs[k].paid++; refs[k].revenue += r.amount; }
     });
+    const paidEnrol = enroll.filter((r) => r.status === "paid");
     const plans = [
-      { name: "Early bird", value: enrol.filter((r) => r.plan === "early" && r.status === "paid").length },
-      { name: "Monthly", value: enrol.filter((r) => r.plan === "monthly" && r.status === "paid").length },
-    ];
+      { name: "Early bird", value: paidEnrol.filter((r) => r.plan === "early").length },
+      { name: "Early + deposit", value: paidEnrol.filter((r) => r.plan === "deposit_early").length },
+      { name: "Monthly", value: paidEnrol.filter((r) => r.plan === "monthly").length },
+      { name: "Monthly + deposit", value: paidEnrol.filter((r) => r.plan === "deposit_monthly").length },
+    ].filter((p, i) => p.value > 0 || i === 0 || i === 2);
+    // Where payments come from: the country chosen at checkout, else the country we detected.
+    const geo: Record<string, { code: string; students: number; revenue: number; payments: number; mismatch: number }> = {};
+    const cur: Record<string, { code: string; payments: number; charged: number; ngn: number }> = {};
+    for (const r of paid) {
+      const x = r as typeof r & { geo_country?: string | null; currency?: string | null; charge_amount?: number | null };
+      const k = (x.country || x.geo_country || "??").toUpperCase().slice(0, 2);
+      const g = (geo[k] ??= { code: k, students: 0, revenue: 0, payments: 0, mismatch: 0 });
+      g.payments++; g.revenue += r.amount; if (r.kind === "enrolment") g.students++;
+      if (x.country && x.geo_country && x.country.toUpperCase() !== x.geo_country.toUpperCase()) g.mismatch++;
+      const c = x.currency || "NGN";
+      const cc = (cur[c] ??= { code: c, payments: 0, charged: 0, ngn: 0 });
+      cc.payments++; cc.charged += Number(x.charge_amount ?? r.amount); cc.ngn += r.amount;
+    }
     return {
       revenue: paid.reduce((a, r) => a + r.amount, 0),
-      students: enrol.filter((r) => r.status === "paid").length,
-      pending: enrol.filter((r) => r.status === "pending").length,
-      early: plans[0]!.value,
+      students: enroll.filter((r) => r.status === "paid").length,
+      pending: enroll.filter((r) => r.status === "pending").length,
+      early: paidEnrol.filter((r) => r.plan === "early" || r.plan === "deposit_early").length,
+      countries: Object.values(geo).sort((a, b) => b.revenue - a.revenue),
+      currencies: Object.values(cur).sort((a, b) => b.ngn - a.ngn),
       events: rows.filter((r) => r.kind === "event").length,
       series: Object.values(days),
       persona: Object.entries(persona).map(([name, value]) => ({ name, value })),
@@ -59,11 +82,11 @@ function Dashboard() {
 
   return (
     <>
-      <div className="adm-head"><h1>Dashboard</h1><Link to="/admin/enrolments" className="adm-btn" style={{ textDecoration: "none" }}>View all enrolments</Link></div>
+      <div className="adm-head"><h1>Dashboard</h1><Link to="/admin/enrolments" className="adm-btn" style={{ textDecoration: "none" }}>View all enrollments</Link></div>
       <div className="adm-grid adm-g4">
         <Stat title="Revenue" sub="All paid" value={naira(s.revenue)} series={s.series.map((d) => d.revenue)} />
         <Stat title="Paid students" sub="Enrolments" value={String(s.students)} series={s.series.map((d) => d.count)} />
-        <Stat title="Early bird seats" sub="Paid in full" value={String(s.early)} pill={`${s.pending} pending`} />
+        <Stat title="Early bird seats" sub="Paid early-bird plans" value={String(s.early)} pill={`${s.pending} pending`} />
         <Stat title="Free event" sub="Registrations" value={String(s.events)} />
       </div>
 
@@ -86,7 +109,7 @@ function Dashboard() {
         </div>
         <div className="adm-card">
           <h3>Who is enrolling</h3>
-          {s.persona.length === 0 ? <p className="adm-empty">No enrolments yet</p> : (
+          {s.persona.length === 0 ? <p className="adm-empty">No enrollments yet</p> : (
             <>
               <div style={{ height: 200 }}>
                 <ResponsiveContainer>
@@ -112,9 +135,28 @@ function Dashboard() {
           <div style={{ height: 220, marginTop: 10 }}>
             <ResponsiveContainer>
               <BarChart data={s.plans}><CartesianGrid stroke="#ebe6f3" vertical={false} /><XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} /><YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={30} /><Tooltip />
-                <Bar dataKey="value" radius={[6, 6, 0, 0]}>{s.plans.map((_, i) => <Cell key={i} fill={i ? "#25d366" : "#7d2ae8"} />)}</Bar></BarChart>
+                <Bar dataKey="value" radius={[6, 6, 0, 0]}>{s.plans.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Bar></BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+
+      <div className="adm-grid adm-g2" style={{ marginTop: 20 }}>
+        <div className="adm-card">
+          <h3>Where payments come from</h3>
+          <div className="sub">Country picked at checkout, or detected from their connection</div>
+          {s.countries.length === 0 ? <p className="adm-empty">No paid payments yet</p> : (
+            <div className="adm-scroll"><table className="adm-table"><thead><tr><th>Country</th><th className="num">Students</th><th className="num">Payments</th><th className="num">Revenue</th></tr></thead>
+              <tbody>{s.countries.map((c) => <tr key={c.code}><td><span style={{ marginRight: 6 }}>{flag(c.code)}</span>{countryName(c.code)}{c.mismatch > 0 && <span className="adm-pill pending" style={{ marginLeft: 6 }} title="Chosen country differs from where they connected from">{c.mismatch} differ</span>}</td><td className="num">{c.students}</td><td className="num">{c.payments}</td><td className="num money">{naira(c.revenue)}</td></tr>)}</tbody></table></div>
+          )}
+        </div>
+        <div className="adm-card">
+          <h3>Currencies received</h3>
+          <div className="sub">What Flutterwave charged, and its naira value at checkout</div>
+          {s.currencies.length === 0 ? <p className="adm-empty">No paid payments yet</p> : (
+            <div className="adm-scroll"><table className="adm-table"><thead><tr><th>Currency</th><th className="num">Payments</th><th className="num">Charged</th><th className="num">In naira</th></tr></thead>
+              <tbody>{s.currencies.map((c) => <tr key={c.code}><td><b>{c.code}</b></td><td className="num">{c.payments}</td><td className="num">{c.code === "NGN" ? naira(c.charged) : `${c.code} ${c.charged.toLocaleString("en-US", { maximumFractionDigits: 2 })}`}</td><td className="num money">{naira(c.ngn)}</td></tr>)}</tbody></table></div>
+          )}
         </div>
       </div>
 
@@ -124,7 +166,7 @@ function Dashboard() {
           <div className="adm-scroll"><table className="adm-table"><thead><tr><th>Name</th><th>Email</th><th>Type</th><th className="num">Amount</th><th>Status</th></tr></thead>
             <tbody>{s.recent.map((r) => (
               <tr key={r.id}><td><span style={{ display: "flex", alignItems: "center", gap: 10 }}><span className="adm-avatar">{initials(r.name)}</span>{r.name}</span></td><td>{r.email}</td>
-                <td>{r.kind === "instalment" ? `${r.instalment_month} instalment` : r.plan === "early" ? "Early bird" : "Monthly plan"}</td>
+                <td>{r.kind === "instalment" ? (r.instalment_month === "Balance" ? "Balance" : `${r.instalment_month} instalment`) : planLabel(r.plan)}</td>
                 <td className="num money">{naira(r.amount)}</td><td><span className={`adm-pill ${r.status}`}>{r.status}</span></td></tr>
             ))}</tbody></table></div>
         )}

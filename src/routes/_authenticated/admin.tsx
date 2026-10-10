@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail } from "lucide-react";
+import { LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard } from "lucide-react";
+import { can, type Access } from "@/lib/access";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn } from "@/lib/admin.functions";
 const logoDark = { url: "/brand/logo-dark.png" };
@@ -24,7 +25,7 @@ function AdminLayout() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-role"],
     retry: false,
-    queryFn: async (): Promise<{ role: string | null }> => {
+    queryFn: async (): Promise<{ role: string | null; permissions?: string[] | null }> => {
       // 1) server check; 2) refresh session and retry; 3) direct check protected by database rules
       try { return await roleFn(); } catch (e1) { console.warn("role check failed, healing", e1); }
       try { await supabase.auth.refreshSession(); return await roleFn(); } catch (e2) { console.warn("retry failed, falling back", e2); }
@@ -75,19 +76,23 @@ function AdminLayout() {
       </div>
     );
 
-  const nav = [
-    { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-    { to: "/admin/enrolments", label: "Enrolments", icon: Users },
-    { to: "/admin/leads", label: "Leads", icon: Inbox },
-    { to: "/admin/emails", label: "Emails", icon: Mail },
-    { to: "/admin/referrals", label: "Referrals", icon: Ticket },
-    { to: "/admin/instalments", label: "Instalments", icon: CalendarClock },
-    { to: "/admin/commissions", label: "Commissions", icon: HandCoins },
-    { to: "/admin/cohorts", label: "Cohorts", icon: GraduationCap },
-    { to: "/admin/preview", label: "View as", icon: Eye },
-    { to: "/admin/team", label: "Admins", icon: ShieldCheck },
-    { to: "/admin/settings", label: "Settings", icon: Settings },
-  ] as const;
+  const access = data as Access;
+  const nav = ([
+    { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true, perm: "dashboard" },
+    { to: "/admin/enrolments", label: "Enrolments", icon: Users, perm: "enrolments" },
+    { to: "/admin/leads", label: "Leads", icon: Inbox, perm: "leads" },
+    { to: "/admin/emails", label: "Emails", icon: Mail, perm: "emails" },
+    { to: "/admin/referrals", label: "Referrals", icon: Ticket, perm: "referrals" },
+    { to: "/admin/instalments", label: "Instalments", icon: CalendarClock, perm: "instalments" },
+    { to: "/admin/commissions", label: "Commissions", icon: HandCoins, perm: "commissions" },
+    { to: "/admin/cohorts", label: "Cohorts", icon: GraduationCap, perm: "cohorts" },
+    { to: "/admin/currencies", label: "Currencies", icon: Coins, perm: "currencies" },
+    { to: "/admin/content", label: "Site content", icon: PanelsTopLeft, perm: "content" },
+    { to: "/admin/media", label: "Media & syllabus", icon: Clapperboard, perm: "media" },
+    { to: "/admin/preview", label: "View as", icon: Eye, perm: "preview" },
+    { to: "/admin/team", label: "Admins & roles", icon: ShieldCheck, perm: "team" },
+    { to: "/admin/settings", label: "Settings", icon: Settings, perm: "settings" },
+  ] as const).filter((n) => can(access, n.perm) || (n.perm === "settings" && access.role === "admin") || (n.perm === "media" && can(access, "content")));
 
   return (
     <div className="adm">
@@ -108,7 +113,7 @@ function AdminLayout() {
       <main className="adm-main">
         <div className="adm-top">
           <span className={`adm-chip ${mode === "test" ? "pending" : ""}`}>Payments: {mode === "test" ? "TEST" : "LIVE"}</span>
-          <span className="adm-chip">{data.role === "super_admin" ? "Super admin" : "Admin"}</span>
+          <span className="adm-chip">{data.role === "super_admin" ? "Super admin" : access.permissions ? "Limited access" : "Admin"}</span>
           <button className="adm-btn ghost" onClick={signOut}><LogOut size={14} style={{ verticalAlign: -2 }} /> Sign out</button>
         </div>
         {mode === "test" && <div className="adm-card" style={{ background: "#fff4d6", marginBottom: 16, fontSize: 14 }}>Test mode is on. Checkout uses Flutterwave test keys and only test records are shown.</div>}

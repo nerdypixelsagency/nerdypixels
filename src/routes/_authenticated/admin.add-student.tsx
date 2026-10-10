@@ -10,7 +10,7 @@ function AddStudent() {
   const fn = useServerFn(addManualStudent);
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [f, setF] = useState({ name: "", email: "", phone: "", plan: "early" as "early" | "monthly", amount: "60000", paymentMethod: "Bank transfer", referralCode: "", paid: true, sendEmail: true });
+  const [f, setF] = useState({ name: "", email: "", phone: "", plan: "early" as "early" | "monthly" | "deposit_early" | "deposit_monthly", amount: "60000", paymentMethod: "Bank transfer", referralCode: "", paid: true, sendEmail: true });
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -32,14 +32,14 @@ function AddStudent() {
   const lbl = { display: "grid", gap: 6, fontSize: 14, fontWeight: 600 } as const;
   return (
     <>
-      <div className="adm-head"><div><Link to="/admin/enrolments" style={{ color: "#6420c9", fontWeight: 600, fontSize: 14 }}>← All enrolments</Link><h1>Add a student manually</h1></div></div>
+      <div className="adm-head"><div><Link to="/admin/enrolments" style={{ color: "#6420c9", fontWeight: 600, fontSize: 14 }}>← All enrollments</Link><h1>Add a student manually</h1></div></div>
       <form className="adm-card" onSubmit={submit} style={{ display: "grid", gap: 14, maxWidth: 620 }} noValidate>
         <p style={{ margin: 0, color: "#574e68", fontSize: 14 }}>For students who paid offline, by bank transfer or in cash. The record is marked as "manual".</p>
         <label style={lbl}>Full name<input className="adm-input" value={f.name} onChange={set("name")} autoComplete="off" required /></label>
         <label style={lbl}>Email<input className="adm-input" type="email" inputMode="email" value={f.email} onChange={set("email")} required /></label>
         <label style={lbl}>WhatsApp number<input className="adm-input" type="tel" inputMode="tel" value={f.phone} onChange={set("phone")} /></label>
         <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))" }}>
-          <label style={lbl}>Plan<select className="adm-select" value={f.plan} onChange={set("plan")}><option value="early">Early bird (paid once)</option><option value="monthly">Monthly plan</option></select></label>
+          <label style={lbl}>Plan<select className="adm-select" value={f.plan} onChange={set("plan")}><option value="early">Early bird (paid once)</option><option value="monthly">Monthly plan</option><option value="deposit_early">Early bird with deposit</option><option value="deposit_monthly">Monthly plan with deposit</option></select></label>
           <label style={lbl}>Amount received (₦)<input className="adm-input" type="number" inputMode="numeric" min={0} value={f.amount} onChange={set("amount")} /></label>
           <label style={lbl}>Payment method<input className="adm-input" value={f.paymentMethod} onChange={set("paymentMethod")} /></label>
           <label style={lbl}>Referral code (optional)<input className="adm-input" value={f.referralCode} onChange={set("referralCode")} /></label>

@@ -82,7 +82,7 @@ function ReferralCard() {
   return (
     <div className="card stack" style={{ gap: 10 }}>
       <h2 style={{ fontSize: 20, margin: 0 }}>Your referral link</h2>
-      <p className="muted" style={{ margin: 0 }}>Share this link with friends. When someone enrols through it, you earn a commission on every confirmed payment.</p>
+      <p className="muted" style={{ margin: 0 }}>Share this link with friends. When someone enrolls through it, you earn a commission on every confirmed payment.</p>
       <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
         <code style={{ background: "var(--canvas, #f5f2fb)", padding: "10px 14px", borderRadius: 10, fontSize: 14, wordBreak: "break-all" }}>{data.link}</code>
         <button className="btn ghost sm" type="button" onClick={() => { navigator.clipboard?.writeText(data.link!).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }).catch(() => {}); }}>{copied ? "Copied!" : "Copy link"}</button>

@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CreditCard, ExternalLink, ShieldCheck } from "lucide-react";
 import { getMyRole, getPaymentModeFn, setPaymentMode } from "@/lib/admin.functions";
+import { AutomationCard } from "@/components/admin/AutomationCard";
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   head: () => ({ meta: [
@@ -40,6 +41,7 @@ function Settings() {
         <div className="adm-setting-row"><span>Public contact</span><b>info@npdacademy.com</b></div>
       </section>
     </div>
+    {isSuper && <AutomationCard />}
     <section className="adm-card" style={{ marginTop:20 }}><h2 className="adm-section-title">Offer and countdown settings</h2><p style={{ margin:0, color:"var(--a-muted)", fontSize:13 }}>Course pricing, early-bird availability, headline, countdown deadline, payment wording, dates, and WhatsApp links are managed per cohort on the Cohorts page.</p></section>
   </>;
 }

@@ -146,7 +146,7 @@ export function followupEmail(first: string) {
     subject: "Your seat at Nerdy Pixels Academy is still waiting",
     html: brandedEmail(
       `Hi ${first}, still thinking it over?`,
-      textToHtml("You recently showed interest in the Nerdy Pixels Academy Digital Marketing Bootcamp, but you haven't completed your enrolment yet.\n\nSeats are limited, and you can pay in full or spread it into monthly instalments. If you have any questions, just reply to this email — we're happy to help."),
+      textToHtml("You recently showed interest in the Nerdy Pixels Academy Digital Marketing Bootcamp, but you haven't completed your enrollment yet.\n\nSeats are limited, and you can pay in full or spread it into monthly instalments. If you have any questions, just reply to this email — we're happy to help."),
       { label: "Complete my enrolment", url: `${SITE}/checkout` },
     ),
   };

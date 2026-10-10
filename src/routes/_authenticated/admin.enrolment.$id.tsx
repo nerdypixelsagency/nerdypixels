@@ -43,7 +43,7 @@ function Detail() {
 
   return (
     <>
-      <div className="adm-head"><div><Link to="/admin/enrolments" style={{ color: "#6420c9", fontWeight: 600, fontSize: 14 }}>← All enrolments</Link><h1>{r.name}</h1></div>
+      <div className="adm-head"><div><Link to="/admin/enrolments" style={{ color: "#6420c9", fontWeight: 600, fontSize: 14 }}>← All enrollments</Link><h1>{r.name}</h1></div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button className="adm-btn green" disabled={busy || r.status !== "paid"} onClick={() => run("Welcome email sent.", () => resendFn({ data: { id } }))}>Resend welcome email</button>
           <button className="adm-btn ghost" disabled={busy || r.status === "refunded"} onClick={() => { if (confirm(`Mark ${r.name}'s payment as refunded? This does not send money back through Flutterwave.`)) run("Marked as refunded.", () => updFn({ data: { id, status: "refunded" } })); }}>Mark refunded</button>
