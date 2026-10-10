@@ -69,7 +69,7 @@ export const addManualStudent = createServerFn({ method: "POST" })
         name: z.string().trim().min(2).max(120),
         email: z.string().trim().email().max(255),
         phone: z.string().trim().max(40).optional().default(""),
-        plan: z.enum(["early", "monthly"]),
+        plan: z.enum(["early", "monthly", "deposit_early", "deposit_monthly"]),
         amount: z.number().int().min(0).max(10_000_000),
         paymentMethod: z.string().trim().min(2).max(60),
         referralCode: z.string().trim().max(40).optional().default(""),
@@ -137,7 +137,7 @@ export const getCommissions = createServerFn({ method: "GET" })
       s.sales++;
       s.revenue += r.amount;
       // Outright (early bird) uses the outright rate; every confirmed monthly payment uses the instalment rate.
-      const pct = r.plan === "early" ? outrightPct : instalmentPct;
+      const pct = r.plan === "early" || r.plan === "deposit_early" ? outrightPct : instalmentPct;
       s.earned += Math.round((r.amount * pct) / 100);
     }
     for (const p of payouts ?? []) slot(p.referral_code.toUpperCase()).paidOut += p.amount;

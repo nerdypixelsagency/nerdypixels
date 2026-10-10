@@ -72,7 +72,7 @@ export const startPayment = createServerFn({ method: "POST" })
     if (q.charge <= 0) throw new Error("There is nothing to pay for this item.");
     const txRef = "NPA-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
     const geo = countryFromHeaders(getRequest().headers);
-    const { error } = await supabaseAdmin.from("enrolments").insert({
+    const record: Record<string, unknown> = {
       kind: data.kind,
       name: data.name,
       email,
@@ -91,7 +91,14 @@ export const startPayment = createServerFn({ method: "POST" })
       tx_ref: txRef,
       mode,
       cohort_id: cohortId,
-    } as never);
+    };
+    let { error } = await supabaseAdmin.from("enrolments").insert(record as never);
+    if (error && /charge_amount|geo_country/.test(error.message)) {
+      // Database not updated yet: only naira can be charged safely, without the new columns.
+      if (q.currency !== "NGN") throw new Error("Paying in other currencies isn't available yet. Please choose Naira (₦).");
+      const { charge_amount: _c, geo_country: _g, ...legacy } = record;
+      ({ error } = await supabaseAdmin.from("enrolments").insert(legacy as never));
+    }
     if (error) {
       console.error("[startPayment:db_insert]", error.code, error.message);
       throw new Error("We couldn't start the payment. Please try again.");
@@ -185,7 +192,9 @@ export const registerEvent = createServerFn({ method: "POST" })
     const mode = m?.value === "test" ? "test" : "live";
     const geo = countryFromHeaders(getRequest().headers);
     const country = data.country || geo;
-    await supabaseAdmin.from("enrolments").insert({ kind: "event", name: data.name, email, phone: data.phone ?? null, persona: data.persona || null, country, geo_country: geo, amount: 0, status: "registered", mode } as never);
+    const ev = { kind: "event", name: data.name, email, phone: data.phone ?? null, persona: data.persona || null, country, geo_country: geo, amount: 0, status: "registered", mode };
+    const { error: evErr } = await supabaseAdmin.from("enrolments").insert(ev as never);
+    if (evErr && evErr.message.includes("geo_country")) { const { geo_country: _g, ...legacy } = ev; await supabaseAdmin.from("enrolments").insert(legacy as never); }
     const [first, ...rest] = data.name.trim().split(/\s+/);
     await supabaseAdmin.from("leads").insert({ first_name: first || data.name, last_name: rest.join(" ") || "-", email, phone: data.phone || "-", country, category: "free_event", source: "Free class", mode } as never);
     const { formConfirmation, sendLogged } = await import("./email-log.server");

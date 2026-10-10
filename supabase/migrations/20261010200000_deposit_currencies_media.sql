@@ -86,9 +86,9 @@ SELECT 'logo', v.title, v.url, v.sort FROM (VALUES
 ) AS v(title, url, sort)
 WHERE NOT EXISTS (SELECT 1 FROM public.site_media WHERE kind = 'logo');
 
--- Hidden until a video link is added in Admin > Media & syllabus.
+-- Shown with a photo; the play button appears once a video link is added in Admin > Media & syllabus.
 INSERT INTO public.site_media (kind, title, subtitle, sort, active)
-SELECT v.kind, v.title, v.subtitle, v.sort, false FROM (VALUES
+SELECT v.kind, v.title, v.subtitle, v.sort, true FROM (VALUES
   ('testimonial', 'Judy', 'Graduate, last cohort', 10),
   ('testimonial', 'Inemesit', 'Graduate, last cohort', 20),
   ('testimonial', 'Akinleye', 'Graduate, last cohort', 30),

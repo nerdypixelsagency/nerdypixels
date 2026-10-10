@@ -96,26 +96,33 @@ function Dashboard() {
   const { data, isLoading, error } = useQuery({ queryKey: ["student"], queryFn: () => fn(), retry: 1 });
   if (isLoading) return <p className="muted">Loading your payments…</p>;
   if (error || !data) return <div className="card stack" style={{ gap: 12 }}><p className="err">{(error as Error)?.message ?? "Could not load your records."}</p><button className="btn ghost" onClick={() => supabase.auth.signOut()}>Sign out</button></div>;
-  const rows = data.rows as Array<{ id: string; kind: string; plan: string | null; instalment_month: string | null; amount: number; status: string; paid_at: string | null; created_at: string; tx_ref: string | null }>;
+  const rows = data.rows as Array<{ id: string; kind: string; plan: string | null; instalment_month: string | null; amount: number; status: string; paid_at: string | null; created_at: string; tx_ref: string | null; currency?: string | null; charge_amount?: number | null }>;
   return (
     <div className="stack" style={{ gap: 20 }}>
       <div className="row" style={{ justifyContent: "space-between" }}>
         <h1 style={{ fontSize: "clamp(28px,5vw,40px)" }}>Hi {data.name.split(" ")[0] || "there"}</h1>
         <button className="btn ghost sm" onClick={() => supabase.auth.signOut()}>Sign out</button>
       </div>
-      {data.nextDue ? (
-        <div className="band"><div className="stack" style={{ gap: 6 }}><h2 style={{ fontSize: 24 }}>{data.nextDue} instalment: {naira(40000)}</h2><p className="muted">Due {data.dueDates[data.nextDue as "December"]}.</p></div>
-          <a className="btn green" href="/pay-instalment">Pay next instalment</a></div>
+      {data.next ? (
+        <div className="band"><div className="stack" style={{ gap: 6 }}><h2 style={{ fontSize: 24 }}>{data.next.label}: {naira(data.next.amount)}</h2>{data.next.dueText && <p className="muted">Due {data.next.dueText}.</p>}</div>
+          <a className="btn green" href={`/pay-instalment?item=${encodeURIComponent(data.next.key)}`}>Pay now</a></div>
       ) : (
-        <div className="card"><b>You're all paid up.</b> <span className="muted">Classes start Thursday 5 November 2026.</span></div>
+        <div className="card"><b>You're all paid up.</b> {data.startDate && <span className="muted">Classes start {data.startDate}.</span>}</div>
+      )}
+      {data.schedule.length > 1 && (
+        <div className="card"><h2 style={{ fontSize: 20, marginBottom: 12 }}>Your payment plan</h2>
+          <div className="tw"><table className="table"><tbody>
+            {data.schedule.map((i) => <tr key={i.key}><td>{i.label}</td><td>{naira(i.amount)}</td><td className="small muted">{i.dueText || "At enrolment"}</td><td><span className={`pill ${i.paid ? "green" : ""}`}>{i.paid ? "paid" : "to pay"}</span></td></tr>)}
+          </tbody></table></div>
+        </div>
       )}
       <ReferralCard />
       <div className="card"><h2 style={{ fontSize: 20, marginBottom: 12 }}>Payment history</h2>
         {rows.length === 0 ? <p className="muted">No payments yet.</p> : (
           <div className="tw"><table className="table"><thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th><th>Receipt ref</th></tr></thead><tbody>
             {rows.map((r) => <tr key={r.id}><td>{new Date(r.paid_at ?? r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</td>
-              <td>{r.kind === "instalment" ? `${r.instalment_month} instalment` : r.kind === "event" ? "Free event" : r.plan === "early" ? "Bootcamp, early bird" : "Bootcamp, first month"}</td>
-              <td>{r.amount ? naira(r.amount) : "—"}</td><td><span className={`pill ${r.status === "paid" ? "green" : ""}`}>{r.status}</span></td><td className="small muted">{r.tx_ref}</td></tr>)}
+              <td>{r.kind === "instalment" ? (r.instalment_month === "Balance" ? "Bootcamp balance" : `${r.instalment_month} instalment`) : r.kind === "event" ? "Free class" : r.plan === "early" ? "Bootcamp, early bird" : r.plan?.startsWith("deposit") ? "Seat deposit" : "Bootcamp, first month"}</td>
+              <td>{r.currency && r.currency !== "NGN" && r.charge_amount ? `${r.currency} ${Number(r.charge_amount).toLocaleString("en-US")}` : r.amount ? naira(r.amount) : "—"}</td><td><span className={`pill ${r.status === "paid" ? "green" : ""}`}>{r.status}</span></td><td className="small muted">{r.tx_ref}</td></tr>)}
           </tbody></table></div>
         )}
       </div>

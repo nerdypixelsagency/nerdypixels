@@ -41,11 +41,11 @@ function PaymentReturn() {
         };
         if (r.kind === "instalment") {
           const pend = read("npa-pending-instalment") || {};
-          sessionStorage.setItem("npa-last-instalment", JSON.stringify({ ...pend, month: r.month, ref: r.ref, first: pend.first || "" }));
+          sessionStorage.setItem("npa-last-instalment", JSON.stringify({ ...pend, month: r.month, ref: r.ref, first: pend.first || "", amount: r.amount, charge: r.charge, cur: r.currency }));
           window.location.replace("/pay-instalment/success");
         } else {
           const pend = read("npa-pending-order") || {};
-          sessionStorage.setItem("npa-last-order", JSON.stringify({ ...pend, plan: r.plan, amount: r.amount, ref: r.ref, cur: "NGN" }));
+          sessionStorage.setItem("npa-last-order", JSON.stringify({ ...pend, plan: r.plan, amount: r.amount, charge: r.charge, ref: r.ref, cur: r.currency }));
           sessionStorage.removeItem("npa-co");
           window.location.replace("/checkout/success");
         }

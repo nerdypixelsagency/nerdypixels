@@ -44,13 +44,21 @@ export const getMyStudentRecords = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("enrolments")
-      .select("id, kind, name, plan, instalment_month, amount, status, paid_at, created_at, tx_ref, mode")
+      .select("id, kind, name, plan, instalment_month, amount, status, paid_at, created_at, tx_ref, mode, cohort_id, currency, charge_amount")
       .eq("email", email)
       .eq("mode", "live")
       .order("created_at");
-    const list = (rows ?? []) as Array<{ kind: string; plan: string | null; instalment_month: string | null; status: string; name: string }>;
-    const monthly = list.some((r) => r.kind === "enrolment" && r.plan === "monthly" && r.status === "paid");
-    const paidMonths = new Set(list.filter((r) => r.kind === "instalment" && r.status === "paid").map((r) => r.instalment_month));
-    const due = monthly ? ["December", "January"].filter((m) => !paidMonths.has(m)) : [];
-    return { email, name: list[0]?.name ?? "", rows: rows ?? [], nextDue: due[0] ?? null, dueDates: { December: "1 December 2026", January: "1 January 2027" } };
+    const list = (rows ?? []) as Array<{ kind: string; plan: string | null; instalment_month: string | null; status: string; name: string; cohort_id?: string | null }>;
+    const { pricingFromCohort, scheduleFor, longDate } = await import("./plans");
+    const enrol = [...list].reverse().find((r) => r.kind === "enrolment" && (r.status === "paid" || r.status === "existing"));
+    const { data: cohortRow } = enrol?.cohort_id
+      ? await supabaseAdmin.from("cohorts").select("*").eq("id", enrol.cohort_id).maybeSingle()
+      : await supabaseAdmin.from("cohorts").select("*").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const cohort = cohortRow as { start_date?: string | null } | null;
+    const paid = new Set(list.filter((r) => r.kind === "instalment" && r.status === "paid").map((r) => r.instalment_month!));
+    const schedule = enrol?.status === "paid"
+      ? scheduleFor(enrol.plan, pricingFromCohort(cohortRow as never)).map((i, idx) => ({ ...i, dueText: i.due ? longDate(i.due) : "", paid: idx === 0 || paid.has(i.key) }))
+      : [];
+    const next = schedule.find((i) => !i.paid) ?? null;
+    return { email, name: list[0]?.name ?? "", rows: rows ?? [], plan: enrol?.plan ?? null, schedule, next, nextDue: next?.key ?? null, startDate: cohort?.start_date ?? "" };
   });

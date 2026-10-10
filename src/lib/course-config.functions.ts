@@ -63,6 +63,8 @@ export const FALLBACK_COURSE_CONFIG: CourseConfig = {
       id: `logo-${i}`, kind: "logo", title: t, subtitle: null, quote: null, video_url: null, sort: i,
       image_url: `/brand/alumni/${t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-")}.webp`,
     })),
+    ...["Judy", "Inemesit", "Akinleye"].map((t, i) => ({ id: `testimonial-${i}`, kind: "testimonial", title: t, subtitle: "Graduate, last cohort", quote: null, video_url: null, image_url: null, sort: i })),
+    { id: "class-recording", kind: "class_recording", title: "SEO Fundamentals, live class", subtitle: "Last cohort", quote: null, video_url: null, image_url: null, sort: 0 },
   ],
   content: {},
 };
@@ -86,7 +88,7 @@ function mapConfig(row: any): CourseConfig {
     freeClassTitle: row.free_class_title ?? FALLBACK_COURSE_CONFIG.freeClassTitle,
     freeClassAt: row.free_class_at === undefined ? FALLBACK_COURSE_CONFIG.freeClassAt : row.free_class_at,
     hasSyllabus: false,
-    currencies: FALLBACK_COURSE_CONFIG.currencies,
+    currencies: [], // filled from the currencies table; none until it exists
     media: FALLBACK_COURSE_CONFIG.media,
     content: {},
   };
@@ -110,6 +112,7 @@ export const getPublicCourseConfig = createServerFn({ method: "GET" }).handler(a
     const cfg = cohort.data ? mapConfig(cohort.data) : { ...FALLBACK_COURSE_CONFIG };
     if (!cur.error && cur.data) cfg.currencies = cur.data.map((c: any) => ({ code: c.code, label: c.label, symbol: c.symbol, deposit: Number(c.deposit), early: Number(c.early_total), monthly: Number(c.monthly), chargeable: !!c.chargeable }));
     if (!media.error && media.data) cfg.media = media.data;
+    else cfg.media = FALLBACK_COURSE_CONFIG.media; // before the media table exists
     if (!content.error && content.data?.published) cfg.content = content.data.published;
     if (cfg.cohortId) {
       const stats = await any.rpc("public_site_stats", { _cohort: cfg.cohortId }).then((r: any) => r, () => ({ error: true }));
