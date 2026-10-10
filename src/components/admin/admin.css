@@ -315,3 +315,4 @@
   .adm-top-logo { display: block; }
   .adm-backdrop { display: block; }
 }
+.adm-auth form h1 { font-family: Outfit, sans-serif; font-weight: 700; font-size: 26px !important; color: #321063; letter-spacing: -.01em; }
