@@ -327,7 +327,8 @@ body.has-sticky .wa-float{bottom:84px}
 main.home .hero h1,.hero h1{font-size:clamp(40px,5.4vw,80px);font-weight:800;letter-spacing:-.045em;line-height:1;text-wrap:balance;max-width:15ch}
 .kicker-line,.eyebrow{text-wrap:balance}
 @media (max-width:760px){
-  main.home .hero h1,.hero h1{font-size:clamp(38px,11vw,52px);line-height:1.02;max-width:none}
+  /* Scales with the screen so the headline always sits on 3 lines (tested 320–760px) */
+  main.home .hero h1,.hero h1{font-size:min(52px,calc((100vw - 48px) * .117));line-height:1.04;max-width:none}
   .kicker-line{font-size:14px;line-height:1.4;max-width:30ch}
   .hero .lead{font-size:16.5px}
 }
