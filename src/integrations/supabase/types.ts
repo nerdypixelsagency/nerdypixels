@@ -99,6 +99,11 @@ export type Database = {
       }
       cohorts: {
         Row: {
+          deposit_amount: number
+          balance_due_date: string | null
+          seat_limit: number | null
+          free_class_title: string | null
+          free_class_at: string | null
           course: string
           course_id: string
           created_at: string
@@ -122,6 +127,11 @@ export type Database = {
           whatsapp_link: string | null
         }
         Insert: {
+          deposit_amount?: number
+          balance_due_date?: string | null
+          seat_limit?: number | null
+          free_class_title?: string | null
+          free_class_at?: string | null
           course?: string
           course_id: string
           created_at?: string
@@ -145,6 +155,11 @@ export type Database = {
           whatsapp_link?: string | null
         }
         Update: {
+          deposit_amount?: number
+          balance_due_date?: string | null
+          seat_limit?: number | null
+          free_class_title?: string | null
+          free_class_at?: string | null
           course?: string
           course_id?: string
           created_at?: string
@@ -290,6 +305,8 @@ export type Database = {
       }
       enrolments: {
         Row: {
+          charge_amount: number | null
+          geo_country: string | null
           admin_notes: string | null
           amount: number
           cohort_id: string | null
@@ -318,6 +335,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          charge_amount?: number | null
+          geo_country?: string | null
           admin_notes?: string | null
           amount?: number
           cohort_id?: string | null
@@ -346,6 +365,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          charge_amount?: number | null
+          geo_country?: string | null
           admin_notes?: string | null
           amount?: number
           cohort_id?: string | null
@@ -475,6 +496,8 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          permissions: string[] | null
+          preset: string | null
           created_at: string
           email: string | null
           id: string
@@ -482,6 +505,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          permissions?: string[] | null
+          preset?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -489,11 +514,160 @@ export type Database = {
           user_id: string
         }
         Update: {
+          permissions?: string[] | null
+          preset?: string | null
           created_at?: string
           email?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      currencies: {
+        Row: {
+          code: string
+          label: string
+          symbol: string
+          deposit: number
+          early_total: number
+          monthly: number
+          chargeable: boolean
+          active: boolean
+          sort: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          label: string
+          symbol: string
+          deposit: number
+          early_total: number
+          monthly: number
+          chargeable?: boolean
+          active?: boolean
+          sort?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          label?: string
+          symbol?: string
+          deposit?: number
+          early_total?: number
+          monthly?: number
+          chargeable?: boolean
+          active?: boolean
+          sort?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          key: string
+          draft: Json
+          published: Json
+          updated_by: string | null
+          published_by: string | null
+          updated_at: string
+          published_at: string | null
+        }
+        Insert: {
+          key: string
+          draft?: Json
+          published?: Json
+          updated_by?: string | null
+          published_by?: string | null
+          updated_at?: string
+          published_at?: string | null
+        }
+        Update: {
+          key?: string
+          draft?: Json
+          published?: Json
+          updated_by?: string | null
+          published_by?: string | null
+          updated_at?: string
+          published_at?: string | null
+        }
+        Relationships: []
+      }
+      site_media: {
+        Row: {
+          id: string
+          kind: string
+          title: string
+          subtitle: string | null
+          quote: string | null
+          video_url: string | null
+          image_url: string | null
+          storage_path: string | null
+          sort: number
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          title: string
+          subtitle?: string | null
+          quote?: string | null
+          video_url?: string | null
+          image_url?: string | null
+          storage_path?: string | null
+          sort?: number
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          title?: string
+          subtitle?: string | null
+          quote?: string | null
+          video_url?: string | null
+          image_url?: string | null
+          storage_path?: string | null
+          sort?: number
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      syllabi: {
+        Row: {
+          id: string
+          course_id: string | null
+          title: string
+          file_url: string
+          storage_path: string | null
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          course_id?: string | null
+          title: string
+          file_url: string
+          storage_path?: string | null
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          course_id?: string | null
+          title?: string
+          file_url?: string
+          storage_path?: string | null
+          active?: boolean
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -503,6 +677,8 @@ export type Database = {
     }
     Functions: {
       claim_super_admin: { Args: never; Returns: boolean }
+      has_perm: { Args: { _perms: string[]; _user_id: string }; Returns: boolean }
+      public_site_stats: { Args: { _cohort: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

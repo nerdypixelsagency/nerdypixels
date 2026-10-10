@@ -120,7 +120,11 @@ export async function ensureAmbassador(email: string, name: string) {
     const base = name.replace(/[^a-zA-Z]/g, "").slice(0, 6).toUpperCase() || "NPA";
     const code = `${base}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     const { data: row, error } = await d.from("ambassadors").insert({ name, email: e, code, source: "student" }).select("id").maybeSingle();
-    if (!error) { await sendAmbassadorEmail({ id: row?.id, name, email: e, code }); return code; }
+    if (!error) {
+      const { autoEmailOn } = await import("./access.server");
+      if (await autoEmailOn("ambassador_emails")) await sendAmbassadorEmail({ id: row?.id, name, email: e, code });
+      return code;
+    }
     if (!error.message.includes("duplicate")) throw new Error(error.message);
   }
   return null;
@@ -143,7 +147,18 @@ export function followupEmail(first: string) {
     html: brandedEmail(
       `Hi ${first}, still thinking it over?`,
       textToHtml("You recently showed interest in the Nerdy Pixels Academy Digital Marketing Bootcamp, but you haven't completed your enrolment yet.\n\nSeats are limited, and you can pay in full or spread it into monthly instalments. If you have any questions, just reply to this email — we're happy to help."),
-      { label: "Complete my enrolment", url: `${SITE}/#checkout` },
+      { label: "Complete my enrolment", url: `${SITE}/checkout` },
+    ),
+  };
+}
+
+export function syllabusEmail(first: string, title: string, url: string) {
+  return {
+    subject: "Your Digital Marketing Bootcamp syllabus — Nerdy Pixels Academy",
+    html: brandedEmail(
+      `Here's your syllabus, ${first}`,
+      textToHtml(`Thanks for your interest in the Digital Marketing Bootcamp. Your copy of "${title}" is ready: every module, the eight portfolio projects and the tools you will use.\n\nWhen you're ready, you can reserve your seat with a small deposit. Questions? Just reply to this email.`),
+      { label: "Download the syllabus", url },
     ),
   };
 }

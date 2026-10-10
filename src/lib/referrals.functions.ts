@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requirePerm } from "./access";
 
 type Ctx = { supabase: any; userId: string };
 
@@ -40,7 +41,7 @@ export const validateReferralCode = createServerFn({ method: "GET" })
 export const listAmbassadors = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "referrals");
     const { data, error } = await context.supabase.from("ambassadors").select("*").order("created_at", { ascending: false }).limit(5000);
     if (error) throw new Error(error.message);
     return data ?? [];
@@ -52,7 +53,7 @@ export const saveAmbassador = createServerFn({ method: "POST" })
     z.object({ id: z.string().uuid().optional(), name: z.string().trim().min(1).max(120), email: z.string().trim().email().max(255).or(z.literal("")), code: z.string().trim().min(4).max(40), active: z.boolean() }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "referrals");
     const code = data.code.toUpperCase();
     if (!CODE_RE.test(code)) throw new Error("Codes can only use letters, numbers and dashes.");
     const row = { name: data.name, email: data.email ? data.email.toLowerCase() : null, code, active: data.active };
@@ -64,7 +65,8 @@ export const saveAmbassador = createServerFn({ method: "POST" })
     if (!data.id && row.email) {
       const { ensureStudentRecord, sendAmbassadorEmail } = await import("./email-log.server");
       await ensureStudentRecord(row.email, row.name);
-      if (row.active) await sendAmbassadorEmail({ id: saved?.id, ...row }, context.userId);
+      const { autoEmailOn } = await import("./access.server");
+      if (row.active && (await autoEmailOn("ambassador_emails"))) await sendAmbassadorEmail({ id: saved?.id, ...row }, context.userId);
     }
     return { ok: true };
   });
@@ -73,7 +75,7 @@ export const emailAmbassadors = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid().optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "referrals");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendAmbassadorEmail, pause } = await import("./email-log.server");
     let q = supabaseAdmin.from("ambassadors").select("id, name, email, code").eq("active", true).not("email", "is", null).limit(1000);
@@ -92,7 +94,7 @@ export const ambassadorEmailStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ refresh: z.boolean().default(false) }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "referrals");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (data.refresh) {
       const { data: rows } = await supabaseAdmin.from("email_log" as never).select("id").eq("type", "ambassador").order("created_at", { ascending: false }).limit(200);
@@ -109,7 +111,7 @@ export const ambassadorEmailStatus = createServerFn({ method: "POST" })
 export const getCommissionSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "referrals", "commissions");
     const { data } = await context.supabase.from("app_settings").select("key, value").in("key", ["commission_outright_pct", "commission_instalment_pct"]);
     const map = Object.fromEntries((data ?? []).map((r: { key: string; value: string }) => [r.key, r.value]));
     return { outright: Number(map["commission_outright_pct"] ?? 10), instalment: Number(map["commission_instalment_pct"] ?? 10) };
@@ -151,7 +153,7 @@ export const myReferralCode = createServerFn({ method: "GET" })
 export const listCohorts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "cohorts");
     const [{ data: cohorts, error }, { data: counts }] = await Promise.all([
       context.supabase.from("cohorts").select("*").order("created_at", { ascending: false }),
       context.supabase.from("enrolments").select("cohort_id").not("cohort_id", "is", null).limit(5000),
@@ -176,7 +178,7 @@ export const saveCohort = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "cohorts");
     const { data: course } = await context.supabase.from("courses").select("id").eq("title", data.course).limit(1).maybeSingle();
     const { data: firstCourse } = course ? { data: null } : await context.supabase.from("courses").select("id").order("created_at").limit(1).maybeSingle();
     const courseId = course?.id ?? firstCourse?.id;

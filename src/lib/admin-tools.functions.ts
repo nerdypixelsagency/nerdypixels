@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requirePerm } from "./access";
 
 type Ctx = { supabase: any; userId: string };
 
@@ -25,7 +26,7 @@ export const getEnrolmentDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "enrolments", "preview");
     const { data: row, error } = await context.supabase.from("enrolments").select("*").eq("id", data.id).maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Enrolment not found.");
@@ -40,7 +41,7 @@ export const saveEnrolmentNotes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), notes: z.string().max(4000) }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "enrolments");
     const { error } = await context.supabase.from("enrolments").update({ admin_notes: data.notes }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -50,7 +51,7 @@ export const resendWelcomeEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "enrolments", "emails");
     const { data: row } = await context.supabase.from("enrolments").select("*").eq("id", data.id).maybeSingle();
     if (!row) throw new Error("Enrolment not found.");
     if (row.status !== "paid") throw new Error("Only paid enrolments get a welcome email.");
@@ -78,7 +79,7 @@ export const addManualStudent = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "enrolments");
     const mode = await modeOf(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: cohort } = await supabaseAdmin.from("cohorts").select("id").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
@@ -113,7 +114,7 @@ export const addManualStudent = createServerFn({ method: "POST" })
 export const getCommissions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const role = await requireAdmin(context);
+    const role = (await requirePerm(context, "commissions")).role;
     const mode = await modeOf(context);
     const [{ data: rates }, { data: rows }, { data: payouts }, { data: ambs }] = await Promise.all([
       context.supabase.from("app_settings").select("key, value").in("key", ["commission_outright_pct", "commission_instalment_pct"]),
@@ -150,7 +151,7 @@ export const recordPayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ code: z.string().trim().min(1).max(40), amount: z.number().int().min(1), note: z.string().max(300).optional().default("") }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "commissions");
     const mode = await modeOf(context);
     const { error } = await context.supabase
       .from("commission_payouts")
@@ -174,7 +175,7 @@ export const setCommissionRates = createServerFn({ method: "POST" })
 export const getLeads = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "leads");
     const mode = await modeOf(context);
     const { data, error } = await context.supabase.from("leads").select("*").eq("mode", mode).order("created_at", { ascending: false }).limit(5000);
     if (error) throw new Error(error.message);

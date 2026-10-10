@@ -1,8 +1,6 @@
 // Server-only helpers: Flutterwave + Resend + enrolment records.
-export const PRICE_EARLY = 60000;
-export const PRICE_MONTH = 40000;
-export const EARLY_END = new Date("2026-10-10T23:59:59+01:00");
-export const COHORT_START = "Thursday 5 November 2026";
+// Fallbacks only; live values come from the open cohort.
+export const COHORT_START = "Saturday 14 November 2026";
 export const PROFILE_FORM = "https://forms.gle/9Yt5Pa5kT5F19MYN8";
 export const WHATSAPP_GROUP =
   "https://wa.me/2349136713644?text=" +
@@ -31,6 +29,7 @@ export async function flwCreatePayment(p: {
   mode: PayMode;
   txRef: string;
   amount: number;
+  currency?: string;
   email: string;
   name: string;
   phone?: string | undefined;
@@ -45,7 +44,7 @@ export async function flwCreatePayment(p: {
     body: JSON.stringify({
       tx_ref: p.txRef,
       amount: p.amount,
-      currency: "NGN",
+      currency: p.currency ?? "NGN",
       redirect_url: p.redirectUrl,
       customer: { email: p.email, name: p.name, phonenumber: p.phone },
       meta: p.meta,
@@ -75,7 +74,11 @@ export async function confirmPayment(transactionId: string, txRef: string) {
     data?: { status?: string; tx_ref?: string; amount?: number; currency?: string; payment_type?: string };
   };
   const d = body.data;
-  const good = d && d.status === "successful" && d.tx_ref === txRef && d.currency === "NGN" && Number(d.amount) >= row.amount;
+  // The currency and amount must match what we quoted when checkout started.
+  const r = row as typeof row & { currency?: string | null; charge_amount?: number | string | null };
+  const expectCur = r.currency || "NGN";
+  const expectAmt = Number(r.charge_amount ?? row.amount);
+  const good = d && d.status === "successful" && d.tx_ref === txRef && d.currency === expectCur && Number(d.amount) + 0.001 >= expectAmt;
   if (!good) {
     if (d?.status === "failed") await db.from("enrolments").update({ status: "failed" }).eq("id", row.id);
     return { ok: false as const, reason: d?.status ?? "unverified" };
@@ -88,7 +91,12 @@ export async function confirmPayment(transactionId: string, txRef: string) {
     .select("*")
     .maybeSingle();
   if (updated) {
-    await sendReceiptEmail(updated).catch((e) => console.error("Email failed", e));
+    // A monthly-deposit student who paid the early-bird balance moves to the early-bird plan.
+    if (updated.kind === "instalment" && updated.instalment_month === "Balance" && updated.plan === "deposit_early") {
+      await db.from("enrolments").update({ plan: "deposit_early" }).eq("email", updated.email).eq("kind", "enrolment").eq("status", "paid").eq("mode", updated.mode).eq("plan", "deposit_monthly");
+    }
+    const { autoEmailOn } = await import("./access.server");
+    if (await autoEmailOn("payment_receipts")) await sendReceiptEmail(updated).catch((e) => console.error("Email failed", e));
     if (updated.mode !== "test") {
       const { ensureAmbassador } = await import("./email-log.server");
       await ensureAmbassador(updated.email, updated.name).catch((e) => console.error("Ambassador create failed", e));
@@ -100,34 +108,56 @@ export async function confirmPayment(transactionId: string, txRef: string) {
 const naira = (n: number) => "₦" + n.toLocaleString("en-NG");
 const esc = (v: unknown) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-type Row = { id: string; kind: string; name: string; email: string; plan: string | null; instalment_month: string | null; amount: number; tx_ref: string | null };
+type Row = { id: string; kind: string; name: string; email: string; plan: string | null; instalment_month: string | null; amount: number; tx_ref: string | null; currency?: string | null; charge_amount?: number | string | null; mode?: string };
+
+export function formatMoney(n: number, code = "NGN", symbol?: string) {
+  if (code === "NGN") return naira(Math.round(n));
+  const v = Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
+  return symbol ? `${symbol}${v}` : `${code} ${v}`;
+}
 
 export async function sendReceiptEmail(row: Row) {
   const key = process.env["RESEND_API_KEY"];
   if (!key) return;
+  const { pricingFromCohort, scheduleFor, planLabel, longDate } = await import("./plans");
   const first = esc(row.name.trim().split(" ")[0]);
   // Pull the open cohort so the welcome email always carries current dates and WhatsApp link.
-  let cohortStart = COHORT_START, whatsapp = WHATSAPP_GROUP, monthlyAmount = PRICE_MONTH;
+  let cohortStart = COHORT_START, whatsapp = WHATSAPP_GROUP;
+  let pricing = pricingFromCohort(null);
+  let symbol: string | undefined;
+  const cur = row.currency || "NGN";
   try {
     const db = await admin();
-    const { data: c } = await db.from("cohorts").select("start_date, whatsapp_link, instalment_amount").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
-    const co = c as { start_date?: string; whatsapp_link?: string; instalment_amount?: number } | null;
+    const { data: c } = await db.from("cohorts").select("*").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const co = c as { start_date?: string; whatsapp_link?: string } | null;
     if (co?.start_date) cohortStart = co.start_date;
     if (co?.whatsapp_link) whatsapp = co.whatsapp_link;
-    if (co?.instalment_amount) monthlyAmount = co.instalment_amount;
+    pricing = pricingFromCohort(c as never);
+    if (cur !== "NGN") {
+      const { data: cr } = await db.from("currencies" as never).select("*").eq("code", cur).maybeSingle();
+      const x = cr as { symbol: string; deposit: number; early_total: number; monthly: number } | null;
+      if (x) { symbol = x.symbol; pricing = { ...pricing, deposit: Number(x.deposit), early: Number(x.early_total), monthly: Number(x.monthly) }; }
+    }
   } catch { /* fall back to defaults */ }
+  const money = (n: number) => formatMoney(n, cur, symbol);
   const isInst = row.kind === "instalment";
-  const subject = isInst ? `Receipt: ${row.instalment_month} instalment received` : "Welcome to the Nerdy Pixels Academy bootcamp";
-  const planLine = isInst
-    ? `${esc(row.instalment_month)} instalment`
-    : row.plan === "early"
-      ? "Early bird, paid in full"
-      : `Monthly plan (${naira(monthlyAmount)} on the 1st of December and January)`;
-  const html = `<div style="font-family:Poppins,Arial,sans-serif;max-width:560px;margin:auto;color:#1A1128">
-<div style="background:#2E0B63;color:#fff;padding:28px;border-radius:16px 16px 0 0"><h1 style="margin:0;font-size:24px">${isInst ? "Thank you" : "You're in"}, ${first}.</h1></div>
+  const what = row.instalment_month === "Balance" ? "balance" : `${row.instalment_month} instalment`;
+  const subject = isInst ? `Receipt: your ${what} has been received` : "Welcome to the Nerdy Pixels Academy bootcamp";
+  // What is still to pay after this payment, with due dates.
+  const items = scheduleFor(row.plan, pricing);
+  const paidIdx = isInst ? items.findIndex((i) => i.key === row.instalment_month) : 0;
+  const upcoming = items.slice(Math.max(1, paidIdx + 1));
+  const dueList = upcoming.length
+    ? `<p><b>Still to pay</b><br>${upcoming.map((i) => `${esc(i.label)}: <b>${money(i.amount)}</b>${i.due ? ` by ${esc(longDate(i.due))}` : ""}`).join("<br>")}<br><a href="https://bootcamp.npdacademy.com/pay-instalment">Pay your next instalment</a></p>`
+    : "";
+  const deposit = !isInst && (row.plan === "deposit_early" || row.plan === "deposit_monthly");
+  const html = `<div style="font-family:Montserrat,Poppins,Arial,sans-serif;max-width:560px;margin:auto;color:#1A1128">
+<div style="background:#2E0B63;color:#fff;padding:28px;border-radius:16px 16px 0 0"><h1 style="margin:0;font-size:24px">${isInst ? "Thank you" : deposit ? "Your seat is reserved" : "You're in"}, ${first}.</h1></div>
 <div style="border:1px solid #E4DEEE;border-top:0;padding:28px;border-radius:0 0 16px 16px">
-<p>We've received your payment of <b>${naira(row.amount)}</b>.</p>
-<p><b>Plan:</b> ${planLine}<br><b>Reference:</b> ${esc(row.tx_ref)}<br><b>Classes start:</b> ${esc(cohortStart)}</p>
+<p>We've received your payment of <b>${money(Number(row.charge_amount ?? row.amount))}</b>${isInst ? ` for your ${esc(what)}` : ""}.</p>
+<p><b>Plan:</b> ${esc(planLabel(row.plan))}<br><b>Reference:</b> ${esc(row.tx_ref)}<br><b>Classes start:</b> ${esc(cohortStart)}</p>
+${deposit ? `<p>Your deposit counts toward your fee and is fully refundable if you ask within 7 days of paying.</p>` : ""}
+${dueList}
 ${isInst ? "" : `<p><b>Your next steps</b></p><ol>
 <li><a href="${whatsapp}">Join your cohort's WhatsApp group</a></li>
 <li><a href="${PROFILE_FORM}">Complete your student profile</a></li>

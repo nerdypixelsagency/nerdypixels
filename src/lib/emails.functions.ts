@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requirePerm } from "./access";
 
 type Ctx = { supabase: any; userId: string };
 
@@ -52,7 +53,7 @@ async function leadsWithStatus(mode: string) {
 export const getLeadsWithStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "leads", "emails");
     const { currentMode } = await import("./email-log.server");
     const mode = await currentMode();
     return { mode, rows: await leadsWithStatus(mode) };
@@ -61,7 +62,7 @@ export const getLeadsWithStatus = createServerFn({ method: "GET" })
 export const listEmails = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails");
     const { data, error } = await context.supabase.from("email_log").select("id, to_email, subject, type, status, error, created_at, mode").order("created_at", { ascending: false }).limit(2000);
     if (error) throw new Error(error.message);
     return data as { id: string; to_email: string; subject: string; type: string; status: string; error: string | null; created_at: string; mode: string }[];
@@ -71,7 +72,7 @@ export const getEmail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails");
     const { data: row } = await context.supabase.from("email_log").select("*").eq("id", data.id).maybeSingle();
     if (!row) throw new Error("Email not found.");
     return row as { id: string; to_email: string; subject: string; html: string; type: string; status: string; error: string | null; created_at: string };
@@ -81,7 +82,7 @@ export const resendEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails");
     const { data: row } = await context.supabase.from("email_log").select("*").eq("id", data.id).maybeSingle();
     if (!row) throw new Error("Email not found.");
     const { sendLogged } = await import("./email-log.server");
@@ -109,7 +110,7 @@ export const previewCustomEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => composeSchema.parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails");
     return buildCustom(data, "Ada Lovelace");
   });
 
@@ -117,7 +118,7 @@ export const audienceCount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ audience: z.enum(AUDIENCES), cohortId: z.string().uuid().optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails");
     return { count: (await resolveAudience(data.audience, data.cohortId)).length };
   });
 
@@ -133,7 +134,7 @@ export const sendCustomEmail = createServerFn({ method: "POST" })
     }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails");
     const { sendLogged, pause, ambassadorEmail, commissionRates } = await import("./email-log.server");
     let list: Recipient[];
     if (data.target === "single") {
@@ -164,7 +165,7 @@ export const sendLeadFollowups = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ ids: z.array(z.string().uuid()).max(400).optional() }).parse(d))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "leads", "emails");
     const { sendLogged, pause, followupEmail, currentMode } = await import("./email-log.server");
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
     let leads = (await leadsWithStatus(await currentMode())).filter((l) => l.pay_status !== "paid");
@@ -188,7 +189,7 @@ export const sendLeadFollowups = createServerFn({ method: "POST" })
 export const listCohortOptions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context);
+    await requirePerm(context, "emails", "cohorts");
     const { data } = await context.supabase.from("cohorts").select("id, name").order("created_at", { ascending: false });
     return (data ?? []) as { id: string; name: string }[];
   });
