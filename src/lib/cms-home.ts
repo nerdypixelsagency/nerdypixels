@@ -137,8 +137,8 @@ export const HOME_DEFAULTS = {
   pricing: {
     show: true,
     eyebrow: "Pricing",
-    title: "Two ways to pay. One {deposit} deposit to start.",
-    lead: "Reserve your seat with {deposit} today, then choose how to pay the rest. Your deposit is fully refundable for 7 days.",
+    title: "Pay in full, or reserve your seat with {deposit}.",
+    lead: "Pay {early} once and you are done, or reserve your seat with {deposit} today and pay the rest on the early-bird or monthly plan. Your deposit is fully refundable for 7 days.",
     guaranteeTitle: "7-day money-back guarantee on your deposit",
     guarantee: "Change your mind within 7 days of paying and we refund your {deposit} in full. After that, you can move it once to the following cohort.",
   },

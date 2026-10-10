@@ -309,3 +309,10 @@ body.has-sticky .wa-float{bottom:84px}
   .hero-bg::after{background:linear-gradient(180deg,rgba(36,8,80,.55) 0%,rgba(36,8,80,.82) 45%,rgba(36,8,80,.95) 100%)}
 }
 .vthumb .soon{position:absolute;z-index:1;top:12px;left:12px;background:rgba(255,255,255,.92);color:var(--deep);font-size:12px;font-weight:700;border-radius:999px;padding:5px 11px;letter-spacing:.01em}
+/* Pay in full, spotlighted next to the deposit */
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin:-4px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.seat-card .btn.deep{background:var(--deep);min-height:50px}
+.full-note{margin-top:-8px}
+.plan-ctas{display:grid;gap:10px;margin-top:auto}
+.plan-ctas .btn{margin-top:0}

@@ -215,8 +215,11 @@ const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden=
 function CTA(){
   const open = earlyOpen();
   if (DEP()) return { href: open ? "/checkout?plan=deposit-early" : "/checkout?plan=deposit-monthly", label: `<span>Reserve my seat for ${P$("deposit")}</span>`, short: "Reserve my seat" };
-  return { href: open ? "/checkout?plan=early" : "/checkout?plan=monthly", label: open ? `Enroll for ${naira(PRICE_EARLY())}` : "Enrol now", short: "Enrol now" };
+  return { href: open ? "/checkout?plan=early" : "/checkout?plan=monthly", label: open ? `Enroll for ${naira(PRICE_EARLY())}` : "Enroll now", short: "Enroll now" };
 }
+/** Paying in full at the early-bird price, offered next to the deposit while early bird is open. */
+const FULL = () => DEP() && earlyOpen() && cfg().earlyBirdEnabled;
+const fullBtn = (where, cls = "btn ghost block") => `<a class="${cls} full-pay" href="/checkout?plan=early" data-ga-enrol="${where}_full"><span>Pay ${P$("early")} in full now</span></a>`;
 /* Responsive WebP: /brand/photos/x-1200.webp also has x-640 (and the hero x-1920 / x-960). */
 function pic(src, alt, opts = {}){
   if (!src) return "";
@@ -300,6 +303,7 @@ ${open?`<p class="then">Then <b>${P$("earlyBal")} by ${esc(BAL_DATE())}</b>. Tha
       :`<p class="then">Then <b>${P$("monthlyFirst")} by ${esc(BAL_DATE())}</b> and ${P$("monthly")} on 1 December and 1 January.</p>`}
 ${open && s !== null ? `<div class="seats"><div class="label"><span>${esc(cfg().offerLabel)} seats</span><span><b class="js-seats-left">${s}</b> of ${lim} left</span></div><div class="meter" role="progressbar" aria-label="Early-bird seats left" aria-valuemin="0" aria-valuemax="${lim}" aria-valuenow="${s}"><i style="width:${Math.round(s/lim*100)}%"></i></div></div>` : ""}
 <a class="btn green block" href="${cta.href}" data-ga-enrol="hero">${cta.label}</a>
+${FULL() ? `<div class="or"><span>or</span></div>${fullBtn("hero", "btn deep block")}<p class="fine full-note">One payment, nothing more to pay later.</p>` : ""}
 <p class="fine">Prices in ${curSelect()} · <a href="/#pricing">See ${open?"the monthly plan":"all plans"}</a></p>
 <p class="fine charge-note" data-charge-note hidden></p></aside>`;
 }
@@ -309,7 +313,7 @@ function plansBlock(){
   const early = DEP()
     ? `<article class="plan${open?" best":" off"}" aria-labelledby="p-early">${open?`<span class="flag">Save ${P$("save")}</span>`:""}<div class="stack" style="gap:6px"><h3 id="p-early">${esc(cfg().offerLabel)}, paid once</h3><p class="muted small">${open?`Closes ${esc(EARLY_DATE())}${cfg().seatLimit?` or when ${cfg().seatLimit} seats are taken`:""}.`:"This offer has closed."}</p></div>
 <div class="total">${P$("early")}<small>in total</small></div><ul class="sched"><li class="today"><span>Today, to reserve your seat</span><b>${P$("deposit")}</b></li><li><span>By ${esc(BAL_DATE())}</span><b>${P$("earlyBal")}</b></li></ul>
-${open?`<a class="btn green block" href="/checkout?plan=deposit-early" data-ga-enrol="pricing"><span>Reserve my seat for ${P$("deposit")}</span></a>`:`<span class="btn ghost block" aria-disabled="true">${esc(cfg().offerLabel)} has closed</span>`}</article>`
+${open?`<div class="plan-ctas"><a class="btn green block" href="/checkout?plan=early" data-ga-enrol="pricing_full"><span>Pay ${P$("early")} in full now</span></a><a class="btn block" href="/checkout?plan=deposit-early" data-ga-enrol="pricing"><span>Or reserve with ${P$("deposit")}</span></a></div>`:`<span class="btn ghost block" aria-disabled="true">${esc(cfg().offerLabel)} has closed</span>`}</article>`
     : `<article class="plan${open?" best":" off"}"><div class="stack" style="gap:6px"><h3>${esc(cfg().offerLabel)}, paid once</h3><p class="muted small">${open?`Until ${esc(EARLY_DATE())}.`:"This offer has closed."}</p></div><div class="total">${P$("early")}<small>paid once</small></div>${open?`<a class="btn green block" href="/checkout?plan=early" data-ga-enrol="pricing"><span>Pay ${P$("early")}</span></a>`:`<span class="btn ghost block" aria-disabled="true">Closed</span>`}</article>`;
   const monthly = DEP()
     ? `<article class="plan${open?"":" best"}" aria-labelledby="p-monthly"><div class="stack" style="gap:6px"><h3 id="p-monthly">Monthly plan</h3><p class="muted small">${P$("monthly")} a month for ${cfg().instalmentCount} months.</p></div>
@@ -537,7 +541,7 @@ function coState(){ const c = sget("npa-co") || { step:1, country:"NG", plan:nul
 function coSave(c){ sset("npa-co", c); }
 function coPlan(c){
   let p = PLAN_PARAM[c.plan] || null;
-  if (DEP() && p === "early") p = "deposit_early"; if (DEP() && p === "monthly") p = "deposit_monthly";
+  if (DEP() && p === "monthly") p = "deposit_monthly"; // paying in full ("early") stays available with deposits
   if (!DEP() && p === "deposit_early") p = "early"; if (!DEP() && p === "deposit_monthly") p = "monthly";
   if (!p) p = earlyOpen() ? (DEP() ? "deposit_early" : "early") : (DEP() ? "deposit_monthly" : "monthly");
   if ((p === "early" || p === "deposit_early") && !earlyOpen()) p = DEP() ? "deposit_monthly" : "monthly";
@@ -557,7 +561,8 @@ function coRender(){
   const v = PV(shown), m$ = n => money(n, shown);
   const choice = (id, title, price, lines, disabled, note) => `<button type="button" role="radio" aria-checked="${plan===id}" class="choice ${plan===id?"on":""}" data-act="co-plan" data-v="${id}"${disabled?" disabled":""}><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">${title}</b><b style="font-size:20px;color:var(--ink)">${price}</b></span>${lines}${note?`<span class="small" style="font-weight:700;color:var(--green-ink)">${note}</span>`:""}</span></button>`;
   const plans = DEP()
-    ? (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, paid once`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_LEFT()!==null?` · ${SEATS_LEFT()} seats left`:""}` : "Offer has closed") : "")
+    ? (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid in full now`, m$(v.early), `<span class="small">One payment today. Nothing more to pay later.</span>`, !open, open ? `Save ${m$(v.save)} · best value, one payment` : "Offer has closed") : "")
+      + (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, reserve with a deposit`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_LEFT()!==null?` · ${SEATS_LEFT()} seats left`:""}` : "Offer has closed") : "")
       + choice("deposit_monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.deposit)} today, ${m$(v.monthlyFirst)} by ${esc(BAL_DATE())}, then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "")
     : (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid once`, m$(v.early), `<span class="small">${esc(cfg().outrightCopy)}</span>`, !open, open ? "Available now" : "Offer has closed") : "")
       + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${esc(cfg().instalmentCopy)} ${m$(v.monthlyTotal)} in total.</span>`, false, "");
