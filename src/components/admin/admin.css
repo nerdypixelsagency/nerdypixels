@@ -309,3 +309,9 @@
   .adm.collapsed .adm-nav { overflow: visible; }
 }
 @media (max-width: 980px) { .adm-collapse { display: none; } }
+/* Phone/tablet drawer controls (after the desktop defaults above so they win) */
+@media (max-width: 980px) {
+  .adm-menu-btn, .adm-menu-close { display: inline-flex; }
+  .adm-top-logo { display: block; }
+  .adm-backdrop { display: block; }
+}
