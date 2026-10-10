@@ -23,9 +23,9 @@ export const HOME_DEFAULTS = {
   hero: {
     show: true,
     kicker: "Next cohort starts {startDate}",
-    title: "Start 2027 as a",
-    accent: "working digital marketer.",
-    lead: "A live, practical bootcamp taught by marketers who do the work every day. Eight modules, five certifications and a real brand project for your portfolio.",
+    title: "Start 2027 as an",
+    accent: "AI-powered digital marketer.",
+    lead: "A live, practical bootcamp taught by marketers who do the work every day. Learn SEO, ads, social and analytics, and the AI tools that make you faster. Eight modules, five certifications and a real brand project for your portfolio.",
     secondary: "Not ready? Join the free class first →",
     trust: [{ text: "Fully refundable for 7 days" }, { text: "{deposit} counts toward your fee" }, { text: "Pay from anywhere in the world" }],
     image: "/brand/photos/hero-neon-1920.webp",
