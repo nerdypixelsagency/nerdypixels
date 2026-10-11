@@ -81,9 +81,12 @@ function detectCurrency(){
   const ok = c => c && curList().some(x => x.code === c);
   try{ const f = new URLSearchParams(location.search).get("currency"); if (ok(f && f.toUpperCase())) return [f.toUpperCase(), "link"]; }catch(e){}
   try{ const s = localStorage.getItem("npa_currency"); if (ok(s)) return [s, "manual"]; }catch(e){}
-  if (GEO) return [autoCurrency(GEO), "auto"];
+  // The device's own timezone is a more reliable signal of where the visitor is
+  // than IP geolocation, which often misplaces Nigerian mobile networks abroad.
+  // So trust the timezone first; fall back to the edge IP country, then naira.
   let tz = ""; try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){}
   if (TZ_COUNTRY[tz]) return [autoCurrency(TZ_COUNTRY[tz]), "auto"];
+  if (GEO) return [autoCurrency(GEO), "auto"];
   // No signal at all: naira, since most visitors are in Nigeria.
   return ["NGN", "auto"];
 }
