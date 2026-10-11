@@ -363,3 +363,20 @@ main.home .hero h1,.hero h1{font-size:clamp(40px,5.4vw,80px);font-weight:800;let
   .ins-hint{display:block;margin:-6px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
   .ins-card:hover{transform:none}
 }
+
+/* Instructor carousel pagination (phones): the active dot stretches and fills until the next slide */
+.ins-dots{display:none}
+@media (max-width:760px){
+  .ins-rail{scroll-behavior:smooth}
+  .ins-dots{display:flex;justify-content:center;align-items:center;gap:7px;margin-top:2px}
+  .ins-dot{position:relative;width:8px;height:8px;padding:0;border:0;border-radius:999px;background:#d8cdee;cursor:pointer;overflow:hidden;transition:width .35s var(--ease),background .35s var(--ease)}
+  .ins-dot::before{content:"";position:absolute;inset:-10px}
+  .ins-dot.on{width:30px;background:#e4d8fb}
+  .ins-dot i{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,var(--purple),#a06bff);transform:scaleX(0);transform-origin:left}
+  .ins-dot.on i{animation:ins-fill var(--rail-ms,3500ms) linear forwards}
+  .rail-paused .ins-dot.on i{animation:none;transform:scaleX(1)}
+  .ins-dot:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+}
+@keyframes ins-fill{to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.ins-dot.on i{animation:none;transform:scaleX(1)}}
+@media (max-width:760px){.js-motion main .ins-card[data-reveal]{opacity:1;transform:none}}

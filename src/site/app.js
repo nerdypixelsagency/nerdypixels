@@ -360,7 +360,7 @@ function instructors(){
     const m = src.match(/^(\/brand\/instructors\/.+)-720\.webp$/);
     const img = src ? `<img src="${esc(src)}"${m?` srcset="${m[1]}-400.webp 400w, ${esc(src)} 720w" sizes="(max-width:640px) 78vw, (max-width:1100px) 33vw, 25vw"`:""} alt="${esc(i.name)}" width="720" height="900" loading="lazy" decoding="async">` : `<span class="ins-initials" aria-hidden="true">${esc(ini(i.name))}</span>`;
     return `<article class="ins-card" data-reveal style="--i:${k}"><div class="ins-photo">${img}</div><div class="ins-info"><h3>${esc(i.name)}</h3><p>${esc(i.role)}${i.org?` <span class="ins-org">· ${esc(i.org)}</span>`:""}</p>${li?`<a class="ins-li" href="${esc(li)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(i.name)} on LinkedIn">${LI}<span>LinkedIn</span></a>`:""}</div></article>`; };
-  return `<div class="ins-rail" tabindex="0" aria-label="Instructors">${list.map(card).join("")}</div>${list.length > 1 ? `<p class="ins-hint" aria-hidden="true">Swipe to meet all ${list.length} instructors →</p>` : ""}`;
+  return `<div class="ins-rail" tabindex="0" aria-label="Instructors">${list.map(card).join("")}</div>${list.length > 1 ? `<div class="ins-dots" role="tablist" aria-label="Choose an instructor">${list.map((x, k) => `<button type="button" role="tab" class="ins-dot${k ? "" : " on"}" aria-label="${esc(x.name)}" aria-selected="${k ? "false" : "true"}" data-rail-dot="${k}"><i></i></button>`).join("")}</div>` : ""}`;
 }
 function modulesList(){
   return MODULES.map(m=>`<article class="card module"><div class="num" aria-hidden="true">${m[0]}</div><div class="stack" style="gap:6px"><h3>Module ${m[0]}: ${m[1]}</h3><p class="muted">${m[2]}</p>${m[4]?MOD_CERT:""}</div><div class="out"><span>Portfolio output</span>${m[3]}</div></article>`).join("")
@@ -812,7 +812,43 @@ function countUp(el){
   const step = t => { const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (to * e).toLocaleString("en-US", { maximumFractionDigits: dec, minimumFractionDigits: dec }) + suf; if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
+/* Phone carousels (instructors): autoplay, synced dots, pause on touch/off-screen. */
+const RAIL_MS = 3500;
+let railCleanup = [];
+function setupRails(){
+  railCleanup.forEach(fn => fn()); railCleanup = [];
+  const phone = matchMedia("(max-width: 760px)").matches;
+  document.querySelectorAll(".ins-rail").forEach(rail => {
+    const dots = rail.nextElementSibling && rail.nextElementSibling.classList.contains("ins-dots") ? [...rail.nextElementSibling.children] : [];
+    const cards = [...rail.children];
+    if (!phone || cards.length < 2) return;
+    rail.style.setProperty("--rail-ms", RAIL_MS + "ms");
+    let idx = 0, timer = null, resume = null, visible = false, raf = 0;
+    const setActive = i => { idx = i; dots.forEach((d, k) => { d.classList.toggle("on", k === i); d.setAttribute("aria-selected", String(k === i)); }); restartBar(); };
+    const restartBar = () => { const d = dots[idx]; if (!d) return; d.classList.remove("on"); void d.offsetWidth; d.classList.add("on"); };
+    const go = i => { const c = cards[(i + cards.length) % cards.length]; rail.scrollTo({ left: c.offsetLeft - (rail.clientWidth - c.offsetWidth) / 2, behavior: reduced() ? "auto" : "smooth" }); };
+    const nearest = () => { const mid = rail.scrollLeft + rail.clientWidth / 2; let best = 0, dist = Infinity; cards.forEach((c, k) => { const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid); if (d < dist) { dist = d; best = k; } }); return best; };
+    const stop = () => { clearInterval(timer); timer = null; };
+    const start = () => { stop(); if (reduced() || !visible || document.hidden) return; timer = setInterval(() => go(idx + 1), RAIL_MS); restartBar(); };
+    const pause = () => { stop(); clearTimeout(resume); rail.parentElement.classList.add("rail-paused"); resume = setTimeout(() => { rail.parentElement.classList.remove("rail-paused"); start(); }, 6000); };
+    const onScroll = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const n = nearest(); if (n !== idx) setActive(n); }); };
+    const onDot = e => { const b = e.target.closest("[data-rail-dot]"); if (!b) return; pause(); go(Number(b.dataset.railDot)); };
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; visible ? start() : stop(); }, { threshold: 0.35 });
+    const onVis = () => (document.hidden ? stop() : start());
+    rail.addEventListener("scroll", onScroll, { passive: true });
+    rail.addEventListener("touchstart", pause, { passive: true });
+    rail.addEventListener("pointerdown", pause);
+    rail.addEventListener("focusin", pause);
+    rail.nextElementSibling && rail.nextElementSibling.addEventListener("click", onDot);
+    document.addEventListener("visibilitychange", onVis);
+    io.observe(rail);
+    railCleanup.push(() => { stop(); clearTimeout(resume); io.disconnect(); rail.removeEventListener("scroll", onScroll); rail.removeEventListener("touchstart", pause); rail.removeEventListener("pointerdown", pause); rail.removeEventListener("focusin", pause); document.removeEventListener("visibilitychange", onVis); });
+  });
+}
+let railResize = 0;
+if (typeof window !== "undefined") addEventListener("resize", () => { clearTimeout(railResize); railResize = setTimeout(setupRails, 250); });
 function enhance(){
+  setupRails();
   if (io) io.disconnect();
   const targets = document.querySelectorAll("main .section, main .stats-strip, main .final, main [data-reveal], main .stat b[data-count]");
   if (!("IntersectionObserver" in window) || reduced()) { targets.forEach(t => t.classList.add("in")); return; }
