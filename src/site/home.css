@@ -380,3 +380,7 @@ main.home .hero h1,.hero h1{font-size:clamp(40px,5.4vw,80px);font-weight:800;let
 @keyframes ins-fill{to{transform:scaleX(1)}}
 @media (prefers-reduced-motion:reduce){.ins-dot.on i{animation:none;transform:scaleX(1)}}
 @media (max-width:760px){.js-motion main .ins-card[data-reveal]{opacity:1;transform:none}}
+
+/* Focus moves to <main> after each page change (for screen readers); it needs no visible ring.
+   This ring was the purple line under the header and above the footer. */
+#main:focus,#main:focus-visible{outline:none}
