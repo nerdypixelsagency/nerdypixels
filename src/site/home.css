@@ -384,3 +384,21 @@ main.home .hero h1,.hero h1{font-size:clamp(40px,5.4vw,80px);font-weight:800;let
 /* Focus moves to <main> after each page change (for screen readers); it needs no visible ring.
    This ring was the purple line under the header and above the footer. */
 #main:focus,#main:focus-visible{outline:none}
+
+/* Hero photo positioning: subject sits in the open space between headline and seat card */
+.hero-bg img{opacity:.92;filter:saturate(1.15) contrast(1.05);object-position:52% 28%;transform-origin:52% 30%}
+.hero-bg::after{background:linear-gradient(90deg,rgba(26,6,60,.95) 0%,rgba(28,6,64,.86) 26%,rgba(32,8,72,.42) 40%,rgba(36,8,80,.12) 52%,rgba(36,8,80,.28) 70%,rgba(36,8,80,.55) 100%),linear-gradient(0deg,rgba(26,6,60,.55),transparent 35%)}
+.hero h1,.hero .lead,.hero .kicker-line,.hero .trust{text-shadow:0 2px 22px rgba(20,5,46,.55)}
+@media (max-width:900px){
+  /* Phones/tablets: photo covers the top of the hero, framed on face and laptop, then fades out */
+  .hero-bg{bottom:auto;height:min(78vw,560px)}
+  .hero-bg img{object-position:50% 22%;opacity:.95}
+  .hero-bg::after{background:linear-gradient(180deg,rgba(36,8,80,.38) 0%,rgba(36,8,80,.5) 45%,rgba(36,8,80,.88) 80%,var(--deeper) 100%)}
+}
+@media (max-width:900px){
+  /* Homepage: leave a clear photo band above the eyebrow so her face is not under the headline */
+  .hero[aria-labelledby="hero-title"]{padding-top:calc(min(78vw,560px) * .4)}
+  .hero[aria-labelledby="hero-title"] .hero-bg::after{background:linear-gradient(180deg,rgba(36,8,80,.12) 0%,rgba(36,8,80,.2) 30%,rgba(36,8,80,.7) 55%,rgba(36,8,80,.92) 80%,var(--deeper) 100%)}
+  /* Fade the whole photo layer out so it melts into the hero colour with no seam */
+  .hero-bg{-webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%);mask-image:linear-gradient(180deg,#000 62%,transparent 100%)}
+}
