@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/admin/leads")({
 });
 
 const q = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-const CAT: Record<string, string> = { hero_lead: "Hero lead form", free_event: "Free event", student_profile: "Student profile", contact: "Contact" };
+const CAT: Record<string, string> = { hero_lead: "Hero lead form", checkout: "Checkout", free_event: "Free event", syllabus: "Syllabus download", student_profile: "Student profile", contact: "Contact" };
 const PAY: Record<string, { label: string; cls: string }> = {
   not_paid: { label: "Not paid", cls: "failed" },
   checkout_started: { label: "Checkout started", cls: "pending" },

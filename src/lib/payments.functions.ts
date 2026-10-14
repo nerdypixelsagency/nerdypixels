@@ -103,6 +103,22 @@ export const startPayment = createServerFn({ method: "POST" })
       console.error("[startPayment:db_insert]", error.code, error.message);
       throw new Error("We couldn't start the payment. Please try again.");
     }
+    // Record the checkout as a lead too, so guests who don't finish paying show
+    // up in Leads for follow-up. Deduped by email; never blocks the payment.
+    if (data.kind === "enrolment") {
+      try {
+        const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { data: recentLead } = await supabaseAdmin.from("leads" as never).select("id").eq("email", email).eq("category", "checkout").gte("created_at", since).limit(1);
+        if (!(recentLead as unknown[] | null)?.length) {
+          const [first, ...rest] = String(data.name).trim().split(/\s+/);
+          await supabaseAdmin.from("leads" as never).insert({
+            first_name: first || data.name, last_name: rest.join(" ") || "-",
+            email, phone: data.phone || "-", country: data.country || geo,
+            source: data.source || "Checkout", category: "checkout", mode,
+          } as never);
+        }
+      } catch (e) { console.error("[startPayment:lead]", e); }
+    }
     const title = key ? (key === "Balance" ? "Bootcamp balance" : `${key} instalment`) : isDepositPlan(plan) ? "Bootcamp seat deposit" : plan === "early" ? "Bootcamp, early bird" : "Bootcamp, first month";
     const link = await flwCreatePayment({
       mode,

@@ -35,19 +35,38 @@ async function resolveAudience(audience: (typeof AUDIENCES)[number], cohortId?: 
   return uniq((data ?? []).map((r) => ({ email: r.email, name: r.name })));
 }
 
-async function leadsWithStatus(mode: string) {
+type LeadRow = { id: string; first_name: string; last_name: string; email: string; phone: string; country: string | null; source: string | null; category: string; created_at: string; followup_count: number; last_followup_at: string | null; mode: string; pay_status: string };
+
+async function leadsWithStatus(mode: string): Promise<LeadRow[]> {
   const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
   const [{ data: leads }, { data: enr }] = await Promise.all([
     db.from("leads").select("*").eq("mode", mode).order("created_at", { ascending: false }).limit(5000),
-    db.from("enrolments").select("email, status").eq("mode", mode).neq("kind", "event").limit(10000),
+    db.from("enrolments").select("id, name, email, phone, country, status, created_at").eq("mode", mode).neq("kind", "event").order("created_at", { ascending: false }).limit(10000),
   ]);
   const st = new Map<string, string>();
+  const latestEnr = new Map<string, NonNullable<typeof enr>[number]>();
   for (const e of enr ?? []) {
     const k = e.email.toLowerCase();
     if (e.status === "paid" || e.status === "existing") st.set(k, "paid");
     else if (!st.has(k)) st.set(k, "checkout_started");
+    if (!latestEnr.has(k)) latestEnr.set(k, e); // list is newest-first
   }
-  return (leads ?? []).map((l) => ({ ...l, pay_status: st.get(l.email.toLowerCase()) ?? "not_paid" }));
+  const have = new Set((leads ?? []).map((l) => l.email.toLowerCase()));
+  const rows: LeadRow[] = (leads ?? []).map((l) => ({ ...l, pay_status: st.get(l.email.toLowerCase()) ?? "not_paid" }));
+  // Guests who reached checkout (an enrolment row exists) but never filled in a
+  // lead form don't have a leads row, so surface them here for follow-up too.
+  for (const [k, e] of latestEnr) {
+    if (have.has(k)) continue;
+    const [first, ...rest] = String(e.name ?? "").trim().split(/\s+/);
+    rows.push({
+      id: e.id, first_name: first || e.email, last_name: rest.join(" ") || "-",
+      email: e.email, phone: e.phone || "-", country: e.country ?? null,
+      source: "Checkout", category: "checkout", created_at: e.created_at,
+      followup_count: 0, last_followup_at: null, mode,
+      pay_status: st.get(k) ?? "checkout_started",
+    });
+  }
+  return rows.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 }
 
 export const getLeadsWithStatus = createServerFn({ method: "GET" })
