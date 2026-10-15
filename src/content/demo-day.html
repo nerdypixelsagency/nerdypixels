@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NPD Demo Day 2026 — Event Master Plan</title>
+<meta name="description" content="NPD Demo Day 2026 — a fully virtual Demo Day for Nerdy Pixels Academy on Saturday 31 October 2026. Run-of-show, judging, games, promotion and the operations plan.">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="NPD Demo Day 2026 — Event Master Plan">
+<meta property="og:description" content="Build. Pitch. Launch. Live. The full plan for Nerdy Pixels Academy's virtual Demo Day on 31 October 2026.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#003172">
+<link rel="icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout concept: an editorial "master plan" — a sticky contents rail beside a column of
+   white section cards on a cool paper ground, with the brand navy→violet reserved for the
+   banner, number chips, table headers and callouts. Faithful to the original; elevated. */
+:root{
+  --navy:#003172; --navy-700:#06224f; --navy-900:#041634;
+  --violet:#8B51FD; --violet-600:#7132e6; --violet-soft:#f2ecff;
+  --ink:#1a2338; --body:#39415a; --muted:#5f6880; --faint:#8a92a8;
+  --line:#e6e9f2; --line-2:#d7dcea;
+  --bg:#f3f5fb; --bg-2:#eef1f9; --card:#ffffff; --accent-bg:#eef3fb;
+  --good-bg:#e4f6ea; --good:#176b3a; --warn-bg:#fff2d8; --warn:#8a5a00; --high-bg:#ffe5e5; --high:#b01e1e;
+  --radius:16px; --radius-sm:12px;
+  --shadow-sm:0 1px 2px rgba(10,30,70,.04), 0 8px 20px -14px rgba(10,30,70,.22);
+  --shadow:0 2px 6px rgba(10,30,70,.05), 0 24px 48px -26px rgba(10,30,70,.28);
+  --maxw:1160px;
+  --f:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0;background:var(--bg);color:var(--body);
+  font-family:var(--f);font-size:clamp(15px,.3vw + 14.4px,16.5px);line-height:1.62;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden;
+}
+img{max-width:100%}
+a{color:var(--violet-600);text-decoration:none}
+a:hover{text-decoration:underline}
+strong{color:var(--ink);font-weight:600}
+h1,h2,h3,h4{font-family:var(--f);color:var(--navy);line-height:1.18;text-wrap:balance;margin:0}
+:focus-visible{outline:2.5px solid var(--violet);outline-offset:3px;border-radius:4px}
+
+/* ---------------- HERO BANNER ---------------- */
+.hero{position:relative;overflow:hidden;color:#fff;isolation:isolate;
+  background:linear-gradient(135deg,var(--navy-900) 0%,var(--navy) 46%,#3a1f8f 128%)}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  background:
+   radial-gradient(42% 60% at 86% 8%,rgba(139,81,253,.5),transparent 70%),
+   radial-gradient(40% 50% at 8% 0%,rgba(26,120,220,.35),transparent 70%);}
+.hero .grid{position:absolute;inset:0;z-index:-1;opacity:.2;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px);
+  background-size:52px 52px;-webkit-mask-image:radial-gradient(80% 80% at 70% 0%,#000,transparent 75%);mask-image:radial-gradient(80% 80% at 70% 0%,#000,transparent 75%)}
+.hero-inner{max-width:var(--maxw);margin:0 auto;padding:clamp(40px,6vw,72px) 20px clamp(44px,6vw,76px)}
+.brand{font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:#cdbcff}
+.hero h1{font-size:clamp(32px,6.4vw,58px);letter-spacing:-.02em;margin:14px 0 6px;color:#fff;max-width:16ch}
+.hero .tagline{font-size:clamp(16px,2.6vw,22px);color:#e3d8ff;font-weight:500;margin:0 0 22px}
+.hero .tagline b{color:#fff;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.26);
+  padding:8px 15px;border-radius:999px;font-size:clamp(12.5px,1.4vw,14px);font-weight:500;color:#f3efff;backdrop-filter:blur(4px)}
+.pill svg{width:15px;height:15px;opacity:.9}
+
+/* ---------------- LAYOUT ---------------- */
+.layout{max-width:var(--maxw);margin:0 auto;padding:0 20px;display:grid;grid-template-columns:244px minmax(0,1fr);gap:40px;align-items:start}
+
+/* contents rail */
+.toc{position:sticky;top:20px;align-self:start;margin-top:-30px;z-index:30}
+.toc-inner{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-sm);overflow:hidden}
+.toc summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 16px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.toc summary::-webkit-details-marker{display:none}
+.toc summary .chev{width:18px;height:18px;transition:transform .2s;color:var(--violet)}
+.toc[open] summary .chev{transform:rotate(180deg)}
+.toc ol{margin:0;padding:4px 10px 12px;list-style:none;counter-reset:toc}
+.toc li{counter-increment:toc}
+.toc a{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:9px;font-size:14px;font-weight:500;color:var(--navy);line-height:1.35}
+.toc a::before{content:counter(toc,decimal-leading-zero);font-size:11px;font-weight:600;color:var(--faint);min-width:18px;font-variant-numeric:tabular-nums}
+.toc a:hover{background:var(--violet-soft);color:var(--violet-600);text-decoration:none}
+.toc a[aria-current="true"]{background:var(--violet-soft);color:var(--violet-600)}
+.toc a[aria-current="true"]::before{color:var(--violet)}
+.toc .print{margin:4px 12px 14px;width:calc(100% - 24px);text-align:center;background:var(--navy);color:#fff;border:0;border-radius:10px;padding:11px 12px;font:600 13px var(--f);cursor:pointer;transition:background .2s}
+.toc .print:hover{background:var(--violet-600)}
+
+main{padding:34px 0 72px;min-width:0}
+
+/* ---------------- SECTION CARDS ---------------- */
+section{scroll-margin-top:84px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:clamp(22px,3.4vw,34px);margin-bottom:22px;box-shadow:var(--shadow-sm)}
+section > h2{display:flex;align-items:center;gap:14px;font-size:clamp(21px,3vw,29px);letter-spacing:-.01em;margin:0 0 6px}
+.num{flex:0 0 auto;width:38px;height:38px;border-radius:11px;display:inline-grid;place-items:center;font-size:15px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--navy),var(--violet));box-shadow:0 6px 16px -8px rgba(113,50,230,.8)}
+section h3{font-size:clamp(16px,1.8vw,19px);font-weight:600;margin:30px 0 10px;letter-spacing:-.01em}
+section h3:first-of-type{margin-top:22px}
+p{margin:0 0 2px}
+section > p{max-width:72ch}
+
+.lead{font-size:clamp(15.5px,1.8vw,17.5px);color:var(--ink);font-weight:500;line-height:1.55;
+  border-left:4px solid var(--violet);background:linear-gradient(180deg,var(--violet-soft),#faf8ff);
+  padding:16px 20px;border-radius:0 12px 12px 0;margin:4px 0 8px;max-width:none}
+.note{font-size:clamp(13.5px,1.5vw,14.5px);color:var(--muted);margin-top:12px;line-height:1.55}
+
+/* ---------------- TABLES ---------------- */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:14px 0 6px;box-shadow:var(--shadow-sm);
+  -webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:clamp(13.5px,1.4vw,14.5px);min-width:560px}
+thead th{background:var(--navy);color:#fff;text-align:left;padding:12px 14px;font-weight:600;white-space:nowrap;position:sticky;top:0}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top;color:var(--body)}
+tbody tr:nth-child(even) td{background:#fafbff}
+tbody tr:hover td{background:var(--accent-bg)}
+tr.key td{background:var(--violet-soft)!important;font-weight:500;color:var(--ink)}
+td.time{white-space:nowrap;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+td strong{color:var(--ink)}
+
+.tag{display:inline-block;font-size:11.5px;padding:3px 10px;border-radius:999px;font-weight:600;letter-spacing:.01em}
+.high{background:var(--high-bg);color:var(--high)}
+.medium{background:var(--warn-bg);color:var(--warn)}
+.low{background:var(--good-bg);color:var(--good)}
+
+/* ---------------- CARD GRID ---------------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0 6px}
+.card{border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;background:linear-gradient(180deg,#fff,#fcfcff);
+  transition:transform .18s ease,box-shadow .2s ease,border-color .2s}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--line-2)}
+.card h4{margin:0 0 7px;color:var(--violet-600);font-size:15px;font-weight:600}
+.card p{margin:0;font-size:14px;color:var(--muted);line-height:1.55}
+
+/* ---------------- LISTS ---------------- */
+section ul:not(.checklist),section ol{margin:10px 0 6px;padding-left:22px}
+section ul:not(.checklist) li,section ol li{margin:7px 0;padding-left:4px}
+section ul:not(.checklist) li::marker{color:var(--violet)}
+section ol li::marker{color:var(--violet);font-weight:600}
+
+/* ---------------- CHECKLIST ---------------- */
+.progress{display:flex;align-items:center;gap:14px;margin:10px 0 6px;font-size:13.5px;color:var(--muted);font-weight:500}
+.progress #progress-text{min-width:92px;font-variant-numeric:tabular-nums}
+.bar{flex:1;height:9px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy),var(--violet));transition:width .4s ease}
+.checklist{list-style:none;padding:0;margin:4px 0 2px}
+.checklist li{display:flex;gap:12px;align-items:flex-start;padding:10px 2px;border-bottom:1px dashed var(--line)}
+.checklist li:last-child{border-bottom:0}
+.checklist input{appearance:none;-webkit-appearance:none;margin:2px 0 0;width:20px;height:20px;flex:0 0 20px;border:2px solid var(--line-2);border-radius:6px;cursor:pointer;position:relative;transition:background .15s,border-color .15s}
+.checklist input:hover{border-color:var(--violet)}
+.checklist input:checked{background:var(--violet);border-color:var(--violet)}
+.checklist input:checked::after{content:"";position:absolute;left:5.5px;top:1.5px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.checklist label{cursor:pointer;font-size:14.5px;color:var(--body);line-height:1.5}
+.checklist input:checked + label{color:var(--faint);text-decoration:line-through}
+
+.credit{text-align:center;color:var(--faint);font-size:13px;padding:8px 20px 44px;line-height:1.6}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (min-width:1001px){
+  .toc summary{cursor:default}
+  .toc .chev{display:none}
+  .toc[open] summary,.toc summary{pointer-events:none}
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr;gap:0;padding:0 16px}
+  .toc{position:sticky;top:env(safe-area-inset-top,0px);margin-top:0;padding-top:12px;background:linear-gradient(180deg,var(--bg) 70%,transparent)}
+  .toc-inner{box-shadow:var(--shadow)}
+  .toc ol{columns:2;column-gap:4px;padding:6px 8px 10px}
+  .toc li{break-inside:avoid}
+  main{padding-top:22px}
+  section{scroll-margin-top:118px}
+}
+@media (max-width:560px){
+  .layout{padding:0 14px}
+  .toc ol{columns:1}
+  .grid{grid-template-columns:1fr}
+  section{padding:20px 16px}
+  .lead{padding:14px 16px}
+  .hero-inner{padding-left:16px;padding-right:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HERO ===================== -->
+<div class="hero">
+  <div class="grid" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="brand">Nerdy Pixels Academy · Event Master Plan</div>
+    <h1>NPD Demo Day 2026</h1>
+    <p class="tagline"><b>Build.</b> Pitch. Launch. <b>Live.</b></p>
+    <div class="meta">
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Saturday, 31 October 2026</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>09:45 – 17:15 WAT</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>100% virtual</span>
+      <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>9 teams · 15-minute pitches</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- ===================== CONTENTS ===================== -->
+<nav class="toc" aria-label="Contents">
+  <details class="toc" open>
+    <summary>On this page <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></summary>
+    <div class="toc-inner">
+      <ol>
+        <li><a href="#overview">Event overview</a></li>
+        <li><a href="#run-of-show">Run-of-show</a></li>
+        <li><a href="#judging">Pitch format &amp; judging</a></li>
+        <li><a href="#engagement">Games &amp; live voting</a></li>
+        <li><a href="#promotion">Promotion &amp; listings</a></li>
+        <li><a href="#countdown">19-day countdown</a></li>
+        <li><a href="#checklist">Operations checklist</a></li>
+        <li><a href="#risks">Roles &amp; risks</a></li>
+        <li><a href="#recommendations">Recommendations</a></li>
+      </ol>
+      <button class="print" type="button" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </details>
+</nav>
+
+<main>
+
+<!-- 1 OVERVIEW -->
+<section id="overview">
+  <h2><span class="num">1</span>Event overview</h2>
+  <p class="lead">Demo Day runs fully online on <strong>Saturday, 31 October 2026, 09:45–17:15 WAT</strong>. A produced livestream is broadcast to YouTube and LinkedIn, and registered guests also get access to the voting, games and networking rooms.</p>
+  <p>Nine teams pitch, NPD launches its new website live, and a panel, speakers and games keep online viewers watching and voting all day. With 19 days to go, the plan relies on fast, organic, community-led promotion rather than paid media.</p>
+
+  <h3>Goals for the day</h3>
+  <div class="grid">
+    <div class="card"><h4>Showcase the teams</h4><p>Give all 9 teams a professional broadcast stage to present their product and launch strategy to judges, brands and recruiters.</p></div>
+    <div class="card"><h4>Launch the website</h4><p>Launch the new NPD website with a moment people share, and drive its first wave of traffic.</p></div>
+    <div class="card"><h4>Grow NPD Academy</h4><p>Position NPD as the place where African digital marketers learn by building, and turn viewers into Cohort 2 enrolments.</p></div>
+  </div>
+
+  <h3>Proposed success targets</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Metric</th><th>Target</th></tr></thead>
+    <tbody>
+      <tr><td>Registrations (all channels)</td><td>1,000</td></tr>
+      <tr><td>Peak concurrent live viewers</td><td>300</td></tr>
+      <tr><td>Unique live viewers across platforms</td><td>800</td></tr>
+      <tr><td>Average viewing time per viewer</td><td>60+ minutes</td></tr>
+      <tr><td>People's Choice votes cast</td><td>400</td></tr>
+      <tr><td>Replay views within 7 days</td><td>3,000</td></tr>
+      <tr><td>New-website sessions on launch day</td><td>2,000</td></tr>
+      <tr><td>Cohort 2 leads captured</td><td>200</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What we borrow from the reference events</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Reference</th><th>What it does well</th><th>How we apply it online</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bolt.new hackathon</strong></td><td>Public project gallery, livestreamed judging, community voting, multiple award categories</td><td>Online showcase of all 9 projects, a People's Choice vote open to every registered viewer, and category prizes so more teams win</td></tr>
+      <tr><td><strong>Adobe Summit</strong></td><td>High-production keynote and a playful "Sneaks" segment that reveals new products with an entertaining host</td><td>The website launch becomes an "NPD Sneaks" broadcast moment with a countdown, live demo and Easter-egg hunt</td></tr>
+      <tr><td><strong>Google Marketing Live</strong></td><td>A tight, scripted product keynote built for the livestream, then on-demand recap content</td><td>Broadcast-style production: branded overlays, strict segment timings, and every session clipped for replay</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 2 RUN OF SHOW -->
+<section id="run-of-show">
+  <h2><span class="num">2</span>Run-of-show: Saturday, 31 October (WAT)</h2>
+  <p class="lead">The nine pitches run in three blocks of three, with something interactive every 60 minutes or less. Each pitch slot is 20 minutes: a 15-minute pitch, 4-minute judges' Q&amp;A, and a 1-minute switch.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Time</th><th>Duration</th><th>Segment</th><th>Online production notes</th></tr></thead>
+    <tbody>
+      <tr><td class="time">08:30</td><td>75 min</td><td>Crew and presenter tech check</td><td>Every speaker and team joins the studio backstage; audio, camera, screen-share and backup power checked</td></tr>
+      <tr><td class="time">09:45</td><td>15 min</td><td>Pre-show goes live</td><td>Countdown, music and highlight reel on stream; warm-up trivia (Game 1) open on phones</td></tr>
+      <tr><td class="time">10:00</td><td>10 min</td><td>MC welcome</td><td>How to vote and play, hashtag, one QR code and link, teaser of "something new at 1:20pm"</td></tr>
+      <tr><td class="time">10:10</td><td>15 min</td><td>Opening keynote</td><td>NPD lead: why we teach by building, and the state of digital marketing in Africa</td></tr>
+      <tr><td class="time">10:25</td><td>10 min</td><td>Hackathon story film and judges' introduction</td><td>3-minute recap video, then judges appear on screen together</td></tr>
+      <tr class="key"><td class="time">10:35</td><td>60 min</td><td>Pitch Block A: Teams 1–3</td><td>Team on screen with slides; judges join for Q&amp;A</td></tr>
+      <tr><td class="time">11:35</td><td>15 min</td><td>Game 2: "Guess the Brand"</td><td>Live leaderboard overlay on stream</td></tr>
+      <tr class="key"><td class="time">11:50</td><td>60 min</td><td>Pitch Block B: Teams 4–6</td><td>Pitch Bingo (Game 3) runs alongside</td></tr>
+      <tr><td class="time">12:50</td><td>30 min</td><td>Lunch break</td><td>Sponsor videos and team teaser reel loop on stream; Meme Caption Challenge (Game 4) runs on social</td></tr>
+      <tr class="key"><td class="time">13:20</td><td>20 min</td><td>NPD Sneaks: new website launch</td><td>On-screen countdown, live screen-shared reveal, 5-minute tour, Easter-egg hunt opens (Game 5)</td></tr>
+      <tr class="key"><td class="time">13:40</td><td>40 min</td><td>Panel discussion</td><td>Proposed topic: "From Bootcamp to Boardroom: What Brands Want from Digital Marketers in 2027"; audience questions from chat</td></tr>
+      <tr class="key"><td class="time">14:20</td><td>60 min</td><td>Pitch Block C: Teams 7–9</td><td>Last block; voting opens immediately after</td></tr>
+      <tr><td class="time">15:20</td><td>20 min</td><td>People's Choice voting opens + guest speaker</td><td>Judges deliberate in a private room while the speaker is live; proposed topic: AI, search and the new marketing playbook</td></tr>
+      <tr><td class="time">15:40</td><td>10 min</td><td>Game 6: Rapid-fire Finale; voting closes</td><td>Quiz on what the teams pitched; final leaderboard</td></tr>
+      <tr class="key"><td class="time">15:50</td><td>25 min</td><td>Awards ceremony</td><td>Winners revealed on graphics; winning teams brought on screen live</td></tr>
+      <tr><td class="time">16:15</td><td>15 min</td><td>Closing and next steps</td><td>Cohort 2 announcement with a Demo Day offer, thank-yous, "cameras on" group screenshot</td></tr>
+      <tr><td class="time">16:30</td><td>45 min</td><td>Virtual networking rooms</td><td>Optional breakout rooms: meet the teams, judges and recruiters</td></tr>
+      <tr><td class="time">17:15</td><td>—</td><td>Close</td><td>Replay published the same evening</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Pitch structure for every team (15 minutes)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Part</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Problem and customer insight</td><td>2 min</td></tr>
+      <tr><td>2</td><td>Product and live demo by screen-share</td><td>5 min</td></tr>
+      <tr><td>3</td><td>Marketing and launch strategy: positioning, channels, budget, first 90 days, KPIs</td><td>6 min</td></tr>
+      <tr><td>4</td><td>Traction, business model and the ask</td><td>2 min</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Pitch order is drawn live on the rehearsal stream on 28 October. One team member presents and one stands by on a separate device and network, ready to take over if the presenter drops.</p>
+</section>
+
+<!-- 3 JUDGING -->
+<section id="judging">
+  <h2><span class="num">3</span>Pitch format and judging</h2>
+  <p class="lead">Four judges score every team out of 100 on a shared online scoresheet, with marketing strategy carrying the most weight. People's Choice is a separate viewer award, so the main result cannot be swung by whichever team brings the biggest online crowd.</p>
+
+  <h3>Judging panel (4 seats, all remote)</h3>
+  <div class="grid">
+    <div class="card"><h4>Brand marketer</h4><p>A senior brand or growth marketer from a recognised African brand.</p></div>
+    <div class="card"><h4>Founder or investor</h4><p>A founder or early-stage investor.</p></div>
+    <div class="card"><h4>Product lead</h4><p>A product or technology lead.</p></div>
+    <div class="card"><h4>NPD faculty</h4><p>Chief judge and tie-breaker.</p></div>
+  </div>
+  <p class="note">The virtual format lets us invite judges from anywhere in Africa or the diaspora. Each judge receives a webcam-and-headset checklist and joins the 28 October rehearsal.</p>
+
+  <h3>Scoring rubric</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Criterion</th><th>Weight</th><th>What judges look for</th></tr></thead>
+    <tbody>
+      <tr><td>Marketing and launch strategy</td><td><strong>30</strong></td><td>Clear audience, positioning, channel mix, budget, 90-day plan, measurable KPIs</td></tr>
+      <tr><td>Product quality and live demo</td><td><strong>20</strong></td><td>Working MVP, core action completed live on screen, polished and trustworthy interface</td></tr>
+      <tr><td>Problem and customer insight</td><td><strong>15</strong></td><td>Real African problem, evidence the customer cares</td></tr>
+      <tr><td>Creativity of the launch idea</td><td><strong>15</strong></td><td>A launch moment people would talk about and share</td></tr>
+      <tr><td>Business model and feasibility</td><td><strong>10</strong></td><td>How it makes money or saves cost; realistic next steps</td></tr>
+      <tr><td>Pitch delivery</td><td><strong>10</strong></td><td>Clarity, on-camera presence, time discipline, handling of Q&amp;A</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Scores are entered in a locked Google Form or sheet during each Q&amp;A and collated by the programme lead during deliberation.</p>
+
+  <h3>Timekeeping rules</h3>
+  <ul>
+    <li>An on-screen countdown timer overlay is visible to the team and to viewers.</li>
+    <li>The producer shows chat cues at 5, 2 and 1 minute; at 15:30 the team's audio is faded and the MC steps in.</li>
+    <li>Overruns cost 2 rubric points per 30 seconds.</li>
+    <li>Every team submits by 27 October a 3-minute backup demo video and a full pre-recorded pitch, played if their power or internet fails.</li>
+  </ul>
+
+  <h3>Awards</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Award</th><th>Decided by</th><th>Suggested prize</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Overall Winner</strong></td><td>Judges' total score</td><td>Cash prize, digital trophy and certificate, feature on the NPD website, partner mentoring</td></tr>
+      <tr><td><strong>Runner-up</strong></td><td>Judges' total score</td><td>Cash prize and certificates</td></tr>
+      <tr><td>Best Marketing Strategy</td><td>Highest marketing score</td><td>Tool credits or ad credits from a sponsor</td></tr>
+      <tr><td>Best Product Demo</td><td>Highest product score</td><td>Tool credits</td></tr>
+      <tr><td>Best Pitch</td><td>Highest delivery score</td><td>Speaking slot at a future NPD event</td></tr>
+      <tr><td>People's Choice</td><td>Viewer vote</td><td>Digital badge and social media feature</td></tr>
+      <tr><td>Audience Champion (top 3 players)</td><td>Game leaderboard</td><td>Data bundles, airtime, NPD course discounts</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Physical trophies and certificates are couriered to winners in the week after the event.</p>
+
+  <h3>People's Choice voting</h3>
+  <ul>
+    <li>Run on Slido or Mentimeter, gated by registration: one vote per registered email, checked against the attendee list.</li>
+    <li>Voting opens at 15:20 and closes at 15:50, after all nine teams have pitched, so early teams are not disadvantaged.</li>
+    <li>Each project gets a page in the online showcase gallery on the new website, so viewers can review every team before voting.</li>
+  </ul>
+</section>
+
+<!-- 4 ENGAGEMENT -->
+<section id="engagement">
+  <h2><span class="num">4</span>Audience engagement: virtual games and live voting</h2>
+  <p class="lead">Six short games run on one cumulative leaderboard, with prizes awarded only to people present at the finale. Everything is played on a phone or second screen through one link and one QR code.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Game</th><th>When</th><th>How it works</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Warm-up trivia</strong></td><td>09:45–10:00</td><td>Brand and marketing trivia on Kahoot or Mentimeter</td><td>Gets everyone onto the voting tool before the show starts</td></tr>
+      <tr><td>2</td><td><strong>Guess the Brand</strong></td><td>11:35</td><td>Brand clues shown as emojis or taglines on stream; fastest correct answers score</td><td>High-energy break between pitch blocks</td></tr>
+      <tr><td>3</td><td><strong>Pitch Bingo</strong></td><td>Block B</td><td>Digital bingo card of marketing terms; mark them as teams say them, then shout "Bingo" in chat</td><td>Keeps viewers listening closely</td></tr>
+      <tr><td>4</td><td><strong>Meme Caption Challenge</strong></td><td>Lunch</td><td>Caption a screenshot from the stream and post it with the hashtag; the MC reads winners on air</td><td>Generates organic social reach during the break</td></tr>
+      <tr><td>5</td><td><strong>Website Easter-egg Hunt</strong></td><td>From 13:20</td><td>Five hidden clues on the new NPD website; first correct submissions score</td><td>Drives real traffic and exploration of the new site</td></tr>
+      <tr><td>6</td><td><strong>Rapid-fire Finale</strong></td><td>15:40</td><td>Ten questions about what the nine teams pitched</td><td>Rewards watching all day; builds tension before the awards</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Keeping the online room alive</h3>
+  <ul>
+    <li>One link and QR code for games and votes, shown as a permanent on-screen overlay and pinned in every platform's chat.</li>
+    <li>A dedicated chat moderator on each streaming platform welcomes people, answers questions and passes the best comments to the MC.</li>
+    <li>The MC reads viewer names and locations on air ("greetings to Abeokuta, Accra and London"), which makes people stay and invite others.</li>
+    <li>Polls every 20–30 minutes, such as "which launch channel would you use?", with results shown on stream.</li>
+    <li>A live WhatsApp community for registered viewers gets segment alerts, such as "Website launch in 10 minutes".</li>
+    <li>Audience prizes delivered digitally: data bundles, airtime, NPD course discounts and one full Cohort 2 scholarship.</li>
+  </ul>
+</section>
+
+<!-- 5 PROMOTION -->
+<section id="promotion">
+  <h2><span class="num">5</span>Organic promotion and listing opportunities</h2>
+  <p class="lead">Our audience is anyone in Africa or the diaspora with a phone, and the message is "watch from anywhere, free". The strongest free channel is the people already invested: 9 teams, 4 judges, speakers, panellists and bootcamp alumni.</p>
+
+  <h3>Event listing platforms</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Platform</th><th>Why use it</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Luma</strong></td><td>Clean registration, automatic reminders and calendar invites, popular with tech communities</td><td>Primary registration page; all other listings link here</td></tr>
+      <tr><td><strong>YouTube scheduled livestream</strong></td><td>Viewers tap "Notify me" and YouTube reminds them when we go live</td><td>Schedule the stream by 15 October; share the link everywhere</td></tr>
+      <tr><td><strong>LinkedIn Event (with LinkedIn Live)</strong></td><td>Attendees are notified when the stream starts; reaches recruiters and brand marketers</td><td>Create from the NPD page, attached to the LinkedIn Live broadcast</td></tr>
+      <tr><td>Eventbrite</td><td>Event discovery, including its online events category</td><td>Mirror listing linking back to Luma</td></tr>
+      <tr><td>Tix.Africa</td><td>African event discovery audience</td><td>Free online-ticket listing</td></tr>
+      <tr><td>Facebook Event (online)</td><td>Reaches Facebook groups and older audiences</td><td>Create from the NPD page; cross-post to groups</td></tr>
+      <tr><td>Meetup and AllEvents</td><td>Extra discovery for online tech and business events</td><td>Quick listings</td></tr>
+      <tr><td>NPD website event page</td><td>Owned, searchable page with Event schema marked as an online event</td><td>Publish by 15 October; it becomes the replay and recap page afterwards</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Owned and community channels</h3>
+  <div class="grid">
+    <div class="card"><h4>Email</h4><p>Bootcamp leads, past enquirers and alumni: announcement, team spotlights digest, final reminder with the watch link.</p></div>
+    <div class="card"><h4>WhatsApp</h4><p>NPD channel, broadcast lists and a Demo Day community for registrants; teams share in their own groups and status updates.</p></div>
+    <div class="card"><h4>Instagram &amp; TikTok</h4><p>Behind-the-scenes clips from the sprint, team spotlights, countdown Reels.</p></div>
+    <div class="card"><h4>X</h4><p>Event hashtag and a pre-event X Space with two teams and a judge.</p></div>
+    <div class="card"><h4>LinkedIn</h4><p>Judge and speaker announcements, team spotlights, an "Inside the Hackathon" LinkedIn Live.</p></div>
+    <div class="card"><h4>Communities</h4><p>African tech and marketing communities, Google Developer Groups, women-in-tech groups and university marketing clubs.</p></div>
+  </div>
+
+  <h3>Earned media</h3>
+  <ul>
+    <li>Send a press release on 15 October to African tech and business media such as Techpoint Africa, TechCabal, Benjamindada.com and BusinessDay. Pitch the angle "nine teams with no coding background built and launched real products in four days".</li>
+    <li>Offer journalists and creators a press link, a media kit and an interview slot with the winners straight after the awards.</li>
+    <li>Ask each judge's and speaker's company to share the event from their brand pages.</li>
+  </ul>
+
+  <h3>Team ambassador programme</h3>
+  <ul>
+    <li>Every team gets a share kit: a branded team poster, a short video template, caption copy and a tracked registration link.</li>
+    <li>A public referral leaderboard shows which team has brought the most registrations; the top team gets a "Hype Squad" shout-out on air.</li>
+    <li>Teams are motivated naturally, because their own audience can vote for them in People's Choice.</li>
+  </ul>
+  <p class="note"><strong>Hashtag:</strong> pick one short, unique tag (for example #NPDDemoDay) and check it is unused before announcing.</p>
+</section>
+
+<!-- 6 COUNTDOWN -->
+<section id="countdown">
+  <h2><span class="num">6</span>19-day countdown: promotion and attendance campaign</h2>
+  <p class="lead">Registration and the scheduled livestreams must be live by 15 October. From 18 October, one team spotlight per day gives us nine days of fresh content and pulls each team's network in turn.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Date</th><th>Workstream</th><th>Key actions</th></tr></thead>
+    <tbody>
+      <tr><td class="time">Tue 13 Oct</td><td>Planning</td><td>Choose the streaming studio and platforms; confirm budget; invite judges, panellists and speaker; pick the hashtag</td></tr>
+      <tr><td class="time">Wed 14 Oct</td><td>Brand and pages</td><td>Event brand kit and stream overlays; Luma page and NPD event page built; share kits drafted</td></tr>
+      <tr class="key"><td class="time">Thu 15 Oct</td><td>Launch promotion</td><td>"Save the date" across all channels; YouTube and LinkedIn Live scheduled; all listings live; press release sent; teams get share kits</td></tr>
+      <tr><td class="time">Fri 16 Oct</td><td>Promotion</td><td>Judges revealed</td></tr>
+      <tr><td class="time">Sat 17 Oct</td><td>Promotion</td><td>Panel and speaker revealed; sponsor outreach closes</td></tr>
+      <tr class="key"><td class="time">18–26 Oct</td><td>Meet the Teams</td><td>One team spotlight per day (Teams 1–9): short video, product, team photo, tracked link</td></tr>
+      <tr><td class="time">Wed 21 Oct</td><td>Live content</td><td>X Space or LinkedIn Live: "Inside the Hackathon" with two teams and a judge</td></tr>
+      <tr><td class="time">Sat 24 Oct</td><td>Website teaser</td><td>"Something new launches live on 31 October" teaser; Easter-egg hunt announced</td></tr>
+      <tr><td class="time">Mon 26 Oct</td><td>Presenter kit</td><td>Every team and speaker gets the tech checklist, overlay guide and studio link</td></tr>
+      <tr><td class="time">Tue 27 Oct</td><td>Teams</td><td>Final decks, backup demo videos and full pre-recorded pitches due; run-of-show frozen</td></tr>
+      <tr class="key"><td class="time">Wed 28 Oct</td><td>Full rehearsal</td><td>Complete online rehearsal in the studio; every team does a timed dry run; pitch order drawn live on stream</td></tr>
+      <tr><td class="time">Thu 29 Oct</td><td>Reminders</td><td>Email and WhatsApp reminder; referral leaderboard update; "add to calendar" push</td></tr>
+      <tr><td class="time">Fri 30 Oct</td><td>Final checks</td><td>Studio, overlays and website launch dry run; final reminder with the watch link and game QR code</td></tr>
+      <tr class="key"><td class="time">Sat 31 Oct</td><td>Demo Day</td><td>Live social coverage all day; leaderboard and highlight clips posted during the stream</td></tr>
+      <tr><td class="time">1–7 Nov</td><td>Follow-up</td><td>Winners announcement, thank-you email with replay, recap film, 9 pitch videos, showcase gallery, Cohort 2 push</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note"><strong>Reminder sequence for registrants:</strong> confirmation with a calendar invite on sign-up, then 7 days, 2 days, the morning of (08:00), and "we're live" at 10:00. Many online registrants miss the live stream, so the replay email to everyone who registered matters as much as the reminders.</p>
+</section>
+
+<!-- 7 CHECKLIST -->
+<section id="checklist">
+  <h2><span class="num">7</span>Operations checklist</h2>
+  <p class="lead">Tick each item as it is done; anything still open on 28 October is escalated at the full rehearsal. Ticks are saved in this browser.</p>
+  <div class="progress"><span id="progress-text">0 of 0 done</span><div class="bar"><span id="progress-bar"></span></div></div>
+
+  <div id="checklists"></div>
+</section>
+
+<!-- 8 RISKS -->
+<section id="risks">
+  <h2><span class="num">8</span>Roles, risks and contingencies</h2>
+  <p class="lead">Eight named roles cover the broadcast, coordinated through a private backstage WhatsApp group and the cue sheet. Names are still to be assigned.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Role</th><th>Responsibilities</th><th>Owner</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Event lead</strong></td><td>Final decisions, sponsor and VIP relations, budget</td><td>—</td></tr>
+      <tr><td><strong>Executive producer</strong></td><td>Runs the studio: brings people on and off screen, plays videos, controls overlays</td><td>—</td></tr>
+      <tr><td><strong>Backup producer</strong></td><td>Mirrors the studio on a separate network and power source; takes over if the main producer drops</td><td>—</td></tr>
+      <tr><td><strong>MC</strong></td><td>Hosts the stream, runs games, polls and awards</td><td>—</td></tr>
+      <tr><td><strong>Programme lead and timekeeper</strong></td><td>Run-of-show, chat cues to presenters, judges' scores, deliberation room</td><td>—</td></tr>
+      <tr><td><strong>Team liaison</strong></td><td>Briefs teams, collects decks and videos, keeps the next team ready backstage</td><td>—</td></tr>
+      <tr><td><strong>Chat moderators</strong></td><td>One per platform: welcome viewers, answer questions, pass comments to the MC, remove spam</td><td>—</td></tr>
+      <tr><td><strong>Social and content lead</strong></td><td>Live clips and posts, hashtag, recap content</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Risk register</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Contingency</th></tr></thead>
+    <tbody>
+      <tr><td>Presenter loses power or internet</td><td><span class="tag high">High</span></td><td>Standby team member takes over; otherwise play the team's pre-recorded pitch and run Q&amp;A live once they reconnect</td></tr>
+      <tr><td>Pitches overrun</td><td><span class="tag high">High</span></td><td>On-screen timer, chat cues, audio fade at 15:30, penalty points</td></tr>
+      <tr><td>Viewers drop off during long blocks</td><td><span class="tag high">High</span></td><td>Game or poll at least every 60 minutes; segment alerts on WhatsApp; prizes only for those present at the finale</td></tr>
+      <tr><td>Producer loses power or internet</td><td><span class="tag medium">Medium</span></td><td>Backup producer takes over in the same studio within a minute; holding screen shows meanwhile</td></tr>
+      <tr><td>Stream drops on one platform</td><td><span class="tag medium">Medium</span></td><td>Other destinations stay live; moderators post the alternative link in chat and on WhatsApp</td></tr>
+      <tr><td>Live demo fails</td><td><span class="tag medium">Medium</span></td><td>Switch to the backup demo video; no score penalty for the switch</td></tr>
+      <tr><td>Spam or abuse in chat or rooms</td><td><span class="tag medium">Medium</span></td><td>Moderators on every platform; slow mode on; registration-only access to networking rooms</td></tr>
+      <tr><td>Vote manipulation</td><td><span class="tag medium">Medium</span></td><td>One vote per registered email; votes checked against the list before results</td></tr>
+      <tr><td>Website launch glitch</td><td><span class="tag low">Low</span></td><td>Soft-launch behind a password on 30 October; switch to a pre-recorded walkthrough if needed</td></tr>
+      <tr><td>Judge or speaker drops out</td><td><span class="tag low">Low</span></td><td>One reserve judge on standby; MC extends the panel by 10 minutes</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 9 RECOMMENDATIONS -->
+<section id="recommendations">
+  <h2><span class="num">9</span>Recommendations: duration, attendance and impact</h2>
+  <p class="lead"><strong>Keep the main event to one day, inside a virtual "Demo Week".</strong> A single six-hour broadcast on the 31st keeps the focus sharp. Short online sessions before and after it build momentum and extend the reach.</p>
+  <p class="note">Online, extra days cost little, but more than about six hours of live viewing in one day causes heavy drop-off.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Day</th><th>Format</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td class="time">Wed 28 Oct</td><td>Livestream, 1 hour</td><td>Public pitch-order draw streamed live; teams share 60-second teasers</td></tr>
+      <tr><td class="time">Fri 30 Oct</td><td>Livestream, 90 minutes</td><td>"Demo Day Eve" masterclass with a judge or speaker; showcase gallery previews the 9 projects</td></tr>
+      <tr class="key"><td class="time">Sat 31 Oct</td><td>Livestream, full day</td><td>Demo Day as planned above</td></tr>
+      <tr><td class="time">Mon 2 Nov</td><td>Livestream, 1 hour</td><td>Winners' AMA and Cohort 2 information session</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note"><strong>Alternative:</strong> if viewer fatigue is a concern, split Demo Day into two half-days. Pitches would run on Friday 30 October (afternoon), with the website launch, panel and awards on Saturday 31 October. This works only if the 31st stays the headline day.</p>
+
+  <h3>Drive attendance</h3>
+  <ol>
+    <li><strong>Let teams sell the event:</strong> People's Choice and the referral leaderboard give all nine teams a reason to bring their networks online.</li>
+    <li><strong>Make the live moments worth catching:</strong> tease the website launch and awards, and give audience prizes only to people watching live.</li>
+    <li><strong>Use daily content, not one announcement:</strong> the nine-day team spotlight keeps the event visible every day until 26 October.</li>
+    <li><strong>Recruit through partners:</strong> each judge, speaker and sponsor shares once, and community leaders get named on-air shout-outs.</li>
+    <li><strong>Go beyond Lagos:</strong> a virtual event can reach students and professionals across Nigeria, Ghana, Kenya and the diaspora, so promote it in those communities too.</li>
+    <li><strong>Invite hiring managers:</strong> "meet job-ready digital marketers" gives brands and agencies a reason to join the networking rooms.</li>
+  </ol>
+
+  <h3>Achieve more from the same day</h3>
+  <div class="grid">
+    <div class="card"><h4>Cohort 2 enrolment</h4><p>A Demo Day-only discount code shown on screen, valid for 7 days, plus the lead form on the new site.</p></div>
+    <div class="card"><h4>Sponsorship</h4><p>Simple packages (award naming rights, game prizes, branded break segments) to cover costs and reach partner audiences.</p></div>
+    <div class="card"><h4>Talent pipeline</h4><p>Share a digital profile book of every participant with brands and agencies in the networking rooms.</p></div>
+    <div class="card"><h4>Content library</h4><p>The full recording becomes 30+ assets: replay, recap film, 9 pitch videos, panel clips, Reels and a search-optimised blog recap.</p></div>
+    <div class="card"><h4>Website momentum</h4><p>Keep the showcase gallery live as a permanent "Built at NPD" portfolio that supports both SEO and enrolment.</p></div>
+  </div>
+
+  <h3>Open questions to settle this week</h3>
+  <ul class="checklist" data-group="open"></ul>
+</section>
+
+</main>
+</div>
+
+<p class="credit">Nerdy Pixels Academy · NPD Demo Day 2026 Event Master Plan · Prepared 12 October 2026</p>
+
+<script>
+(function(){
+  var groups = {
+    "Streaming platform and production": [
+      "Streaming studio chosen (for example StreamYard or Restream Studio) on a paid plan that allows enough guests on screen",
+      "Destinations connected: YouTube Live (primary), LinkedIn Live and Facebook",
+      "Branded overlays: logo, lower-thirds, countdown timer, game QR code, sponsor slots, leaderboard",
+      "Holding screens: “Starting soon”, “Break”, “Technical difficulty — back shortly”",
+      "Pre-recorded assets loaded: sprint film, sponsor videos, backup demos, full backup pitches",
+      "Private judges' room (Zoom or Google Meet) for deliberation",
+      "Networking rooms set up with breakouts (Zoom, Airmeet or Gather)"
+    ],
+    "Power and connectivity (crew and all presenters)": [
+      "Producer studio has a generator or inverter with at least 10 hours of backup",
+      "Producer has two internet connections, plus a second producer on a separate network who can take over",
+      "Every presenter confirms power backup and a primary plus backup data connection",
+      "Every team names a standby presenter on a separate device and network"
+    ],
+    "Presenter readiness": [
+      "Tech checklist sent: wired headset or external mic, webcam at eye level, front lighting, quiet room, laptop on charge",
+      "Branded virtual backgrounds sent to teams, judges and speakers",
+      "Screen-share tested for every live demo",
+      "Studio join links and call times sent, with a WhatsApp group for backstage"
+    ],
+    "Programme and people": [
+      "MC and online co-host confirmed and briefed",
+      "4 judges confirmed; rubric, online scoresheet and team one-pagers sent by 27 October",
+      "Panellists (3 plus moderator) and guest speaker confirmed; briefs and questions agreed",
+      "Opening and keynote script written",
+      "Sprint recap film (3 minutes) edited",
+      "Run-of-show and cue sheet shared with all crew"
+    ],
+    "Teams": [
+      "Pitch template and 15-minute structure sent to all teams",
+      "Decks, backup demo videos and full pre-recorded pitches received by 27 October",
+      "Timed dry run completed by every team on 28 October",
+      "Pitch order drawn and published"
+    ],
+    "Website launch": [
+      "New site fully tested on mobile and desktop; staging signed off by 28 October",
+      "Reveal sequence rehearsed: on-screen countdown, switch to the live site, guided tour by screen-share",
+      "Showcase gallery with all 9 team pages ready",
+      "Five Easter-egg clues hidden and tested",
+      "Analytics, Event schema and Cohort 2 lead form working",
+      "Rollback plan, plus a pre-recorded walkthrough if the site fails during the reveal"
+    ],
+    "Engagement and voting": [
+      "Voting and game tool set up (Slido, Mentimeter or Kahoot); all six games built",
+      "One short link and QR code for games and votes",
+      "Registration list loaded for vote validation",
+      "One chat moderator per platform, briefed on tone and escalation",
+      "Digital prizes ready to send: data bundles, airtime, discount codes, scholarship"
+    ],
+    "Registration and access": [
+      "Luma page live with calendar invites and the reminder sequence",
+      "Watch link and game link on the confirmation email and the event page",
+      "WhatsApp community for registrants set up",
+      "Captions turned on where the platform supports them"
+    ],
+    "Branding and awards": [
+      "Digital award graphics for every category",
+      "Digital certificates for all participants and winners",
+      "Trophies and printed certificates ordered for courier delivery after the event",
+      "Sponsor logos placed on overlays, slides and the website"
+    ],
+    "Content capture": [
+      "Local recording turned on in the studio for high-quality clips",
+      "Social lead posting live clips and screenshots during the stream",
+      "Consent notice in registration terms for recording and sharing"
+    ],
+    "Post-event": [
+      "Winners announced on all channels within 2 hours",
+      "Replay published on YouTube and the NPD event page the same evening",
+      "Thank-you email with the replay link and Cohort 2 offer by 2 November",
+      "Feedback survey sent to viewers, teams and judges",
+      "Recap film, 9 pitch videos and panel clips published by 7 November"
+    ]
+  };
+  var openQs = [
+    "Which streaming studio and platforms will we use, and who produces?",
+    "Prize budget, and whether cash prizes are offered",
+    "Judges, panellists and speaker shortlist",
+    "Has the new website been fully tested and approved for 31 October?",
+    "Do we have a power-backed, dual-internet location for the producer?"
+  ];
+
+  var KEY = "npd-demo-day-2026-checks";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch(e) { saved = {}; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch(e) {} }
+
+  function makeItem(id, text){
+    var li = document.createElement("li");
+    var cb = document.createElement("input");
+    cb.type = "checkbox"; cb.id = id; cb.checked = !!saved[id];
+    var lb = document.createElement("label");
+    lb.htmlFor = id; lb.textContent = text;
+    cb.addEventListener("change", function(){ saved[id] = cb.checked; save(); update(); });
+    li.appendChild(cb); li.appendChild(lb);
+    return li;
+  }
+
+  var container = document.getElementById("checklists");
+  var g = 0;
+  Object.keys(groups).forEach(function(name){
+    var h = document.createElement("h3"); h.textContent = name; container.appendChild(h);
+    var ul = document.createElement("ul"); ul.className = "checklist ops";
+    groups[name].forEach(function(t, i){ ul.appendChild(makeItem("ops-" + g + "-" + i, t)); });
+    container.appendChild(ul); g++;
+  });
+  var openList = document.querySelector('[data-group="open"]');
+  openQs.forEach(function(t, i){ openList.appendChild(makeItem("open-" + i, t)); });
+
+  function update(){
+    var all = document.querySelectorAll(".checklist.ops input");
+    var done = 0; all.forEach(function(c){ if (c.checked) done++; });
+    document.getElementById("progress-text").textContent = done + " of " + all.length + " done";
+    document.getElementById("progress-bar").style.width = (all.length ? (done / all.length * 100) : 0) + "%";
+  }
+  update();
+
+  /* Highlight the contents link for the section in view. */
+  var links = [].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var byId = {};
+  links.forEach(function(a){ byId[a.getAttribute("href").slice(1)] = a; });
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){
+          links.forEach(function(a){ a.removeAttribute("aria-current"); });
+          var a = byId[e.target.id]; if (a) a.setAttribute("aria-current", "true");
+        }
+      });
+    }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+    document.querySelectorAll("main section[id]").forEach(function(s){ io.observe(s); });
+  }
+
+  /* On mobile, close the contents panel after tapping a link. */
+  var details = document.querySelector("nav.toc details");
+  links.forEach(function(a){
+    a.addEventListener("click", function(){
+      if (details && window.matchMedia("(max-width: 1000px)").matches) details.open = false;
+    });
+  });
+})();
+</script>
+</body>
+</html>

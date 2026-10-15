@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const SITE = "https://bootcamp.npdacademy.com";
-const STATIC = ["/", "/courses", "/courses/digital-marketing", "/curriculum", "/faq", "/blog", "/events/first-marketing-strategy", "/contact", "/payment-policy", "/privacy", "/terms"];
+const STATIC = ["/", "/courses", "/courses/digital-marketing", "/curriculum", "/faq", "/blog", "/events/first-marketing-strategy", "/demo-day", "/contact", "/payment-policy", "/privacy", "/terms"];
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
