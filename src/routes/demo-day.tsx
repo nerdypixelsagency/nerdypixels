@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 // Standalone landing page served as its own HTML document, outside the site shell
-// (no shared header or footer). Content lives in src/content/demo-day.html.
-import html from "@/content/demo-day.html?raw";
+// (no shared header or footer). Content lives in src/content/demo-day-landing.html,
+// a self-contained bundle with the site logo swapped in.
+import html from "@/content/demo-day-landing.html?raw";
 
 export const Route = createFileRoute("/demo-day")({
   server: {
