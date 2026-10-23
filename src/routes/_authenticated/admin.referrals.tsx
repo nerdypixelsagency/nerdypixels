@@ -3,13 +3,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Fragment, useMemo, useState } from "react";
 import { getEnrolments } from "@/lib/admin.functions";
-import { ambassadorEmailStatus, emailAmbassadors, listAmbassadors, saveAmbassador } from "@/lib/referrals.functions";
+import { ambassadorEmailStatus, emailAmbassadors, getCommissionSettings, listAmbassadors, saveAmbassador } from "@/lib/referrals.functions";
 import { download, enrolmentsQuery, naira, toCsv } from "@/components/admin/data";
 import { FilterToolbar } from "@/components/admin/FilterToolbar";
 
 export const Route = createFileRoute("/_authenticated/admin/referrals")({ component: Referrals });
 
-type Ambassador = { id: string; name: string; email: string | null; code: string; source: string; active: boolean };
+type Ambassador = { id: string; name: string; email: string | null; code: string; source: string; active: boolean; outright_pct: number | null; instalment_pct: number | null };
 
 const linkFor = (code: string) => `https://bootcamp.npdacademy.com/?ref=${code}`;
 
@@ -20,6 +20,8 @@ function Referrals() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery(enrolmentsQuery(fn));
   const { data: ambassadors = [], isLoading: ambLoading } = useQuery({ queryKey: ["ambassadors"], queryFn: () => ambFn() });
+  const rateFn = useServerFn(getCommissionSettings);
+  const { data: rates } = useQuery({ queryKey: ["commission-settings"], queryFn: () => rateFn() });
   const [open, setOpen] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [edit, setEdit] = useState<Ambassador | null>(null);
@@ -57,6 +59,7 @@ function Referrals() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
+    const pct = (v: FormDataEntryValue | null) => { const s = String(v ?? "").trim(); return s === "" ? null : Number(s); };
     try {
       await saveFn({
         data: {
@@ -65,6 +68,8 @@ function Referrals() {
           email: String(fd.get("email") || ""),
           code: String(fd.get("code") || ""),
           active: fd.get("active") === "on",
+          outrightPct: pct(fd.get("outrightPct")),
+          instalmentPct: pct(fd.get("instalmentPct")),
         },
       });
       setShowForm(false); setEdit(null); setMsg("Ambassador saved.");
@@ -90,8 +95,11 @@ function Referrals() {
           <input className="adm-input" name="name" required placeholder="Full name" defaultValue={edit?.name ?? ""} />
           <input className="adm-input" name="email" type="email" placeholder="Email (optional)" defaultValue={edit?.email ?? ""} />
           <input className="adm-input" name="code" required placeholder="CODE-XXXX" defaultValue={edit?.code ?? ""} style={{ textTransform: "uppercase" }} />
+          <input className="adm-input" name="outrightPct" type="number" min={0} max={100} step="0.5" style={{ width: 150 }} placeholder={`Outright % (${rates?.outright ?? 10})`} defaultValue={edit?.outright_pct ?? ""} />
+          <input className="adm-input" name="instalmentPct" type="number" min={0} max={100} step="0.5" style={{ width: 150 }} placeholder={`Instalment % (${rates?.instalment ?? 10})`} defaultValue={edit?.instalment_pct ?? ""} />
           <label style={{ fontSize: 13, display: "flex", gap: 6, alignItems: "center" }}><input type="checkbox" name="active" defaultChecked={edit ? edit.active : true} /> Active</label>
           <button className="adm-btn green">{edit ? "Save changes" : "Add ambassador"}</button>
+          <p style={{ width: "100%", margin: 0, color: "#6b6280", fontSize: 12.5 }}>Leave a rate blank to use the global default ({rates?.outright ?? 10}% outright / {rates?.instalment ?? 10}% instalment). A rate change only applies to <b>future</b> sales — sales already paid keep the rate they earned.</p>
         </form>
       )}
       <FilterToolbar search={search} onSearch={setSearch} placeholder="Search ambassador name, email, or code" active={!!search} onReset={() => setSearch("")} />
@@ -100,10 +108,11 @@ function Referrals() {
         <p style={{ margin: "0 0 12px", color: "#6b6280", fontSize: 13 }}>Ambassadors are students who refer other students. New ambassadors are emailed their code automatically. Shareable link: <b>bootcamp.npdacademy.com/?ref=CODE</b> — the code is remembered and pre-filled at checkout.</p>
         {ambLoading ? <p className="adm-empty">Loading…</p> : ambassadors.length === 0 ? <p className="adm-empty">No ambassadors yet</p> : (
           <div className="adm-scroll"><table className="adm-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Link</th><th>Source</th><th>Status</th><th>Code email</th><th></th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Commission</th><th>Link</th><th>Source</th><th>Status</th><th>Code email</th><th></th></tr></thead>
             <tbody>{(ambassadors as Ambassador[]).filter((a) => !search || [a.name,a.email,a.code].some((v) => v?.toLowerCase().includes(search.toLowerCase()))).map((a) => (
               <tr key={a.id}>
                 <td><b>{a.name}</b></td><td>{a.email ?? "—"}</td><td><b>{a.code}</b></td>
+                <td style={{ whiteSpace: "nowrap", fontSize: 13 }}>{a.outright_pct == null && a.instalment_pct == null ? <span style={{ color: "#6b6280" }}>Default</span> : <>{a.outright_pct ?? rates?.outright ?? 10}% <span style={{ color: "#6b6280" }}>out</span> · {a.instalment_pct ?? rates?.instalment ?? 10}% <span style={{ color: "#6b6280" }}>inst</span></>}</td>
                 <td><button className="adm-btn ghost" style={{ padding: "4px 10px" }} onClick={() => copy(a.code)}>{copied === a.code ? "Copied!" : "Copy link"}</button></td>
                 <td>{a.source === "student" ? "Student" : "Imported"}</td>
                 <td><span className={`adm-pill ${a.active ? "paid" : "failed"}`}>{a.active ? "Active" : "Off"}</span></td>

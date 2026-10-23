@@ -83,6 +83,11 @@ export const addManualStudent = createServerFn({ method: "POST" })
     const mode = await modeOf(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: cohort } = await supabaseAdmin.from("cohorts").select("id").eq("status", "open").order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const referral_code = data.referralCode ? data.referralCode.toUpperCase() : null;
+    // A manually-added paid sale locks in its commission now, like a real one.
+    const snap = data.paid
+      ? await (await import("./payments.server")).commissionSnapshot(supabaseAdmin, { referral_code, plan: data.plan, amount: data.amount })
+      : { commission_pct: null, commission_amount: null };
     const row = {
       kind: "enrolment",
       name: data.name,
@@ -94,7 +99,9 @@ export const addManualStudent = createServerFn({ method: "POST" })
       currency: "NGN",
       status: data.paid ? "paid" : "pending",
       payment_method: data.paymentMethod,
-      referral_code: data.referralCode ? data.referralCode.toUpperCase() : null,
+      referral_code,
+      commission_pct: snap.commission_pct,
+      commission_amount: snap.commission_amount,
       paid_at: data.paid ? new Date().toISOString() : null,
       tx_ref: `MANUAL-${Date.now()}-${Math.floor(Math.random() * 1e4)}`,
       source_type: "manual",
@@ -119,26 +126,35 @@ export const getCommissions = createServerFn({ method: "GET" })
     const [{ data: rates }, { data: rows }, { data: payouts }, { data: ambs }] = await Promise.all([
       context.supabase.from("app_settings").select("key, value").in("key", ["commission_outright_pct", "commission_instalment_pct"]),
       // Commission counts on confirmed (paid) payments only — never pending, failed or refunded.
-      context.supabase.from("enrolments").select("referral_code, amount, plan, kind").eq("mode", mode).eq("status", "paid").not("referral_code", "is", null).limit(5000),
+      context.supabase.from("enrolments").select("referral_code, amount, plan, kind, commission_pct, commission_amount").eq("mode", mode).eq("status", "paid").not("referral_code", "is", null).limit(5000),
       context.supabase.from("commission_payouts").select("*").eq("mode", mode).order("created_at", { ascending: false }),
-      context.supabase.from("ambassadors").select("code, name").limit(5000),
+      context.supabase.from("ambassadors").select("code, name, outright_pct, instalment_pct").limit(5000),
     ]);
     const rm = Object.fromEntries((rates ?? []).map((r: { key: string; value: string }) => [r.key, r.value]));
     const outrightPct = Number(rm["commission_outright_pct"] ?? 10);
     const instalmentPct = Number(rm["commission_instalment_pct"] ?? 10);
-    const names: Record<string, string> = {};
-    for (const a of ambs ?? []) names[(a as { code: string }).code.toUpperCase()] = (a as { name: string }).name;
-    const by: Record<string, { code: string; name: string; sales: number; revenue: number; earned: number; paidOut: number }> = {};
-    const slot = (code: string) => (by[code] ??= { code, name: names[code] ?? "", sales: 0, revenue: 0, earned: 0, paidOut: 0 });
+    type Amb = { code: string; name: string; outright_pct: number | null; instalment_pct: number | null };
+    const ambByCode: Record<string, Amb> = {};
+    for (const a of (ambs ?? []) as Amb[]) ambByCode[a.code.toUpperCase()] = a;
+    const by: Record<string, { code: string; name: string; outrightPct: number; instalmentPct: number; custom: boolean; sales: number; revenue: number; earned: number; paidOut: number }> = {};
+    const slot = (code: string) => (by[code] ??= {
+      code,
+      name: ambByCode[code]?.name ?? "",
+      // The ambassador's current effective rates (what future sales will earn).
+      outrightPct: ambByCode[code]?.outright_pct ?? outrightPct,
+      instalmentPct: ambByCode[code]?.instalment_pct ?? instalmentPct,
+      custom: ambByCode[code]?.outright_pct != null || ambByCode[code]?.instalment_pct != null,
+      sales: 0, revenue: 0, earned: 0, paidOut: 0,
+    });
     for (const r of rows ?? []) {
       const code = String(r.referral_code || "").trim().toUpperCase();
       if (!code) continue;
       const s = slot(code);
       s.sales++;
       s.revenue += r.amount;
-      // Outright (early bird) uses the outright rate; every confirmed monthly payment uses the instalment rate.
-      const pct = r.plan === "early" || r.plan === "deposit_early" ? outrightPct : instalmentPct;
-      s.earned += Math.round((r.amount * pct) / 100);
+      // Earnings come from the rate snapshotted when each sale was paid; the fallback
+      // only covers any legacy row that predates the snapshot (and the backfill).
+      s.earned += r.commission_amount ?? Math.round((r.amount * (r.plan === "early" || r.plan === "deposit_early" ? outrightPct : instalmentPct)) / 100);
     }
     for (const p of payouts ?? []) slot(p.referral_code.toUpperCase()).paidOut += p.amount;
     const list = Object.values(by)

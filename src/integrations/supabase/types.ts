@@ -53,7 +53,9 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          instalment_pct: number | null
           name: string
+          outright_pct: number | null
           source: string
           updated_at: string
         }
@@ -63,7 +65,9 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          instalment_pct?: number | null
           name: string
+          outright_pct?: number | null
           source?: string
           updated_at?: string
         }
@@ -73,7 +77,9 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          instalment_pct?: number | null
           name?: string
+          outright_pct?: number | null
           source?: string
           updated_at?: string
         }
@@ -310,6 +316,8 @@ export type Database = {
           admin_notes: string | null
           amount: number
           cohort_id: string | null
+          commission_amount: number | null
+          commission_pct: number | null
           country: string | null
           created_at: string
           currency: string
@@ -340,6 +348,8 @@ export type Database = {
           admin_notes?: string | null
           amount?: number
           cohort_id?: string | null
+          commission_amount?: number | null
+          commission_pct?: number | null
           country?: string | null
           created_at?: string
           currency?: string
@@ -370,6 +380,8 @@ export type Database = {
           admin_notes?: string | null
           amount?: number
           cohort_id?: string | null
+          commission_amount?: number | null
+          commission_pct?: number | null
           country?: string | null
           created_at?: string
           currency?: string

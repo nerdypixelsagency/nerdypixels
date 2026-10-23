@@ -50,13 +50,29 @@ export const listAmbassadors = createServerFn({ method: "GET" })
 export const saveAmbassador = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ id: z.string().uuid().optional(), name: z.string().trim().min(1).max(120), email: z.string().trim().email().max(255).or(z.literal("")), code: z.string().trim().min(4).max(40), active: z.boolean() }).parse(d),
+    z.object({
+      id: z.string().uuid().optional(),
+      name: z.string().trim().min(1).max(120),
+      email: z.string().trim().email().max(255).or(z.literal("")),
+      code: z.string().trim().min(4).max(40),
+      active: z.boolean(),
+      // Optional per-ambassador rate overrides (null/undefined = use the global default).
+      outrightPct: z.number().min(0).max(100).nullable().optional(),
+      instalmentPct: z.number().min(0).max(100).nullable().optional(),
+    }).parse(d),
   )
   .handler(async ({ data, context }) => {
     await requirePerm(context, "referrals");
     const code = data.code.toUpperCase();
     if (!CODE_RE.test(code)) throw new Error("Codes can only use letters, numbers and dashes.");
-    const row = { name: data.name, email: data.email ? data.email.toLowerCase() : null, code, active: data.active };
+    const row = {
+      name: data.name,
+      email: data.email ? data.email.toLowerCase() : null,
+      code,
+      active: data.active,
+      outright_pct: data.outrightPct ?? null,
+      instalment_pct: data.instalmentPct ?? null,
+    };
     const q = data.id
       ? context.supabase.from("ambassadors").update(row).eq("id", data.id).select("id").maybeSingle()
       : context.supabase.from("ambassadors").insert({ ...row, source: "imported" }).select("id").maybeSingle();
@@ -78,7 +94,7 @@ export const emailAmbassadors = createServerFn({ method: "POST" })
     await requirePerm(context, "referrals");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendAmbassadorEmail, pause } = await import("./email-log.server");
-    let q = supabaseAdmin.from("ambassadors").select("id, name, email, code").eq("active", true).not("email", "is", null).limit(1000);
+    let q = supabaseAdmin.from("ambassadors").select("id, name, email, code, outright_pct, instalment_pct").eq("active", true).not("email", "is", null).limit(1000);
     if (data.id) q = q.eq("id", data.id);
     const { data: list } = await q;
     let sent = 0; const failed: string[] = [];

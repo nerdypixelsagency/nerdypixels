@@ -93,10 +93,12 @@ export async function refreshDelivery(ids?: string[]) {
   return n;
 }
 
-/** Sends the code/link email to one ambassador. */
-export async function sendAmbassadorEmail(a: { id?: string | undefined; name: string; email: string | null; code: string }, sentBy?: string | null) {
+/** Sends the code/link email to one ambassador, showing their effective rate. */
+export async function sendAmbassadorEmail(a: { id?: string | undefined; name: string; email: string | null; code: string; outright_pct?: number | null; instalment_pct?: number | null }, sentBy?: string | null) {
   if (!a.email) return { ok: false, error: "No email" };
-  const m = ambassadorEmail(a.name, a.code, await commissionRates());
+  const g = await commissionRates();
+  const rates = { outright: a.outright_pct ?? g.outright, instalment: a.instalment_pct ?? g.instalment };
+  const m = ambassadorEmail(a.name, a.code, rates);
   return sendLogged(a.email, m.subject, m.html, { type: "ambassador", relatedId: a.id ?? a.code, sentBy, mode: "live" });
 }
 

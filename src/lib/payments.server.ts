@@ -59,6 +59,27 @@ export async function flwCreatePayment(p: {
   return body.data.link;
 }
 
+// The commission that applies to a referred sale, resolved at the moment the sale
+// is confirmed paid. Snapshotting it here (rather than recomputing live) means a
+// later rate change only affects future sales. NULL referral code = no commission.
+export async function commissionSnapshot(
+  db: Awaited<ReturnType<typeof admin>>,
+  sale: { referral_code?: string | null; plan?: string | null; amount: number },
+): Promise<{ commission_pct: number | null; commission_amount: number | null }> {
+  const code = (sale.referral_code || "").trim().toUpperCase();
+  if (!code) return { commission_pct: null, commission_amount: null };
+  const [{ data: rates }, { data: amb }] = await Promise.all([
+    db.from("app_settings").select("key, value").in("key", ["commission_outright_pct", "commission_instalment_pct"]),
+    db.from("ambassadors").select("outright_pct, instalment_pct").eq("code", code).maybeSingle(),
+  ]);
+  const rm = Object.fromEntries((rates ?? []).map((r: { key: string; value: string }) => [r.key, r.value]));
+  const isOutright = sale.plan === "early" || sale.plan === "deposit_early";
+  const globalPct = isOutright ? Number(rm["commission_outright_pct"] ?? 10) : Number(rm["commission_instalment_pct"] ?? 10);
+  const override = amb ? (isOutright ? amb.outright_pct : amb.instalment_pct) : null;
+  const pct = override ?? globalPct;
+  return { commission_pct: pct, commission_amount: Math.round((sale.amount * pct) / 100) };
+}
+
 // Verifies with Flutterwave and marks the record paid. Idempotent.
 export async function confirmPayment(transactionId: string, txRef: string) {
   const db = await admin();
@@ -83,9 +104,11 @@ export async function confirmPayment(transactionId: string, txRef: string) {
     if (d?.status === "failed") await db.from("enrolments").update({ status: "failed" }).eq("id", row.id);
     return { ok: false as const, reason: d?.status ?? "unverified" };
   }
+  // Lock in the commission for this sale at the rate in effect right now.
+  const snap = await commissionSnapshot(db, { referral_code: row.referral_code, plan: row.plan, amount: row.amount });
   const { data: updated } = await db
     .from("enrolments")
-    .update({ status: "paid", paid_at: new Date().toISOString(), flw_transaction_id: String(transactionId), payment_method: d.payment_type ?? row.payment_method })
+    .update({ status: "paid", paid_at: new Date().toISOString(), flw_transaction_id: String(transactionId), payment_method: d.payment_type ?? row.payment_method, commission_pct: snap.commission_pct, commission_amount: snap.commission_amount })
     .eq("id", row.id)
     .neq("status", "paid")
     .select("*")
