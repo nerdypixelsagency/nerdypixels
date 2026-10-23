@@ -359,8 +359,8 @@ function instructors(){
   const list = HOME().instructors.items || [];
   const ini = n => String(n).trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
   const safeLink = u => /^https:\/\/([a-z]+\.)?linkedin\.com\//i.test(u || "") ? u : "";
-  const card = (i, k) => { const li = safeLink(i.linkedin); const src = i.photo || "";
-    const m = src.match(/^(\/brand\/instructors\/.+)-720\.webp$/);
+  const card = (i, k) => { const li = safeLink(i.linkedin); const src = i.name === "Hakeem Okunola" ? "/brand/people/hakeem-720.webp" : (i.photo || "");
+    const m = src.match(/^(\/brand\/(?:instructors|people)\/.+)-720\.webp$/);
     const img = src ? `<img src="${esc(src)}"${m?` srcset="${m[1]}-400.webp 400w, ${esc(src)} 720w" sizes="(max-width:640px) 78vw, (max-width:1100px) 33vw, 25vw"`:""} alt="${esc(i.name)}" width="720" height="900" loading="lazy" decoding="async">` : `<span class="ins-initials" aria-hidden="true">${esc(ini(i.name))}</span>`;
     return `<article class="ins-card" data-reveal style="--i:${k}"><div class="ins-photo">${img}</div><div class="ins-info"><h3>${esc(i.name)}</h3><p>${esc(i.role)}${i.org?` <span class="ins-org">· ${esc(i.org)}</span>`:""}</p>${li?`<a class="ins-li" href="${esc(li)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(i.name)} on LinkedIn">${LI}<span>LinkedIn</span></a>`:""}</div></article>`; };
   return `<div class="ins-rail" tabindex="0" aria-label="Instructors">${list.map(card).join("")}</div>${list.length > 1 ? `<div class="ins-dots" role="tablist" aria-label="Choose an instructor">${list.map((x, k) => `<button type="button" role="tab" class="ins-dot${k ? "" : " on"}" aria-label="${esc(x.name)}" aria-selected="${k ? "false" : "true"}" data-rail-dot="${k}"><i></i></button>`).join("")}</div>` : ""}`;
@@ -820,11 +820,10 @@ const RAIL_MS = 3500;
 let railCleanup = [];
 function setupRails(){
   railCleanup.forEach(fn => fn()); railCleanup = [];
-  const phone = matchMedia("(max-width: 760px)").matches;
   document.querySelectorAll(".ins-rail").forEach(rail => {
     const dots = rail.nextElementSibling && rail.nextElementSibling.classList.contains("ins-dots") ? [...rail.nextElementSibling.children] : [];
     const cards = [...rail.children];
-    if (!phone || cards.length < 2) return;
+    if (cards.length < 2) return;
     rail.style.setProperty("--rail-ms", RAIL_MS + "ms");
     let idx = 0, timer = null, resume = null, visible = false, raf = 0;
     const setActive = i => { idx = i; dots.forEach((d, k) => { d.classList.toggle("on", k === i); d.setAttribute("aria-selected", String(k === i)); }); restartBar(); };
@@ -841,11 +840,12 @@ function setupRails(){
     rail.addEventListener("scroll", onScroll, { passive: true });
     rail.addEventListener("touchstart", pause, { passive: true });
     rail.addEventListener("pointerdown", pause);
+    rail.addEventListener("mouseenter", pause);
     rail.addEventListener("focusin", pause);
     rail.nextElementSibling && rail.nextElementSibling.addEventListener("click", onDot);
     document.addEventListener("visibilitychange", onVis);
     io.observe(rail);
-    railCleanup.push(() => { stop(); clearTimeout(resume); io.disconnect(); rail.removeEventListener("scroll", onScroll); rail.removeEventListener("touchstart", pause); rail.removeEventListener("pointerdown", pause); rail.removeEventListener("focusin", pause); document.removeEventListener("visibilitychange", onVis); });
+    railCleanup.push(() => { stop(); clearTimeout(resume); io.disconnect(); rail.removeEventListener("scroll", onScroll); rail.removeEventListener("touchstart", pause); rail.removeEventListener("pointerdown", pause); rail.removeEventListener("mouseenter", pause); rail.removeEventListener("focusin", pause); document.removeEventListener("visibilitychange", onVis); });
   });
 }
 let railResize = 0;
