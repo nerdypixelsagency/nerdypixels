@@ -13,7 +13,9 @@ export async function autoEmailOn(key: AutoEmailKey) {
     } catch { v = {}; }
     cache = { at: Date.now(), v };
   }
-  return cache.v[key] !== false;
+  // The master switch turns every automation off at once; otherwise each one
+  // follows its own flag. Both default on.
+  return cache.v["master"] !== false && cache.v[key] !== false;
 }
 export const clearAutoEmailCache = () => { cache = null; };
 

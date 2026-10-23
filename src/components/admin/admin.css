@@ -201,6 +201,18 @@
 .adm-switch.on i{background:#25d366}
 .adm-switch.on i::after{transform:translateX(18px)}
 .adm-switch input:focus-visible+i{outline:3px solid #7d2ae8;outline-offset:2px}
+.adm-switch input:disabled{cursor:default}
+/* Larger switch for the master automation toggle */
+.adm-switch.lg{width:54px;height:32px}
+.adm-switch.lg i::after{width:26px;height:26px}
+.adm-switch.lg.on i::after{transform:translateX(22px)}
+/* Master automation banner */
+.adm-master{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:14px;border:1px solid var(--a-line);margin:4px 0 8px;transition:background .2s,border-color .2s}
+.adm-master.on{background:linear-gradient(90deg,rgba(37,211,102,.1),rgba(37,211,102,.02));border-color:rgba(37,211,102,.4)}
+.adm-master.off{background:linear-gradient(90deg,rgba(224,147,42,.14),rgba(224,147,42,.04));border-color:rgba(224,147,42,.5)}
+.adm-master-icon{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff}
+.adm-master.on .adm-master-icon{background:#25d366}
+.adm-master.off .adm-master-icon{background:#e0932a}
 .adm-checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 14px;margin-top:10px}
 .adm-checks label{display:flex;gap:8px;align-items:center;font-size:13px}
 .adm-thumb{width:72px;height:48px;border-radius:8px;object-fit:cover;background:#f1eff5;display:block}

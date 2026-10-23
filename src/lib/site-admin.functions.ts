@@ -193,15 +193,15 @@ export const getAutomation = createServerFn({ method: "GET" })
     const m = Object.fromEntries((data ?? []).map((r: { key: string; value: string }) => [r.key, r.value]));
     let flags: Record<string, boolean> = {};
     try { flags = JSON.parse(m["auto_emails"] ?? "{}"); } catch { flags = {}; }
-    return { flags: Object.fromEntries(AUTO_KEYS.map((k) => [k, flags[k] !== false])), recipients: (m["summary_recipients"] ?? "fegokendigital@gmail.com,hayjay.okunolaa@gmail.com").split(/[\s,;]+/).filter(Boolean) };
+    return { master: flags["master"] !== false, flags: Object.fromEntries(AUTO_KEYS.map((k) => [k, flags[k] !== false])), recipients: (m["summary_recipients"] ?? "fegokendigital@gmail.com,hayjay.okunolaa@gmail.com").split(/[\s,;]+/).filter(Boolean) };
   });
 
 export const saveAutomation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ flags: z.record(z.string(), z.boolean()), recipients: z.array(z.string().trim().toLowerCase().email()).min(1).max(20) }).parse(d))
+  .inputValidator((d: unknown) => z.object({ master: z.boolean().optional(), flags: z.record(z.string(), z.boolean()), recipients: z.array(z.string().trim().toLowerCase().email()).min(1).max(20) }).parse(d))
   .handler(async ({ data, context }) => {
     await requireSuper(context);
-    const flags = Object.fromEntries(AUTO_KEYS.map((k) => [k, data.flags[k] !== false]));
+    const flags = { master: data.master !== false, ...Object.fromEntries(AUTO_KEYS.map((k) => [k, data.flags[k] !== false])) };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("app_settings").upsert([{ key: "auto_emails", value: JSON.stringify(flags) }, { key: "summary_recipients", value: [...new Set(data.recipients)].join(",") }], { onConflict: "key" });
     if (error) throw new Error(error.message);
