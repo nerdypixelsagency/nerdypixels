@@ -97,7 +97,7 @@ function Coupons() {
       <div className="adm-head"><h1>Coupons &amp; paylinks</h1>
         <button className="adm-btn" onClick={() => edit()}>+ New coupon</button>
       </div>
-      <p className="adm-sub" style={{ marginTop: -6 }}>Each coupon makes a shareable payment link (and QR) for the bootcamp at a discounted, outright price. The charged amount is enforced on the server — it can't be tampered with in the browser.</p>
+      <p className="adm-sub" style={{ marginTop: -6 }}>Each coupon makes a shareable payment link (and QR) for the bootcamp at a discounted, outright price. The charged amount is enforced on the server, so it can't be tampered with in the browser.</p>
       {msg && <div className="adm-card" style={{ background: "#E8FBF0", color: "#0B6B3A", marginBottom: 12 }}>{msg}</div>}
       {err && <div className="adm-card" style={{ background: "#FDECEC", color: "#A42121", marginBottom: 12 }}>{err}</div>}
 
@@ -163,7 +163,7 @@ function Coupons() {
               <label>Max uses (optional)<input type="number" value={draft.maxUses} onChange={(e) => setDraft({ ...draft, maxUses: e.target.value })} placeholder="No limit" /></label>
               <label className="adm-check" style={{ alignSelf: "end" }}><input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} /> Active</label>
             </div>
-            <p className="adm-muted" style={{ fontSize: 12 }}>Coupons apply to the outright (paid-in-full) bootcamp only — never instalments.</p>
+            <p className="adm-muted" style={{ fontSize: 12 }}>Coupons apply to the outright (paid-in-full) bootcamp only, never instalments.</p>
             {err && <div style={{ color: "#C62B2B", fontSize: 13 }}>{err}</div>}
             <div className="adm-row" style={{ justifyContent: "flex-end", gap: 8, marginTop: 10 }}>
               <button className="adm-btn ghost" onClick={() => setDraft(null)}>Cancel</button>

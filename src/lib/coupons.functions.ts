@@ -18,14 +18,20 @@ export const getCoupon = createServerFn({ method: "POST" })
     const { openCohort, currencyRows, quote } = await import("./pricing.server");
     const { validateCoupon } = await import("./coupons.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { pricingFromCohort } = await import("./plans");
     const [cohort, rows] = await Promise.all([openCohort(), currencyRows()]);
     const base = quote(cohort, rows, data.currency, "early");
     const v = await validateCoupon(supabaseAdmin, { code: data.code, currency: data.currency, rows, baseQuote: base });
     if (!v.ok) return { valid: false as const, reason: v.reason };
+    // The strike-through "was" price is the full monthly total (what they save against).
+    const pr = pricingFromCohort(cohort);
+    const monthlyQ = quote(cohort, rows, data.currency, "monthly");
+    const listNgn = pr.monthly * pr.count;
+    const listCharge = Math.round(monthlyQ.charge * pr.count * 100) / 100;
     return {
       valid: true as const, code: data.code.toUpperCase(), label: v.label, badge: v.badge,
       charge: v.charge, amountNgn: v.amountNgn, currency: v.currency,
-      baseCharge: base.charge, baseNgn: base.amountNgn, baseCurrency: base.currency,
+      baseCharge: listCharge, baseNgn: listNgn, baseCurrency: v.currency,
       expiresAt: v.coupon.expires_at, plan: v.plan,
     };
   });

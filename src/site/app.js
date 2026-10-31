@@ -533,7 +533,7 @@ P.event = () => { const f = FREE(), H = HOME().freeClass; return { title:f.title
 <section class="hero"><div class="hero-bg" aria-hidden="true">${pic("/brand/photos/free-class-1200.webp", "", { eager:true, sizes:"100vw" })}</div><div class="wrap hero-grid" style="align-items:start">
 <div class="stack" style="gap:22px"><p class="kicker-line">Free live class</p><h1>${esc(f.title)}</h1>
 <p class="lead">${T(H.lead)}</p>
-${f.at?`<div class="grid g3">${[["Date",f.past?"Next date coming soon":f.dateLabel.replace(/ \d{4}$/,"")],["Time",f.past?"—":f.timeLabel],["Where","Online, free"]].map(r=>`<div class="glass"><div class="small">${r[0]}</div><b>${esc(r[1])}</b></div>`).join("")}</div>`:""}
+${f.at?`<div class="grid g3">${[["Date",f.past?"Next date coming soon":f.dateLabel.replace(/ \d{4}$/,"")],["Time",f.past?"TBC":f.timeLabel],["Where","Online, free"]].map(r=>`<div class="glass"><div class="small">${r[0]}</div><b>${esc(r[1])}</b></div>`).join("")}</div>`:""}
 <ul class="trust">${(H.gets||[]).map(g=>`<li>${svg("check")}<span>${T(g.text)}</span></li>`).join("")}</ul>
 </div>
 ${f.past?`<div class="seat-card"><h2 style="font-size:24px">This class has happened</h2><p>Tell us on WhatsApp and we'll invite you to the next one.</p><a class="btn green block" href="${wa("Hello, please invite me to the next free class.")}" target="_blank" rel="noopener">Invite me to the next one</a></div>`:`<div class="seat-card"><h2 style="font-size:24px">Save your free seat</h2>${freeClassForm()}</div>`}</div></section>
@@ -587,12 +587,12 @@ function couponBanner(coup){
   const was = coup.baseCharge && coup.baseCharge > coup.charge ? `<span style="text-decoration:line-through;opacity:.6">${money(coup.baseCharge, coup.currency)}</span> ` : "";
   return `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#efe7fe,#f7f1ff);border:1px solid #e2d4fb">
 <b style="background:#7D2AE8;color:#fff;font-size:12px;font-weight:800;letter-spacing:.02em;padding:5px 11px;border-radius:999px">${esc(coup.badge || ("Code " + coup.code))}</b>
-<span class="small"><b>${esc(coup.code)}</b> applied — pay ${was}<b style="color:var(--ink)">${money(coup.charge, coup.currency)}</b> once, no instalments.</span>
+<span class="small"><b>${esc(coup.code)}</b> applied. Pay ${was}<b style="color:var(--ink)">${money(coup.charge, coup.currency)}</b> once, no instalments.</span>
 <span class="small" style="margin-left:auto;font-weight:700;color:#7D2AE8;white-space:nowrap">${I.lock ? "" : ""}⏳ Ends in <span id="co-cd" data-exp="${esc(coup.expiresAt || "")}">…</span></span></div>`;
 }
 function couponCard(coup){
   const was = coup.baseCharge && coup.baseCharge > coup.charge ? `<span class="small muted" style="text-decoration:line-through;font-weight:500">${money(coup.baseCharge, coup.currency)}</span> ` : "";
-  return `<div class="choice on" style="cursor:default"><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">Full bootcamp, paid once</b><b style="font-size:20px;color:var(--ink)">${was}${money(coup.charge, coup.currency)}</b></span><span class="small">One payment today with <b>${esc(coup.code)}</b>. Nothing more to pay later — all 8 modules, 5 certifications and the capstone.</span></span></div>`;
+  return `<div class="choice on" style="cursor:default"><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">Full bootcamp, paid once</b><b style="font-size:20px;color:var(--ink)">${was}${money(coup.charge, coup.currency)}</b></span><span class="small">One payment today with <b>${esc(coup.code)}</b>. Nothing more to pay later. Includes all 8 modules, 5 certifications and the capstone.</span></span></div>`;
 }
 
 P.checkout = (q) => { const c = coState();
@@ -643,7 +643,7 @@ ${chargeNote}
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="2">Back</button><button class="btn green" type="button" data-act="co-pay" style="flex:1">${I.lock("#06301A")} Pay ${money(todayCharged, charged)}</button></div>
 <p class="small muted">Payments are processed securely by our licensed payment partner, Flutterwave. We never see or store your card details or wallet PIN.</p>`;
   const sched = plan === "deposit_early" ? [["Today (deposit)", v.deposit], [`By ${BAL_DATE()}`, v.earlyBal]] : plan === "monthly" ? [[`Today (due by ${startShort()})`, v.monthly], ["1 December", v.monthly], ["1 January", v.monthly]] : null;
-  document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${coup ? couponBanner(coup) : (COUPON && !COUPON.valid ? `<div class="small" style="padding:11px 14px;border-radius:12px;background:#fff4d6;color:#7a5b00;margin:12px 0">That discount code isn't valid or has expired — showing standard prices.</div>` : "")}${steps}<div class="mobile-due"><span class="small">${esc(planName(plan))}, due today</span><b style="font-size:20px;color:var(--ink)">${m$(today)}</b></div>${body}`;
+  document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${coup ? couponBanner(coup) : (COUPON && !COUPON.valid ? `<div class="small" style="padding:11px 14px;border-radius:12px;background:#fff4d6;color:#7a5b00;margin:12px 0">That discount code isn't valid or has expired, so standard prices apply.</div>` : "")}${steps}<div class="mobile-due"><span class="small">${esc(planName(plan))}, due today</span><b style="font-size:20px;color:var(--ink)">${m$(today)}</b></div>${body}`;
   document.getElementById("co-sum").innerHTML = `<h2 style="font-size:18px">Order summary</h2><div><b style="color:var(--ink)">${esc(cfg().courseTitle)}</b><div class="small muted">${esc(cfg().cohortName)} cohort, classes start ${esc(COHORT_START())}</div></div>
 <div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px"><span>Plan</span><b style="color:var(--ink)">${esc(planName(plan))}</b></div>
 ${sched ? sched.map(r=>`<div class="sumrow"><span>${esc(r[0])}</span><span>${m$(r[1])}</span></div>`).join("") : ""}
@@ -992,7 +992,7 @@ document.addEventListener("input", e => {
   refTimer = setTimeout(() => {
     window.__npaRefCheck({ code }).then(r => {
       if (t.value.trim().toUpperCase() !== code) return;
-      if (r && r.ok){ note.textContent = `Code applied — referred by ${r.name}.`; note.className = "ref-note ok"; }
+      if (r && r.ok){ note.textContent = `Code applied. Referred by ${r.name}.`; note.className = "ref-note ok"; }
       else { note.textContent = "Code not recognised."; note.className = "ref-note bad"; }
     }).catch(() => {});
   }, 400);
