@@ -13,6 +13,7 @@ export const PERMS = [
   ["currencies", "Currencies & prices"],
   ["content", "Site content builder"],
   ["media", "Media & syllabus"],
+  ["nerdx_waitlist", "NerdX SEO waitlist"],
   ["preview", "View as student"],
 ] as const;
 export type Perm = (typeof PERMS)[number][0];
@@ -22,7 +23,7 @@ export const PRESETS: Record<string, { label: string; perms: Perm[] | null; help
   editor: { label: "Content editor", perms: ["content", "media"], help: "Edits the website, testimonials, media and syllabus." },
   finance: { label: "Finance", perms: ["dashboard", "enrolments", "instalments", "commissions", "currencies"], help: "Payments, instalments, commissions and prices." },
   support: { label: "Student support", perms: ["enrolments", "leads", "emails", "instalments", "preview"], help: "Answers students and leads, sends emails and reminders." },
-  marketing: { label: "Marketing", perms: ["dashboard", "leads", "emails", "referrals", "content", "media"], help: "Leads, email campaigns, ambassadors and site content." },
+  marketing: { label: "Marketing", perms: ["dashboard", "leads", "emails", "referrals", "nerdx_waitlist", "content", "media"], help: "Leads, email campaigns, ambassadors and site content." },
   viewer: { label: "Viewer", perms: ["dashboard"], help: "Sees the dashboard statistics only." },
 };
 

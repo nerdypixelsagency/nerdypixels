@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Menu, X, PanelLeftClose, PanelLeftOpen, LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard } from "lucide-react";
+import { Menu, X, PanelLeftClose, PanelLeftOpen, LayoutDashboard, Users, Ticket, CalendarClock, ShieldCheck, LogOut, HandCoins, Inbox, GraduationCap, Settings, Eye, Mail, Coins, PanelsTopLeft, Clapperboard, Search } from "lucide-react";
 import { can, type Access } from "@/lib/access";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyRole, getPaymentModeFn } from "@/lib/admin.functions";
@@ -92,6 +92,7 @@ function AdminLayout() {
     { to: "/admin/referrals", label: "Referrals", icon: Ticket, perm: "referrals" },
     { to: "/admin/instalments", label: "Instalments", icon: CalendarClock, perm: "instalments" },
     { to: "/admin/commissions", label: "Commissions", icon: HandCoins, perm: "commissions" },
+    { to: "/admin/nerdx-waitlist", label: "NerdX waitlist", icon: Search, perm: "nerdx_waitlist" },
     { to: "/admin/cohorts", label: "Cohorts", icon: GraduationCap, perm: "cohorts" },
     { to: "/admin/currencies", label: "Currencies", icon: Coins, perm: "currencies" },
     { to: "/admin/content", label: "Site content", icon: PanelsTopLeft, perm: "content" },

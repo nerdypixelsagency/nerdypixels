@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SitePage } from "@/site/SitePage";
 import { headFor } from "@/site/meta";
 import { getBlogData, blogDeps } from "@/lib/blog.functions";
@@ -11,6 +11,8 @@ const geoOnServer = async () => (typeof window === "undefined" ? (await getVisit
 export const Route = createFileRoute("/$")({
   loaderDeps: ({ search }) => blogDeps(search as Record<string, unknown>),
   loader: async ({ params, deps }) => {
+    // Canonicalise the NerdX landing URL (any casing) to /NerdX-SEO.
+    if (/^nerdx-seo\/?$/i.test(params._splat ?? "")) throw redirect({ href: "/NerdX-SEO" });
     const path = "/" + (params._splat ?? "");
     const [blog, config, geo] = await Promise.all([/^\/blog(\/|$)/.test(path) ? getBlogData({ data: { path, ...deps } }) : Promise.resolve(null), getPublicCourseConfig(), geoOnServer()]);
     return { blog, config, geo };

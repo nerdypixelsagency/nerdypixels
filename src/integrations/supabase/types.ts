@@ -85,6 +85,51 @@ export type Database = {
         }
         Relationships: []
       }
+      nerdx_waitlist: {
+        Row: {
+          beta: boolean
+          challenge: string | null
+          created_at: string
+          email: string
+          id: string
+          mode: string
+          name: string | null
+          role: string | null
+          source: string
+          timeline: string | null
+          use_case: string | null
+          website: string | null
+        }
+        Insert: {
+          beta?: boolean
+          challenge?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          mode?: string
+          name?: string | null
+          role?: string | null
+          source?: string
+          timeline?: string | null
+          use_case?: string | null
+          website?: string | null
+        }
+        Update: {
+          beta?: boolean
+          challenge?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          mode?: string
+          name?: string | null
+          role?: string | null
+          source?: string
+          timeline?: string | null
+          use_case?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string

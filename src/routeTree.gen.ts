@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
+import { Route as NerdXSEORouteImport } from './routes/NerdX-SEO'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DemoDayRouteImport } from './routes/demo-day'
@@ -30,12 +31,14 @@ import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminInstalmentsRouteImport } from './routes/_authenticated/admin.instalments'
 import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated/admin.leads'
 import { Route as AuthenticatedAdminMediaRouteImport } from './routes/_authenticated/admin.media'
+import { Route as AuthenticatedAdminNerdxWaitlistRouteImport } from './routes/_authenticated/admin.nerdx-waitlist'
 import { Route as AuthenticatedAdminPreviewRouteImport } from './routes/_authenticated/admin.preview'
 import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin.referrals'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin.team'
 import { Route as ApiPublicAuthEmailHookRouteImport } from './routes/api/public/auth-email-hook'
 import { Route as ApiPublicFlutterwaveWebhookRouteImport } from './routes/api/public/flutterwave-webhook'
+import { Route as ApiPublicNerdxWaitlistRouteImport } from './routes/api/public/nerdx-waitlist'
 import { Route as AuthenticatedAdminEnrolmentIdRouteImport } from './routes/_authenticated/admin.enrolment.$id'
 import { Route as ApiPublicCronDailySummaryRouteImport } from './routes/api/public/cron/daily-summary'
 import { Route as ApiPublicCronInstalmentRemindersRouteImport } from './routes/api/public/cron/instalment-reminders'
@@ -48,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NerdXSEORoute = NerdXSEORouteImport.update({
+  id: '/NerdX-SEO',
+  path: '/NerdX-SEO',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -152,6 +160,12 @@ const AuthenticatedAdminMediaRoute = AuthenticatedAdminMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminNerdxWaitlistRoute =
+  AuthenticatedAdminNerdxWaitlistRouteImport.update({
+    id: '/nerdx-waitlist',
+    path: '/nerdx-waitlist',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminPreviewRoute =
   AuthenticatedAdminPreviewRouteImport.update({
     id: '/preview',
@@ -186,6 +200,11 @@ const ApiPublicFlutterwaveWebhookRoute =
     path: '/api/public/flutterwave-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicNerdxWaitlistRoute = ApiPublicNerdxWaitlistRouteImport.update({
+  id: '/api/public/nerdx-waitlist',
+  path: '/api/public/nerdx-waitlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminEnrolmentIdRoute =
   AuthenticatedAdminEnrolmentIdRouteImport.update({
     id: '/enrolment/$id',
@@ -208,6 +227,7 @@ const ApiPublicCronInstalmentRemindersRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/NerdX-SEO': typeof NerdXSEORoute
   '/auth': typeof AuthRoute
   '/demo-day': typeof DemoDayRoute
   '/payment-return': typeof PaymentReturnRoute
@@ -225,12 +245,14 @@ export interface FileRoutesByFullPath {
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/admin/nerdx-waitlist': typeof AuthenticatedAdminNerdxWaitlistRoute
   '/admin/preview': typeof AuthenticatedAdminPreviewRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
+  '/api/public/nerdx-waitlist': typeof ApiPublicNerdxWaitlistRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/enrolment/$id': typeof AuthenticatedAdminEnrolmentIdRoute
   '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
@@ -239,6 +261,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/NerdX-SEO': typeof NerdXSEORoute
   '/auth': typeof AuthRoute
   '/demo-day': typeof DemoDayRoute
   '/payment-return': typeof PaymentReturnRoute
@@ -255,12 +278,14 @@ export interface FileRoutesByTo {
   '/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/admin/nerdx-waitlist': typeof AuthenticatedAdminNerdxWaitlistRoute
   '/admin/preview': typeof AuthenticatedAdminPreviewRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
+  '/api/public/nerdx-waitlist': typeof ApiPublicNerdxWaitlistRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/enrolment/$id': typeof AuthenticatedAdminEnrolmentIdRoute
   '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
@@ -271,6 +296,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/NerdX-SEO': typeof NerdXSEORoute
   '/auth': typeof AuthRoute
   '/demo-day': typeof DemoDayRoute
   '/payment-return': typeof PaymentReturnRoute
@@ -288,12 +314,14 @@ export interface FileRoutesById {
   '/_authenticated/admin/instalments': typeof AuthenticatedAdminInstalmentsRoute
   '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
   '/_authenticated/admin/media': typeof AuthenticatedAdminMediaRoute
+  '/_authenticated/admin/nerdx-waitlist': typeof AuthenticatedAdminNerdxWaitlistRoute
   '/_authenticated/admin/preview': typeof AuthenticatedAdminPreviewRoute
   '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/team': typeof AuthenticatedAdminTeamRoute
   '/api/public/auth-email-hook': typeof ApiPublicAuthEmailHookRoute
   '/api/public/flutterwave-webhook': typeof ApiPublicFlutterwaveWebhookRoute
+  '/api/public/nerdx-waitlist': typeof ApiPublicNerdxWaitlistRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/enrolment/$id': typeof AuthenticatedAdminEnrolmentIdRoute
   '/api/public/cron/daily-summary': typeof ApiPublicCronDailySummaryRoute
@@ -304,6 +332,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$'
+    | '/NerdX-SEO'
     | '/auth'
     | '/demo-day'
     | '/payment-return'
@@ -321,12 +350,14 @@ export interface FileRouteTypes {
     | '/admin/instalments'
     | '/admin/leads'
     | '/admin/media'
+    | '/admin/nerdx-waitlist'
     | '/admin/preview'
     | '/admin/referrals'
     | '/admin/settings'
     | '/admin/team'
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
+    | '/api/public/nerdx-waitlist'
     | '/admin/'
     | '/admin/enrolment/$id'
     | '/api/public/cron/daily-summary'
@@ -335,6 +366,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/NerdX-SEO'
     | '/auth'
     | '/demo-day'
     | '/payment-return'
@@ -351,12 +383,14 @@ export interface FileRouteTypes {
     | '/admin/instalments'
     | '/admin/leads'
     | '/admin/media'
+    | '/admin/nerdx-waitlist'
     | '/admin/preview'
     | '/admin/referrals'
     | '/admin/settings'
     | '/admin/team'
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
+    | '/api/public/nerdx-waitlist'
     | '/admin'
     | '/admin/enrolment/$id'
     | '/api/public/cron/daily-summary'
@@ -366,6 +400,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/$'
+    | '/NerdX-SEO'
     | '/auth'
     | '/demo-day'
     | '/payment-return'
@@ -383,12 +418,14 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/instalments'
     | '/_authenticated/admin/leads'
     | '/_authenticated/admin/media'
+    | '/_authenticated/admin/nerdx-waitlist'
     | '/_authenticated/admin/preview'
     | '/_authenticated/admin/referrals'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/team'
     | '/api/public/auth-email-hook'
     | '/api/public/flutterwave-webhook'
+    | '/api/public/nerdx-waitlist'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/enrolment/$id'
     | '/api/public/cron/daily-summary'
@@ -399,6 +436,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
+  NerdXSEORoute: typeof NerdXSEORoute
   AuthRoute: typeof AuthRoute
   DemoDayRoute: typeof DemoDayRoute
   PaymentReturnRoute: typeof PaymentReturnRoute
@@ -407,6 +445,7 @@ export interface RootRouteChildren {
   StudentRoute: typeof StudentRoute
   ApiPublicAuthEmailHookRoute: typeof ApiPublicAuthEmailHookRoute
   ApiPublicFlutterwaveWebhookRoute: typeof ApiPublicFlutterwaveWebhookRoute
+  ApiPublicNerdxWaitlistRoute: typeof ApiPublicNerdxWaitlistRoute
   ApiPublicCronDailySummaryRoute: typeof ApiPublicCronDailySummaryRoute
   ApiPublicCronInstalmentRemindersRoute: typeof ApiPublicCronInstalmentRemindersRoute
 }
@@ -425,6 +464,13 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/$'
       preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/NerdX-SEO': {
+      id: '/NerdX-SEO'
+      path: '/NerdX-SEO'
+      fullPath: '/NerdX-SEO'
+      preLoaderRoute: typeof NerdXSEORouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -560,6 +606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMediaRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/nerdx-waitlist': {
+      id: '/_authenticated/admin/nerdx-waitlist'
+      path: '/nerdx-waitlist'
+      fullPath: '/admin/nerdx-waitlist'
+      preLoaderRoute: typeof AuthenticatedAdminNerdxWaitlistRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/preview': {
       id: '/_authenticated/admin/preview'
       path: '/preview'
@@ -602,6 +655,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFlutterwaveWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/nerdx-waitlist': {
+      id: '/api/public/nerdx-waitlist'
+      path: '/api/public/nerdx-waitlist'
+      fullPath: '/api/public/nerdx-waitlist'
+      preLoaderRoute: typeof ApiPublicNerdxWaitlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/enrolment/$id': {
       id: '/_authenticated/admin/enrolment/$id'
       path: '/enrolment/$id'
@@ -637,6 +697,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminInstalmentsRoute: typeof AuthenticatedAdminInstalmentsRoute
   AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
   AuthenticatedAdminMediaRoute: typeof AuthenticatedAdminMediaRoute
+  AuthenticatedAdminNerdxWaitlistRoute: typeof AuthenticatedAdminNerdxWaitlistRoute
   AuthenticatedAdminPreviewRoute: typeof AuthenticatedAdminPreviewRoute
   AuthenticatedAdminReferralsRoute: typeof AuthenticatedAdminReferralsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
@@ -656,6 +717,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminInstalmentsRoute: AuthenticatedAdminInstalmentsRoute,
   AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
   AuthenticatedAdminMediaRoute: AuthenticatedAdminMediaRoute,
+  AuthenticatedAdminNerdxWaitlistRoute: AuthenticatedAdminNerdxWaitlistRoute,
   AuthenticatedAdminPreviewRoute: AuthenticatedAdminPreviewRoute,
   AuthenticatedAdminReferralsRoute: AuthenticatedAdminReferralsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
@@ -682,6 +744,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   SplatRoute: SplatRoute,
+  NerdXSEORoute: NerdXSEORoute,
   AuthRoute: AuthRoute,
   DemoDayRoute: DemoDayRoute,
   PaymentReturnRoute: PaymentReturnRoute,
@@ -690,6 +753,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudentRoute: StudentRoute,
   ApiPublicAuthEmailHookRoute: ApiPublicAuthEmailHookRoute,
   ApiPublicFlutterwaveWebhookRoute: ApiPublicFlutterwaveWebhookRoute,
+  ApiPublicNerdxWaitlistRoute: ApiPublicNerdxWaitlistRoute,
   ApiPublicCronDailySummaryRoute: ApiPublicCronDailySummaryRoute,
   ApiPublicCronInstalmentRemindersRoute: ApiPublicCronInstalmentRemindersRoute,
 }
