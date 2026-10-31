@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo } from "react";
 import { startPayment, registerEvent, submitLead, requestSyllabus, getVisitorGeo } from "@/lib/payments.functions";
 import { validateReferralCode } from "@/lib/referrals.functions";
+import { getCoupon } from "@/lib/coupons.functions";
 const astronaut = { url: "/brand/astronaut.webp" };
 // @ts-expect-error plain JS site bundle
 import { renderStatic, boot, renderNow, primeBlog, primeCourseConfig, primeGeo } from "./app.js";
@@ -22,6 +23,7 @@ export function SitePage({ blog = null, config, geo = null }: { blog?: BlogData 
   const syllabus = useServerFn(requestSyllabus);
   const geoFn = useServerFn(getVisitorGeo);
   const refCheck = useServerFn(validateReferralCode);
+  const couponFn = useServerFn(getCoupon);
   // Server-rendered HTML so crawlers see full page content without running JS.
   primeBlog(blog);
   primeCourseConfig(config);
@@ -50,6 +52,7 @@ export function SitePage({ blog = null, config, geo = null }: { blog?: BlogData 
     w["__npaLead"] = (d: unknown) => lead({ data: d as never });
     w["__npaSyllabus"] = (d: unknown) => syllabus({ data: d as never });
     w["__npaRefCheck"] = (d: { code: string }) => refCheck({ data: d });
+    w["__npaCoupon"] = (d: { code: string; currency?: string }) => couponFn({ data: d });
     w["__npaNav"] = (href: string) => {
       const target = new URL(href, location.origin);
       const current = new URLSearchParams(location.search);

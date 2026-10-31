@@ -25,6 +25,7 @@ import { Route as AuthenticatedAdminAddStudentRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminCohortsRouteImport } from './routes/_authenticated/admin.cohorts'
 import { Route as AuthenticatedAdminCommissionsRouteImport } from './routes/_authenticated/admin.commissions'
 import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin.content'
+import { Route as AuthenticatedAdminCouponsRouteImport } from './routes/_authenticated/admin.coupons'
 import { Route as AuthenticatedAdminCurrenciesRouteImport } from './routes/_authenticated/admin.currencies'
 import { Route as AuthenticatedAdminEmailsRouteImport } from './routes/_authenticated/admin.emails'
 import { Route as AuthenticatedAdminEnrolmentsRouteImport } from './routes/_authenticated/admin.enrolments'
@@ -124,6 +125,12 @@ const AuthenticatedAdminContentRoute =
   AuthenticatedAdminContentRouteImport.update({
     id: '/content',
     path: '/content',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCouponsRoute =
+  AuthenticatedAdminCouponsRouteImport.update({
+    id: '/coupons',
+    path: '/coupons',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminCurrenciesRoute =
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/admin/cohorts': typeof AuthenticatedAdminCohortsRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/currencies': typeof AuthenticatedAdminCurrenciesRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
@@ -272,6 +280,7 @@ export interface FileRoutesByTo {
   '/admin/cohorts': typeof AuthenticatedAdminCohortsRoute
   '/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/admin/currencies': typeof AuthenticatedAdminCurrenciesRoute
   '/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
@@ -308,6 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/cohorts': typeof AuthenticatedAdminCohortsRoute
   '/_authenticated/admin/commissions': typeof AuthenticatedAdminCommissionsRoute
   '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
+  '/_authenticated/admin/coupons': typeof AuthenticatedAdminCouponsRoute
   '/_authenticated/admin/currencies': typeof AuthenticatedAdminCurrenciesRoute
   '/_authenticated/admin/emails': typeof AuthenticatedAdminEmailsRoute
   '/_authenticated/admin/enrolments': typeof AuthenticatedAdminEnrolmentsRoute
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/admin/cohorts'
     | '/admin/commissions'
     | '/admin/content'
+    | '/admin/coupons'
     | '/admin/currencies'
     | '/admin/emails'
     | '/admin/enrolments'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/admin/cohorts'
     | '/admin/commissions'
     | '/admin/content'
+    | '/admin/coupons'
     | '/admin/currencies'
     | '/admin/emails'
     | '/admin/enrolments'
@@ -412,6 +424,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/cohorts'
     | '/_authenticated/admin/commissions'
     | '/_authenticated/admin/content'
+    | '/_authenticated/admin/coupons'
     | '/_authenticated/admin/currencies'
     | '/_authenticated/admin/emails'
     | '/_authenticated/admin/enrolments'
@@ -564,6 +577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminContentRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/coupons': {
+      id: '/_authenticated/admin/coupons'
+      path: '/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AuthenticatedAdminCouponsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/currencies': {
       id: '/_authenticated/admin/currencies'
       path: '/currencies'
@@ -691,6 +711,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCohortsRoute: typeof AuthenticatedAdminCohortsRoute
   AuthenticatedAdminCommissionsRoute: typeof AuthenticatedAdminCommissionsRoute
   AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
+  AuthenticatedAdminCouponsRoute: typeof AuthenticatedAdminCouponsRoute
   AuthenticatedAdminCurrenciesRoute: typeof AuthenticatedAdminCurrenciesRoute
   AuthenticatedAdminEmailsRoute: typeof AuthenticatedAdminEmailsRoute
   AuthenticatedAdminEnrolmentsRoute: typeof AuthenticatedAdminEnrolmentsRoute
@@ -711,6 +732,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCohortsRoute: AuthenticatedAdminCohortsRoute,
   AuthenticatedAdminCommissionsRoute: AuthenticatedAdminCommissionsRoute,
   AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
+  AuthenticatedAdminCouponsRoute: AuthenticatedAdminCouponsRoute,
   AuthenticatedAdminCurrenciesRoute: AuthenticatedAdminCurrenciesRoute,
   AuthenticatedAdminEmailsRoute: AuthenticatedAdminEmailsRoute,
   AuthenticatedAdminEnrolmentsRoute: AuthenticatedAdminEnrolmentsRoute,

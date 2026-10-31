@@ -17,6 +17,7 @@ const startSchema = z.object({
   persona: z.string().max(40).optional(),
   source: z.string().max(40).optional(),
   referral: z.string().trim().max(40).optional(),
+  coupon: z.string().trim().max(40).optional(),
   method: z.string().max(20).optional(),
 });
 
@@ -46,9 +47,14 @@ export const startPayment = createServerFn({ method: "POST" })
     let cohortId = cohort?.id ?? null;
     let referral = data.referral ? data.referral.toUpperCase() : null;
     if (data.kind === "enrolment") {
-      plan = data.plan ?? (deposits ? "deposit_monthly" : "monthly");
-      if (isDepositPlan(plan) && !deposits) plan = plan === "deposit_early" ? "early" : "monthly";
-      if (isEarlyPlan(plan)) { const why = await earlyClosed(); if (why) throw new Error(why); }
+      // A coupon is an outright, paid-in-full offer that bypasses the early-bird window.
+      if (data.coupon) {
+        plan = "early";
+      } else {
+        plan = data.plan ?? (deposits ? "deposit_monthly" : "monthly");
+        if (isDepositPlan(plan) && !deposits) plan = plan === "deposit_early" ? "early" : "monthly";
+        if (isEarlyPlan(plan)) { const why = await earlyClosed(); if (why) throw new Error(why); }
+      }
     } else {
       key = data.month;
       if (!key) throw new Error("Choose which payment you are making.");
@@ -69,7 +75,17 @@ export const startPayment = createServerFn({ method: "POST" })
         throw new Error(isEarlyPlan(plan) ? "You're on the early-bird plan, so you only have the balance left to pay." : "That payment isn't part of your plan.");
     }
     const q = quote(cohort, rows, data.currency, plan, key);
-    if (q.charge <= 0) throw new Error("There is nothing to pay for this item.");
+    // Apply a coupon: the discounted charge is computed here (server-side), never trusted from the browser.
+    let qf = q;
+    let couponCode: string | null = null;
+    if (data.kind === "enrolment" && data.coupon) {
+      const { validateCoupon, couponMessage } = await import("./coupons.server");
+      const v = await validateCoupon(supabaseAdmin, { code: data.coupon, currency: data.currency, rows, baseQuote: q });
+      if (!v.ok) throw new Error(couponMessage(v.reason));
+      qf = { amountNgn: v.amountNgn, charge: v.charge, currency: v.currency };
+      couponCode = data.coupon.toUpperCase();
+    }
+    if (qf.charge <= 0) throw new Error("There is nothing to pay for this item.");
     const txRef = "NPA-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
     const geo = countryFromHeaders(getRequest().headers);
     const record: Record<string, unknown> = {
@@ -84,19 +100,22 @@ export const startPayment = createServerFn({ method: "POST" })
       referral_code: referral,
       plan,
       instalment_month: key ?? (plan === "monthly" ? "November" : null),
-      amount: q.amountNgn,
-      charge_amount: q.charge,
-      currency: q.currency,
+      amount: qf.amountNgn,
+      charge_amount: qf.charge,
+      currency: qf.currency,
       payment_method: data.method ?? null,
       tx_ref: txRef,
       mode,
       cohort_id: cohortId,
     };
+    // Only reference the coupon column for actual coupon sales, so normal checkout
+    // is unaffected if this deploys before the coupons migration is applied.
+    if (couponCode) record["coupon_code"] = couponCode;
     let { error } = await supabaseAdmin.from("enrolments").insert(record as never);
-    if (error && /charge_amount|geo_country/.test(error.message)) {
+    if (error && /charge_amount|geo_country|coupon_code/.test(error.message)) {
       // Database not updated yet: only naira can be charged safely, without the new columns.
-      if (q.currency !== "NGN") throw new Error("Paying in other currencies isn't available yet. Please choose Naira (₦).");
-      const { charge_amount: _c, geo_country: _g, ...legacy } = record;
+      if (qf.currency !== "NGN") throw new Error("Paying in other currencies isn't available yet. Please choose Naira (₦).");
+      const { charge_amount: _c, geo_country: _g, coupon_code: _cp, ...legacy } = record;
       ({ error } = await supabaseAdmin.from("enrolments").insert(legacy as never));
     }
     if (error) {
@@ -119,20 +138,20 @@ export const startPayment = createServerFn({ method: "POST" })
         }
       } catch (e) { console.error("[startPayment:lead]", e); }
     }
-    const title = key ? (key === "Balance" ? "Bootcamp balance" : `${key} instalment`) : isDepositPlan(plan) ? "Bootcamp seat deposit" : plan === "early" ? "Bootcamp, early bird" : "Bootcamp, first month";
+    const title = couponCode ? "Bootcamp, discounted enrolment" : key ? (key === "Balance" ? "Bootcamp balance" : `${key} instalment`) : isDepositPlan(plan) ? "Bootcamp seat deposit" : plan === "early" ? "Bootcamp, early bird" : "Bootcamp, first month";
     const link = await flwCreatePayment({
       mode,
       txRef,
-      amount: q.charge,
-      currency: q.currency,
+      amount: qf.charge,
+      currency: qf.currency,
       email: data.email,
       name: data.name,
       phone: data.phone,
       redirectUrl: `${originOf()}/payment-return`,
       title,
-      meta: { kind: data.kind, plan, referral_code: referral ?? "", month: key ?? "" },
+      meta: { kind: data.kind, plan, referral_code: referral ?? "", month: key ?? "", coupon: couponCode ?? "" },
     });
-    return { link, txRef, amount: q.amountNgn, charge: q.charge, currency: q.currency, plan };
+    return { link, txRef, amount: qf.amountNgn, charge: qf.charge, currency: qf.currency, plan };
   });
 
 export const verifyPayment = createServerFn({ method: "POST" })

@@ -85,6 +85,66 @@ export type Database = {
         }
         Relationships: []
       }
+      coupons: {
+        Row: {
+          active: boolean
+          badge: string
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          kind: string
+          label: string
+          max_uses: number | null
+          percent: number | null
+          plan: string
+          price_ngn: number | null
+          price_usd: number | null
+          starts_at: string | null
+          updated_at: string
+          uses: number
+        }
+        Insert: {
+          active?: boolean
+          badge?: string
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          max_uses?: number | null
+          percent?: number | null
+          plan?: string
+          price_ngn?: number | null
+          price_usd?: number | null
+          starts_at?: string | null
+          updated_at?: string
+          uses?: number
+        }
+        Update: {
+          active?: boolean
+          badge?: string
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          max_uses?: number | null
+          percent?: number | null
+          plan?: string
+          price_ngn?: number | null
+          price_usd?: number | null
+          starts_at?: string | null
+          updated_at?: string
+          uses?: number
+        }
+        Relationships: []
+      }
       nerdx_waitlist: {
         Row: {
           beta: boolean
@@ -362,6 +422,7 @@ export type Database = {
           amount: number
           cohort_id: string | null
           commission_amount: number | null
+          coupon_code: string | null
           commission_pct: number | null
           country: string | null
           created_at: string
@@ -394,6 +455,7 @@ export type Database = {
           amount?: number
           cohort_id?: string | null
           commission_amount?: number | null
+          coupon_code?: string | null
           commission_pct?: number | null
           country?: string | null
           created_at?: string
@@ -426,6 +488,7 @@ export type Database = {
           amount?: number
           cohort_id?: string | null
           commission_amount?: number | null
+          coupon_code?: string | null
           commission_pct?: number | null
           country?: string | null
           created_at?: string
@@ -734,6 +797,7 @@ export type Database = {
     }
     Functions: {
       claim_super_admin: { Args: never; Returns: boolean }
+      increment_coupon: { Args: { p_code: string }; Returns: undefined }
       has_perm: { Args: { _perms: string[]; _user_id: string }; Returns: boolean }
       public_site_stats: { Args: { _cohort: string }; Returns: Json }
       has_role: {

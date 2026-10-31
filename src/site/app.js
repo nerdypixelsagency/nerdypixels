@@ -566,18 +566,56 @@ function coPlan(c){
 }
 /** Today's amount for a plan, in a given currency. */
 function dueToday(plan, code){ const v = PV(code); return plan === "early" ? v.early : plan === "monthly" ? v.monthly : v.deposit; }
-P.checkout = (q) => { const c = coState(); if (PLAN_PARAM[q.plan]) c.plan = PLAN_PARAM[q.plan]; if (!c.step || c.step>3) c.step=1; coSave(c);
+
+/* ---- Coupon paylinks: a valid coupon forces an outright, discounted price. ---- */
+let COUPON = null, COUPON_CODE = null, COUPON_LOADING = false, coCdTimer = null;
+function couponActive(){ return COUPON && COUPON.valid && (!COUPON.expiresAt || new Date(COUPON.expiresAt).getTime() > Date.now()); }
+function loadCoupon(){
+  if (!COUPON_CODE || COUPON_LOADING || !window.__npaCoupon) return;
+  COUPON_LOADING = true;
+  window.__npaCoupon({ code: COUPON_CODE, currency: chargeCode() })
+    .then(r => { COUPON = r && r.valid ? Object.assign({}, r) : { valid:false, reason:(r&&r.reason)||"error" }; COUPON_LOADING = false; if (document.getElementById("co")) coRender(); })
+    .catch(() => { COUPON = { valid:false, reason:"error" }; COUPON_LOADING = false; if (document.getElementById("co")) coRender(); });
+}
+function fmtLeft(ms){ if (ms <= 0) return "Expired"; const s = Math.floor(ms/1000), d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60), x = s%60; return d>0 ? `${d}d ${h}h ${m}m` : h>0 ? `${h}h ${m}m ${x}s` : `${m}m ${x}s`; }
+function startCouponCd(){
+  clearInterval(coCdTimer);
+  const upd = () => { const el = document.getElementById("co-cd"); if (!el){ clearInterval(coCdTimer); return; } const exp = el.dataset.exp; if (!exp){ el.textContent = "no time limit"; return; } const left = new Date(exp).getTime() - Date.now(); el.textContent = fmtLeft(left); if (left <= 0){ clearInterval(coCdTimer); COUPON = null; if (document.getElementById("co")) coRender(); } };
+  upd(); coCdTimer = setInterval(upd, 1000);
+}
+function couponBanner(coup){
+  const was = coup.baseCharge && coup.baseCharge > coup.charge ? `<span style="text-decoration:line-through;opacity:.6">${money(coup.baseCharge, coup.currency)}</span> ` : "";
+  return `<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:14px 16px;border-radius:14px;background:linear-gradient(90deg,#efe7fe,#f7f1ff);border:1px solid #e2d4fb">
+<b style="background:#7D2AE8;color:#fff;font-size:12px;font-weight:800;letter-spacing:.02em;padding:5px 11px;border-radius:999px">${esc(coup.badge || ("Code " + coup.code))}</b>
+<span class="small"><b>${esc(coup.code)}</b> applied — pay ${was}<b style="color:var(--ink)">${money(coup.charge, coup.currency)}</b> once, no instalments.</span>
+<span class="small" style="margin-left:auto;font-weight:700;color:#7D2AE8;white-space:nowrap">${I.lock ? "" : ""}⏳ Ends in <span id="co-cd" data-exp="${esc(coup.expiresAt || "")}">…</span></span></div>`;
+}
+function couponCard(coup){
+  const was = coup.baseCharge && coup.baseCharge > coup.charge ? `<span class="small muted" style="text-decoration:line-through;font-weight:500">${money(coup.baseCharge, coup.currency)}</span> ` : "";
+  return `<div class="choice on" style="cursor:default"><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">Full bootcamp, paid once</b><b style="font-size:20px;color:var(--ink)">${was}${money(coup.charge, coup.currency)}</b></span><span class="small">One payment today with <b>${esc(coup.code)}</b>. Nothing more to pay later — all 8 modules, 5 certifications and the capstone.</span></span></div>`;
+}
+
+P.checkout = (q) => { const c = coState();
+  if (q.coupon){ COUPON_CODE = String(q.coupon).toUpperCase().trim(); if (!COUPON || COUPON.code !== COUPON_CODE) COUPON = null; c.coupon = COUPON_CODE; c.plan = "early"; }
+  else { COUPON_CODE = null; COUPON = null; delete c.coupon; }
+  if (PLAN_PARAM[q.plan] && !q.coupon) c.plan = PLAN_PARAM[q.plan]; if (!c.step || c.step>3) c.step=1; coSave(c);
   return { title:"Checkout | Nerdy Pixels Academy", html:`<section class="section" style="padding-top:40px"><div class="wrap co"><div id="co" class="stack" style="gap:26px"></div><aside id="co-sum" class="summary" aria-label="Order summary"></aside></div></section>`, mount: coRender };};
 function coRender(){
-  const c = coState(), plan = coPlan(c), ct = country(c.country), open = earlyOpen();
-  const charged = chargeCode(), shown = CUR_CODE, today = dueToday(plan, shown), todayCharged = dueToday(plan, charged);
+  const c = coState();
+  if (c.coupon && !COUPON_CODE) COUPON_CODE = c.coupon;
+  if (COUPON_CODE && !COUPON && !COUPON_LOADING) loadCoupon();
+  const coup = couponActive() ? COUPON : null;
+  const ct = country(c.country), open = earlyOpen();
+  let plan = coup ? "early" : coPlan(c);
+  let charged = chargeCode(), shown = CUR_CODE, today = dueToday(plan, shown), todayCharged = dueToday(plan, charged);
+  if (coup){ charged = coup.currency; shown = coup.currency; today = coup.charge; todayCharged = coup.charge; }
   const localMethods = charged === "NGN" && ct.code === "NG" ? ct.methods : charged === ct.cur ? ct.methods : [["card","Card",`Visa or Mastercard, charged in ${curRow(charged).label}`]];
   const method = localMethods.find(m=>m[0]===c.method) ? c.method : localMethods[0][0];
   const chargeNote = charged !== shown ? `<p class="small note">Shown in ${esc(curRow(shown).label)}. You'll be charged <b>${money(todayCharged, charged)}</b> in ${esc(curRow(charged).label)} on the secure payment screen.</p>` : "";
   const steps = `<ol class="steps" aria-label="Checkout steps">${["Plan","Your details","Payment"].map((s,i)=>`<li class="${c.step===i+1?"on":c.step>i+1?"done":""}"${c.step===i+1?' aria-current="step"':""}><i>${c.step>i+1?"✓":i+1}</i>${s}</li>`).join("")}</ol>`;
   const v = PV(shown), m$ = n => money(n, shown);
   const choice = (id, title, price, lines, disabled, note) => `<button type="button" role="radio" aria-checked="${plan===id}" class="choice ${plan===id?"on":""}" data-act="co-plan" data-v="${id}"${disabled?" disabled":""}><span class="radio"></span><span class="stack" style="gap:4px;flex:1"><span class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)">${title}</b><b style="font-size:20px;color:var(--ink)">${price}</b></span>${lines}${note?`<span class="small" style="font-weight:700;color:var(--green-ink)">${note}</span>`:""}</span></button>`;
-  const plans = DEP()
+  const plans = coup ? couponCard(coup) : DEP()
     ? (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid in full now`, m$(v.early), `<span class="small">One payment today. Nothing more to pay later.</span>`, !open, open ? `Save ${m$(v.save)} · best value, one payment` : "Offer has closed") : "")
       + (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, reserve with a deposit`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_SHOWN()!==null?` · ${SEATS_SHOWN()} seats left`:""}` : "Offer has closed") : "")
       + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.monthly)} today (due by ${esc(startShort())}), then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "")
@@ -605,7 +643,7 @@ ${chargeNote}
 <div class="row"><button class="btn ghost" type="button" data-act="co-step" data-v="2">Back</button><button class="btn green" type="button" data-act="co-pay" style="flex:1">${I.lock("#06301A")} Pay ${money(todayCharged, charged)}</button></div>
 <p class="small muted">Payments are processed securely by our licensed payment partner, Flutterwave. We never see or store your card details or wallet PIN.</p>`;
   const sched = plan === "deposit_early" ? [["Today (deposit)", v.deposit], [`By ${BAL_DATE()}`, v.earlyBal]] : plan === "monthly" ? [[`Today (due by ${startShort()})`, v.monthly], ["1 December", v.monthly], ["1 January", v.monthly]] : null;
-  document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${steps}<div class="mobile-due"><span class="small">${esc(planName(plan))}, due today</span><b style="font-size:20px;color:var(--ink)">${m$(today)}</b></div>${body}`;
+  document.getElementById("co").innerHTML = `<a href="/courses/digital-marketing" style="font-weight:600;text-decoration:none">Back to the bootcamp</a>${coup ? couponBanner(coup) : (COUPON && !COUPON.valid ? `<div class="small" style="padding:11px 14px;border-radius:12px;background:#fff4d6;color:#7a5b00;margin:12px 0">That discount code isn't valid or has expired — showing standard prices.</div>` : "")}${steps}<div class="mobile-due"><span class="small">${esc(planName(plan))}, due today</span><b style="font-size:20px;color:var(--ink)">${m$(today)}</b></div>${body}`;
   document.getElementById("co-sum").innerHTML = `<h2 style="font-size:18px">Order summary</h2><div><b style="color:var(--ink)">${esc(cfg().courseTitle)}</b><div class="small muted">${esc(cfg().cohortName)} cohort, classes start ${esc(COHORT_START())}</div></div>
 <div class="sumrow" style="border-top:1px solid var(--line);padding-top:12px"><span>Plan</span><b style="color:var(--ink)">${esc(planName(plan))}</b></div>
 ${sched ? sched.map(r=>`<div class="sumrow"><span>${esc(r[0])}</span><span>${m$(r[1])}</span></div>`).join("") : ""}
@@ -613,6 +651,7 @@ ${sched ? sched.map(r=>`<div class="sumrow"><span>${esc(r[0])}</span><span>${m$(
 ${charged !== shown ? `<span class="small muted">Charged as ${money(todayCharged, charged)}</span>` : ""}
 <ul class="list small" style="border-top:1px solid var(--line);padding-top:12px">${check("8 modules and 8 portfolio pieces")}${check("5 industry certifications")}${check("Live classes Thursday to Sunday")}${check("Capstone hackathon")}</ul>
 <p class="small muted row" style="gap:8px">${I.lock()} Secure, encrypted checkout</p>`;
+  if (coup) startCouponCd(); else clearInterval(coCdTimer);
 }
 const moneyOf = (o) => o && o.cur && o.cur !== "NGN" && o.charge ? money(o.charge, o.cur) : naira(o.amount || 0);
 P.checkoutDone = () => { const o = sget("npa-last-order"); if (!o) return P.notFound();
@@ -916,13 +955,14 @@ document.addEventListener("click", e => {
   if (act === "co-step"){ c.step = Number(val); coSave(c); coRender(); window.scrollTo({top:0,behavior:"smooth"}); }
   if (act === "co-method"){ c.method = val; coSave(c); coRender(); }
   if (act === "co-pay"){
-    const ct = country(c.country), plan = coPlan(c), charged = chargeCode();
+    const coup = couponActive() ? COUPON : null;
+    const ct = country(c.country), plan = coup ? "early" : coPlan(c), charged = coup ? coup.currency : chargeCode();
     const methods = charged === "NGN" && ct.code === "NG" ? ct.methods : charged === ct.cur ? ct.methods : [["card","Card",""]];
     const m = methods.find(x=>x[0]===c.method) || methods[0];
     const btn = a; btn.disabled = true; const old = btn.innerHTML; btn.innerHTML = "Opening secure payment…";
-    const order = { plan, amount: dueToday(plan, "NGN"), charge: dueToday(plan, charged), cur: charged, country: ct.code, methodLabel: m[1], method: m[0], name: c.name, first: c.name.trim().split(" ")[0], email: c.email.trim(), phone: c.phone, persona: c.persona, source: c.source, referral: c.ref };
+    const order = { plan, amount: coup ? coup.amountNgn : dueToday(plan, "NGN"), charge: coup ? coup.charge : dueToday(plan, charged), cur: charged, coupon: coup ? coup.code : "", country: ct.code, methodLabel: m[1], method: m[0], name: c.name, first: c.name.trim().split(" ")[0], email: c.email.trim(), phone: c.phone, persona: c.persona, source: c.source, referral: c.ref };
     save("orders", order);
-    window.__npaPay({ kind:"enrolment", plan, currency: charged, name:c.name, email:c.email.trim(), phone:(ct.dial||"")+" "+(c.phone||""), country:ct.code, persona:c.persona, source:c.source, referral:c.ref, method:m[0] })
+    window.__npaPay({ kind:"enrolment", plan, currency: charged, name:c.name, email:c.email.trim(), phone:(ct.dial||"")+" "+(c.phone||""), country:ct.code, persona:c.persona, source:c.source, referral:c.ref, coupon: coup ? coup.code : undefined, method:m[0] })
       .then(r => { sset("npa-pending-order", order); track("add_payment_info", { plan, value: r.charge }); location.href = r.link; })
       .catch(err => { btn.disabled = false; btn.innerHTML = old; toast((err && err.message) || "We couldn't start the payment. Please try again."); });
   }
@@ -931,8 +971,8 @@ document.addEventListener("keydown", e => { if (e.key !== "Escape") return; clos
 document.addEventListener("change", e => {
   const t = e.target;
   if (t.classList && t.classList.contains("cur-sel")){ setCurrency(t.value, "manual"); try{ localStorage.setItem("npa_currency", t.value); }catch(err){} track("currency_change", { new_currency: t.value });
-    if (document.getElementById("co")) coRender(); else if (document.querySelector('form[data-form="instalment"]')) render(true); else applyCurrency(); applyCurrency(); return; }
-  if (t.id === "co-country"){ const c = coState(); c.country = t.value; c.method = null; coSave(c); if (CUR_HOW !== "manual") setCurrency(t.value === "XX" ? autoCurrency("US") : autoCurrency(t.value), "auto"); coRender(); applyCurrency(); }
+    if (document.getElementById("co")){ COUPON = null; coRender(); } else if (document.querySelector('form[data-form="instalment"]')) render(true); else applyCurrency(); applyCurrency(); return; }
+  if (t.id === "co-country"){ const c = coState(); c.country = t.value; c.method = null; coSave(c); if (CUR_HOW !== "manual") setCurrency(t.value === "XX" ? autoCurrency("US") : autoCurrency(t.value), "auto"); COUPON = null; coRender(); applyCurrency(); }
   if (t.dataset && t.dataset.dialTarget){ const el = document.getElementById(t.dataset.dialTarget); if (el) el.textContent = country(t.value).dial; }
 });
 document.addEventListener("toggle", e => { const d = e.target; if (d.tagName === "DETAILS" && d.open) track("faq_open", { question: (d.querySelector("summary")||{}).textContent?.trim().slice(0, 60) }); }, true);

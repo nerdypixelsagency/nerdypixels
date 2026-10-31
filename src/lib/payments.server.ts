@@ -114,6 +114,10 @@ export async function confirmPayment(transactionId: string, txRef: string) {
     .select("*")
     .maybeSingle();
   if (updated) {
+    // Count a coupon use only once the sale is verified paid.
+    if ((updated as { coupon_code?: string | null }).coupon_code) {
+      await db.rpc("increment_coupon", { p_code: (updated as { coupon_code: string }).coupon_code }).then(() => undefined, (e) => console.error("[coupon:increment]", e));
+    }
     // A monthly-deposit student who paid the early-bird balance moves to the early-bird plan.
     if (updated.kind === "instalment" && updated.instalment_month === "Balance" && updated.plan === "deposit_early") {
       await db.from("enrolments").update({ plan: "deposit_early" }).eq("email", updated.email).eq("kind", "enrolment").eq("status", "paid").eq("mode", updated.mode).eq("plan", "deposit_monthly");

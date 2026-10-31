@@ -14,6 +14,7 @@ export const PERMS = [
   ["content", "Site content builder"],
   ["media", "Media & syllabus"],
   ["nerdx_waitlist", "NerdX SEO waitlist"],
+  ["coupons", "Coupons & paylinks"],
   ["preview", "View as student"],
 ] as const;
 export type Perm = (typeof PERMS)[number][0];
@@ -21,9 +22,9 @@ export type Perm = (typeof PERMS)[number][0];
 export const PRESETS: Record<string, { label: string; perms: Perm[] | null; help: string }> = {
   full: { label: "Full admin", perms: null, help: "Every page except Admins and Settings." },
   editor: { label: "Content editor", perms: ["content", "media"], help: "Edits the website, testimonials, media and syllabus." },
-  finance: { label: "Finance", perms: ["dashboard", "enrolments", "instalments", "commissions", "currencies"], help: "Payments, instalments, commissions and prices." },
+  finance: { label: "Finance", perms: ["dashboard", "enrolments", "instalments", "commissions", "currencies", "coupons"], help: "Payments, instalments, commissions, prices and coupons." },
   support: { label: "Student support", perms: ["enrolments", "leads", "emails", "instalments", "preview"], help: "Answers students and leads, sends emails and reminders." },
-  marketing: { label: "Marketing", perms: ["dashboard", "leads", "emails", "referrals", "nerdx_waitlist", "content", "media"], help: "Leads, email campaigns, ambassadors and site content." },
+  marketing: { label: "Marketing", perms: ["dashboard", "leads", "emails", "referrals", "nerdx_waitlist", "coupons", "content", "media"], help: "Leads, email campaigns, ambassadors, coupons and site content." },
   viewer: { label: "Viewer", perms: ["dashboard"], help: "Sees the dashboard statistics only." },
 };
 
