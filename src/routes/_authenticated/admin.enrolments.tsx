@@ -54,7 +54,7 @@ function Enrolments() {
                 <td>{new Date(r.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</td>
                 <td><Link to="/admin/enrolment/$id" params={{ id: r.id }} style={{ color: "#6420c9", fontWeight: 700 }}>{r.name}</Link>{r.source_type === "manual" && <><br /><span className="adm-chip" style={{ fontSize: 11 }}>manual</span></>}</td>
                 <td>{r.email}<br /><span style={{ color: "#6b6280" }}>{r.phone}</span></td>
-                <td>{r.kind === "event" ? "Free event" : r.kind === "instalment" ? `${r.instalment_month} instalment` : r.plan === "early" ? "Early bird" : "Monthly plan"}</td>
+                <td>{r.kind === "event" ? "Free event" : r.kind === "instalment" ? `${r.instalment_month} instalment` : r.plan === "early" ? "Early bird" : r.plan === "full" ? "Paid in full" : "Monthly plan"}</td>
                 <td>{PERSONAS[r.persona ?? ""] ?? "—"}</td>
                 <td>{r.referral_code ?? "—"}</td>
                 <td className="num money">{r.amount ? naira(r.amount) : "—"}</td>
