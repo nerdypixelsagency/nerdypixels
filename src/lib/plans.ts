@@ -1,7 +1,7 @@
 // Payment plans and schedules, shared by checkout, reminders, the student area and admin.
 // Legacy plans ("early", "monthly") stay valid for students who enrolled before deposits.
 
-export const PLAN_IDS = ["early", "monthly", "deposit_early", "deposit_monthly"] as const;
+export const PLAN_IDS = ["early", "monthly", "deposit_early", "deposit_monthly", "full"] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 export const INSTALMENT_KEYS = ["Balance", "December", "January"] as const;
 export type InstalmentKey = (typeof INSTALMENT_KEYS)[number];
@@ -33,6 +33,9 @@ export function scheduleFor(plan: string | null | undefined, p: Pricing): Schedu
   switch (plan) {
     case "early":
       return [{ key: "Full", label: "Early bird, paid in full", amount: p.early, due: null }];
+    case "full":
+      // Outright, non-discounted: the whole programme (monthly total) paid once.
+      return [{ key: "Full", label: "Paid in full", amount: p.monthly * p.count, due: null }];
     case "deposit_early":
       return [
         { key: "Deposit", label: "Seat deposit", amount: p.deposit, due: null },
@@ -62,6 +65,7 @@ export function unpaidItems(plan: string | null | undefined, paid: Set<string>, 
 export function planLabel(plan: string | null | undefined) {
   switch (plan) {
     case "early": return "Early bird, paid in full";
+    case "full": return "Paid in full";
     case "deposit_early": return "Early bird with deposit";
     case "deposit_monthly": return "Monthly plan with deposit";
     case "monthly": return "Monthly plan";

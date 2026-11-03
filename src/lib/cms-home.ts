@@ -28,7 +28,7 @@ export const HOME_DEFAULTS = {
     accent: "AI-powered digital marketer.",
     lead: "A live, practical bootcamp taught by marketers who do the work every day. Learn SEO, ads, social and analytics, and the AI tools that make you faster. Eight modules, five certifications and a real brand project for your portfolio.",
     secondary: "Not ready? Join the free class first →",
-    trust: [{ text: "Fully refundable for 7 days" }, { text: "{deposit} counts toward your fee" }, { text: "Pay from anywhere in the world" }],
+    trust: [{ text: "Fully refundable for 7 days" }, { text: "Pay monthly or in full" }, { text: "Pay from anywhere in the world" }],
     image: "/brand/photos/hero-neon-1920.webp",
   },
   logos: { show: true, label: "Our alumni have worked at" },
@@ -36,7 +36,7 @@ export const HOME_DEFAULTS = {
     show: true,
     items: [
       { value: "1,000+", label: "alumni in our network", live: "" },
-      { value: "{seatsLeft}", label: "early-bird seats left", live: "seats_left" },
+      { value: "{seatsLeft}", label: "seats left", live: "seats_left" },
       { value: "", label: "days until classes start", live: "days_to_start" },
       { value: "5", label: "certifications each", live: "" },
     ],
@@ -143,10 +143,10 @@ export const HOME_DEFAULTS = {
   pricing: {
     show: true,
     eyebrow: "Pricing",
-    title: "Pay in full, or reserve your seat with {deposit}.",
-    lead: "Pay {early} once and you are done, or reserve your seat with {deposit} today and pay the {earlyBalance} balance by {balanceDue}. Prefer to spread it? The monthly plan is {monthly} a month, with no deposit.",
-    guaranteeTitle: "7-day money-back guarantee on your deposit",
-    guarantee: "Change your mind within 7 days of paying and we refund your {deposit} in full. After that, you can move it once to the following cohort.",
+    title: "Flexible monthly plan, or pay in full.",
+    lead: "The bootcamp is {monthly} a month ({monthlyTotal} in total): pay {monthly} when you enroll, then {monthly} on 1 December and 1 January. Prefer to pay once? You can choose pay-in-full at checkout.",
+    guaranteeTitle: "7-day money-back guarantee",
+    guarantee: "Change your mind within 7 days of your first payment and we refund it in full. After that, you can move your place once to the following cohort.",
   },
   inside: {
     show: true,
@@ -162,7 +162,7 @@ export const HOME_DEFAULTS = {
   },
   faq: {
     show: true,
-    title: "Questions people ask before they reserve",
+    title: "Questions people ask before they enroll",
     items: [
       { q: "I am a complete beginner. Can I keep up?", a: "Yes. Every module starts from the fundamentals and builds up to practical work, so you do not need any marketing experience. Instructors answer questions live in every class." },
       { q: "What if I miss a live class?", a: "Every live class is recorded and the replay is shared with the cohort, so you can catch up the same week." },

@@ -17,7 +17,7 @@ const M: Record<string, Meta> = {
   "/courses/digital-marketing": {
     title: "Professional Digital Marketing Bootcamp | Nerdy Pixels Academy",
     description:
-      "12-week live digital marketing bootcamp: SEO, social media, paid ads, analytics and content. ₦60,000 early bird or ₦40,000 monthly. Certified, with a portfolio.",
+      "12-week live digital marketing bootcamp: SEO, social media, paid ads, analytics and content. ₦40,000 a month, or pay in full. Certified, with a portfolio.",
     type: "product",
   },
   "/curriculum": {
@@ -40,7 +40,7 @@ const M: Record<string, Meta> = {
     title: "Contact Nerdy Pixels Academy",
     description: "Questions about the bootcamp, payments or your student profile? Message Nerdy Pixels Academy on WhatsApp or email info@npdacademy.com.",
   },
-  "/payment-policy": { title: "Payment Policy | Nerdy Pixels Academy", description: "How payments, instalments, refunds and early-bird pricing work at Nerdy Pixels Academy." },
+  "/payment-policy": { title: "Payment Policy | Nerdy Pixels Academy", description: "How payments, instalments and refunds work at Nerdy Pixels Academy." },
   "/privacy": { title: "Privacy Policy | Nerdy Pixels Academy", description: "How Nerdy Pixels Academy collects, uses and protects your personal information." },
   "/terms": { title: "Terms of Service | Nerdy Pixels Academy", description: "The terms that apply when you use the Nerdy Pixels Academy website and enroll in a programme." },
   "/checkout": { title: "Enrol: Checkout | Nerdy Pixels Academy", description: "Secure your seat in the Digital Marketing Bootcamp.", noindex: true },
@@ -55,7 +55,7 @@ export function metaFor(path: string): Meta {
 
 const FAQ = [
   ["When does the next cohort start?", "Classes start on Thursday 5 November 2026 and run live online."],
-  ["How much does the bootcamp cost?", "₦60,000 when you pay once before 10 October 2026 (early bird), or ₦40,000 per month in equal monthly instalments due on the 1st of every month."],
+  ["How much does the bootcamp cost?", "₦40,000 per month in equal monthly instalments due on the 1st of every month, or pay ₦120,000 once at checkout."],
   ["Do I get certified?", "Yes. You work towards five industry certifications and build eight portfolio projects."],
   ["Can I use a referral code?", "Yes. Enter your ambassador's referral code at checkout and it is attached to your payment and receipt."],
 ];

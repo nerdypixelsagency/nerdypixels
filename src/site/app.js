@@ -192,7 +192,7 @@ const FAQS = () => [
    ["How does the monthly plan work?",`There's no deposit. You pay ${naira(PRICE_MONTH())} by ${startShort()}, then ${naira(PRICE_MONTH())} on 1 December and 1 January: ${naira(PRICE_MONTH()*cfg().instalmentCount)} in total. We email a reminder before each date.`],
    ["Is the deposit refundable?",`Yes. Ask within 7 days of paying, and no later than ${BAL_DATE()}, for a full refund. After that you can move it once to the following cohort.`],
   ] : [
-   ["What does it cost?",`The early-bird price is ${naira(PRICE_EARLY())} paid once, until ${EARLY_DATE()}. After that, the bootcamp is ${naira(PRICE_MONTH())} a month for ${cfg().instalmentCount} months.`],
+   ["What does it cost?",`The bootcamp is ${naira(PRICE_MONTH())} a month (${naira(PRICE_MONTH()*cfg().instalmentCount)} in total): you pay ${naira(PRICE_MONTH())} when you enroll, then ${naira(PRICE_MONTH())} on 1 December and 1 January. Prefer to pay once? You can pay the full ${naira(PRICE_MONTH()*cfg().instalmentCount)} at checkout.`],
    ["How does the monthly plan work?",`You pay the first instalment of ${naira(PRICE_MONTH())} when you enroll. The December and January instalments are ${naira(PRICE_MONTH())} each, payable on the 1st of the month. We email a reminder before each date.`],
   ]),
   ["Can I pay from outside Nigeria?","Yes. Prices show in your local currency where we can, and you can pay with any Visa or Mastercard from anywhere in the world. You see the exact amount before you confirm."],
@@ -332,6 +332,7 @@ ${open?`<div class="plan-ctas"><a class="btn green block" href="/checkout?plan=e
     : `<article class="plan${open?"":" best"}"><div class="stack" style="gap:6px"><h3>Monthly plan</h3><p class="muted small">${cfg().instalmentCount} equal payments.</p></div><div class="total">${P$("monthly")}<small>a month</small></div><a class="btn block" href="/checkout?plan=monthly" data-ga-enrol="pricing"><span>Start with ${P$("monthly")}</span></a></article>`;
   return `<div class="cur-row"><span>Showing prices in</span>${curSelect()}<span class="muted" data-cur-note></span></div>
 <div class="plans">${eb?early:""}${monthly}</div>
+${!open&&!DEP()?`<p class="small muted" style="text-align:center;margin-top:2px">Prefer to pay once? You can choose <b>pay in full (${P$("monthlyTotal")})</b> at checkout.</p>`:""}
 <p class="small muted charge-note" data-charge-note hidden></p>
 ${DEP()?`<div class="guarantee">${svg("shield")}<div><b>${T(H.guaranteeTitle)}</b>${T(H.guarantee)}</div></div>`:""}
 <div class="paybox"><div class="globe">${svg("globe")}</div><div><b style="color:var(--ink)">Pay from anywhere in the world</b><p class="small muted">Join live classes from anywhere in the world. <span id="payText">Pay in naira by bank transfer, USSD or card, or use any international Visa or Mastercard.</span></p><div class="methods" id="payMethods"></div></div></div>
@@ -552,8 +553,8 @@ P.eventDone = () => { const r = lastOf("events"); const f = FREE(), cta = CTA();
 </div></div></section>`};};
 
 /* ---------- Checkout ---------- */
-const PLAN_PARAM = { "deposit-early":"deposit_early", "deposit-monthly":"deposit_monthly", deposit_early:"deposit_early", deposit_monthly:"deposit_monthly", early:"early", monthly:"monthly" };
-function planName(p){ return { early:"Early bird, paid in full", monthly:"Monthly plan", deposit_early:`${cfg().offerLabel} with deposit`, deposit_monthly:"Monthly plan with deposit" }[p] || "Monthly plan"; }
+const PLAN_PARAM = { "deposit-early":"deposit_early", "deposit-monthly":"deposit_monthly", deposit_early:"deposit_early", deposit_monthly:"deposit_monthly", early:"early", monthly:"monthly", full:"full" };
+function planName(p){ return { early:"Early bird, paid in full", full:"Pay in full", monthly:"Monthly plan", deposit_early:`${cfg().offerLabel} with deposit`, deposit_monthly:"Monthly plan with deposit" }[p] || "Monthly plan"; }
 function coState(){ const c = sget("npa-co") || { step:1, country:"NG", plan:null, method:null, name:"", email:"", phone:"", persona:"", source:"", ref:"", agree:false }; if (!c.ref){ try{ const r = localStorage.getItem("npa-ref"); if (r){ c.ref = r; sset("npa-co", c); } }catch(e){} } return c; }
 function coSave(c){ sset("npa-co", c); }
 function coPlan(c){
@@ -565,7 +566,7 @@ function coPlan(c){
   return p;
 }
 /** Today's amount for a plan, in a given currency. */
-function dueToday(plan, code){ const v = PV(code); return plan === "early" ? v.early : plan === "monthly" ? v.monthly : v.deposit; }
+function dueToday(plan, code){ const v = PV(code); return plan === "early" ? v.early : plan === "full" ? v.monthlyTotal : plan === "monthly" ? v.monthly : v.deposit; }
 
 /* ---- Coupon paylinks: a valid coupon forces an outright, discounted price. ---- */
 let COUPON = null, COUPON_CODE = null, COUPON_LOADING = false, coCdTimer = null;
@@ -619,8 +620,10 @@ function coRender(){
     ? (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid in full now`, m$(v.early), `<span class="small">One payment today. Nothing more to pay later.</span>`, !open, open ? `Save ${m$(v.save)} · best value, one payment` : "Offer has closed") : "")
       + (cfg().earlyBirdEnabled ? choice("deposit_early", `${esc(cfg().offerLabel)}, reserve with a deposit`, `${m$(v.early)} <span class="small muted" style="font-weight:500">total</span>`, `<span class="small">${m$(v.deposit)} today, then ${m$(v.earlyBal)} by ${esc(BAL_DATE())}.</span>`, !open, open ? `Save ${m$(v.save)}${SEATS_SHOWN()!==null?` · ${SEATS_SHOWN()} seats left`:""}` : "Offer has closed") : "")
       + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.monthly)} today (due by ${esc(startShort())}), then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "")
-    : (cfg().earlyBirdEnabled ? choice("early", `${esc(cfg().offerLabel)}, paid once`, m$(v.early), `<span class="small">${esc(cfg().outrightCopy)}</span>`, !open, open ? "Available now" : "Offer has closed") : "")
-      + choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${esc(cfg().instalmentCopy)} ${m$(v.monthlyTotal)} in total.</span>`, false, "");
+    : choice("monthly", "Monthly plan", `${m$(v.monthly)} <span class="small muted" style="font-weight:500">a month</span>`, `<span class="small">${m$(v.monthly)} today (due by ${esc(startShort())}), then ${m$(v.monthly)} on 1 December and 1 January. ${m$(v.monthlyTotal)} in total.</span>`, false, "Flexible, pay as you go")
+      + (cfg().earlyBirdEnabled && open
+          ? choice("early", `${esc(cfg().offerLabel)}, paid once`, m$(v.early), `<span class="small">${esc(cfg().outrightCopy)}</span>`, false, `Save ${m$(v.save)}`)
+          : choice("full", "Pay in full", m$(v.monthlyTotal), `<span class="small">One payment today. Nothing more to pay later.</span>`, false, ""));
   let body = "";
   if (c.step===1) body = `<h1 style="font-size:clamp(26px,3vw,34px)">Choose your plan</h1>
 <div class="grid g2"><label class="f">Where are you paying from?<select id="co-country">${countryOptions(ct.code)}</select></label><label class="f">Show prices in${curSelect()}</label></div>${chargeNote}
@@ -781,7 +784,9 @@ P.payment = () => { const d = cfg().depositAmount, e = PRICE_EARLY(), m = PRICE_
    ? [`Seat deposit: ${naira(d)}, paid when you enroll. It counts toward your fee.`,
       `${cfg().offerLabel}: ${naira(e)} in total (the deposit, then ${naira(e-d)} by ${BAL_DATE()}), available until ${EARLY_DATE()}${cfg().seatLimit?" or until early-bird seats run out":""}.`,
       `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total, with no deposit. The first ${naira(m)} is due by ${startShort()}, then ${naira(m)} on 1 December and 1 January.`]
-   : [`Early bird: ${naira(e)}, paid once, available until ${EARLY_DATE()}.`, `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total.`]],
+   : [...(earlyOpen() ? [`Early bird: ${naira(e)}, paid once, available until ${EARLY_DATE()}.`] : []),
+      `Monthly plan: ${naira(m)} a month for ${n} months, ${naira(m*n)} in total. The first ${naira(m)} is due when you enroll, then ${naira(m)} on 1 December and 1 January.`,
+      `Pay in full: ${naira(m*n)} once, if you prefer a single payment at checkout.`]],
  ["Paying from outside Nigeria",["You can pay from anywhere in the world. Prices shown in other currencies are fixed by us, not live exchange rates. Where we can't charge your currency directly, you pay by Visa or Mastercard in US dollars, and the exact amount is shown before you confirm. Your bank may charge its own fees."]],
  ["Instalments and reminders",[`We email a payment link before each due date${DEP()?`, starting with the balance due ${BAL_DATE()}`:""}. December and January instalments are due on the 1st of the month.`,"If a payment is more than seven days late, we may pause your access to live classes until it is paid. Talk to us early if you are having difficulty paying."]],
  ["Refunds", DEP()
